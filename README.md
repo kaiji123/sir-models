@@ -1,5 +1,5 @@
 # Diagram to R
-
+Demo: compartmodels.com
 Draw a compartmental epidemic model (SIR, SEIR, vector-borne, …) as a box-and-arrow diagram and get
 ready-to-run **R / deSolve** code. Generation is **deterministic**: the same diagram always produces
 byte-identical R code (no timestamps, no randomness; order comes only from the model's lists).
