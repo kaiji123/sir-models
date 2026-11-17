@@ -1,0 +1,179 @@
+{
+  "version": 1,
+  "id": "scabies_mda",
+  "category": "Water, enteric & NTDs",
+  "name": "Scabies SIS with egg-stage reinfection and two-dose ivermectin MDA",
+  "description": "Scabies (Sarcoptes scabiei).\nParameter values: 0 of 9 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Lydeamore MJ, Campbell PT, Regan DG, Tong SYC, Andrews RM, Steer AC, Romani L, Kaldor JM, McVernon J, McCaw JM. A biological model of scabies infection dynamics and treatment informs mass drug administration strategies to increase the likelihood of…",
+  "referenceUrl": "https://doi.org/10.1016/j.mbs.2018.08.007",
+  "time": {
+    "start": "0",
+    "stop": "3",
+    "step": "0.005",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "solver": {
+    "hmax": "0.005"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "uninfested",
+      "init": "0.7*N0",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "I",
+      "description": "infested (active mites)",
+      "init": "0.3*N0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Ie",
+      "description": "post-treatment carriage of surviving eggs, which re-hatch unless a second dose is given",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 140
+    }
+  ],
+  "parameters": [
+    {
+      "name": "R0_sc",
+      "symbol": "",
+      "value": "1.5",
+      "description": "R0 [I]"
+    },
+    {
+      "name": "dur_sc",
+      "symbol": "",
+      "value": "365",
+      "description": "untreated infestation duration, chronic [I] (day)"
+    },
+    {
+      "name": "hatch",
+      "symbol": "",
+      "value": "1/7",
+      "description": "egg hatch/maturation back to active infestation (ivermectin is not ovicidal) [M] (day^-1)"
+    },
+    {
+      "name": "cover_s",
+      "symbol": "",
+      "value": "0.85",
+      "description": "MDA coverage [I]"
+    },
+    {
+      "name": "eff_s",
+      "symbol": "",
+      "value": "0.95",
+      "description": "ivermectin kill of active mites [I]"
+    },
+    {
+      "name": "t1",
+      "symbol": "",
+      "value": "100",
+      "description": "first MDA dose [I] (day)"
+    },
+    {
+      "name": "t2",
+      "symbol": "",
+      "value": "110",
+      "description": "second dose, 7–14 days later [M on interval] (day)"
+    },
+    {
+      "name": "win_s",
+      "symbol": "",
+      "value": "1",
+      "description": "pulse width [I] (day)"
+    },
+    {
+      "name": "N0",
+      "symbol": "",
+      "value": "100000",
+      "description": "total initial population [illustrative default]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "b_sc",
+      "symbol": "",
+      "expr": "R0_sc/dur_sc",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "dose_on",
+      "symbol": "",
+      "expr": "ifelse((t >= t1 & t < t1 + win_s) | (t >= t2 & t < t2 + win_s), 1, 0)",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "mda_k",
+      "symbol": "",
+      "expr": "dose_on*(-log(1 - cover_s*eff_s)/win_s)",
+      "description": "",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "b_sc*I/N",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c2",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "1/dur_sc",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "mda_k",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c3",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "hatch",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f5",
+      "from": "c3",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "mda_k",
+      "output": "",
+      "curve": 60
+    }
+  ]
+}

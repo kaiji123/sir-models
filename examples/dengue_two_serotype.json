@@ -1,0 +1,459 @@
+{
+  "version": 1,
+  "id": "dengue_two_serotype",
+  "category": "Vector-borne",
+  "name": "Two-serotype dengue with secondary infection (after Esteva & Vargas 2003) [ILLUSTRATIVE-COMPOSITE]",
+  "description": "Dengue (DENV, two co-circulating serotypes), tropical urban settings.\nParameter values: 0 of 8 checked against the source; the rest are recalled or illustrative.",
+  "reference": "",
+  "referenceUrl": "",
+  "time": {
+    "start": "0",
+    "stop": "3650",
+    "step": "5",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Sh",
+      "description": "susceptible to both serotypes",
+      "init": "9989",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 220
+    },
+    {
+      "id": "c2",
+      "name": "I1",
+      "description": "primary infection with serotype 1",
+      "init": "10",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "I2",
+      "description": "primary infection with serotype 2",
+      "init": "1",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 300
+    },
+    {
+      "id": "c4",
+      "name": "R1",
+      "description": "recovered from serotype 1, susceptible to serotype 2",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c5",
+      "name": "R2",
+      "description": "recovered from serotype 2, susceptible to serotype 1",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 520,
+      "y": 300
+    },
+    {
+      "id": "c6",
+      "name": "I12",
+      "description": "secondary infection with serotype 2 after serotype 1",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 720,
+      "y": 140
+    },
+    {
+      "id": "c7",
+      "name": "I21",
+      "description": "secondary infection with serotype 1 after serotype 2",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 720,
+      "y": 300
+    },
+    {
+      "id": "c8",
+      "name": "Rh",
+      "description": "immune to both",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 920,
+      "y": 220
+    },
+    {
+      "id": "c9",
+      "name": "Sv",
+      "description": "susceptible mosquitoes",
+      "init": "20000",
+      "inN": false,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 596
+    },
+    {
+      "id": "c10",
+      "name": "Iv1",
+      "description": "mosquitoes infectious with serotype 1",
+      "init": "0",
+      "inN": false,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 516
+    },
+    {
+      "id": "c11",
+      "name": "Iv2",
+      "description": "mosquitoes infectious with serotype 2",
+      "init": "0",
+      "inN": false,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 676
+    }
+  ],
+  "parameters": [
+    {
+      "name": "a_bite",
+      "symbol": "",
+      "value": "0.5",
+      "description": "biting rate (1/day)"
+    },
+    {
+      "name": "p_vh",
+      "symbol": "",
+      "value": "0.5",
+      "description": "mosquito → human per-bite transmission probability"
+    },
+    {
+      "name": "p_hv",
+      "symbol": "",
+      "value": "0.5",
+      "description": "human → mosquito per-bite transmission probability"
+    },
+    {
+      "name": "gam_h",
+      "symbol": "",
+      "value": "0.1429",
+      "description": "recovery rate (7-day viraemia) (1/day)"
+    },
+    {
+      "name": "mu_h",
+      "symbol": "",
+      "value": "4.2e-5",
+      "description": "human birth/death rate (65-year life) (1/day)"
+    },
+    {
+      "name": "mu_v",
+      "symbol": "",
+      "value": "0.0714",
+      "description": "mosquito death rate (14-day life) (1/day)"
+    },
+    {
+      "name": "A_v",
+      "symbol": "",
+      "value": "1428",
+      "description": "mosquito recruitment, = mu_v × 20000 (mosquitoes/day)"
+    },
+    {
+      "name": "x_sec",
+      "symbol": "",
+      "value": "1.0",
+      "description": "susceptibility of R1/R2 to the heterologous serotype relative to Sh. Esteva & Vargas's enhancement factor; values >1 model ADE."
+    }
+  ],
+  "variables": [
+    {
+      "name": "Nh",
+      "symbol": "",
+      "expr": "Sh + I1 + I2 + R1 + R2 + I12 + I21 + Rh",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "Nv",
+      "symbol": "",
+      "expr": "Sv + Iv1 + Iv2",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "lam1",
+      "symbol": "",
+      "expr": "a_bite*p_vh*Iv1/Nh",
+      "description": "human force of infection, serotype 1",
+      "output": false
+    },
+    {
+      "name": "lam2",
+      "symbol": "",
+      "expr": "a_bite*p_vh*Iv2/Nh",
+      "description": "human force of infection, serotype 2",
+      "output": false
+    },
+    {
+      "name": "lamv1",
+      "symbol": "",
+      "expr": "a_bite*p_hv*(I1 + I21)/Nh",
+      "description": "mosquito force of infection, serotype 1",
+      "output": false
+    },
+    {
+      "name": "lamv2",
+      "symbol": "",
+      "expr": "a_bite*p_hv*(I2 + I12)/Nh",
+      "description": "mosquito force of infection, serotype 2",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "mu_h*Nh",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 90
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lam1",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "lam2",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c2",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "gam_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c3",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "gam_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c4",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "x_sec*lam2",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": "c5",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "x_sec*lam1",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c6",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "gam_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f9",
+      "from": "c7",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "gam_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f10",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_h",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 350
+    },
+    {
+      "id": "f11",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_h",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 270
+    },
+    {
+      "id": "f12",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_h",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 430
+    },
+    {
+      "id": "f13",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_h",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 270
+    },
+    {
+      "id": "f14",
+      "from": "c5",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_h",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 430
+    },
+    {
+      "id": "f15",
+      "from": "c6",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_h",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 270
+    },
+    {
+      "id": "f16",
+      "from": "c7",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_h",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 430
+    },
+    {
+      "id": "f17",
+      "from": "c8",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_h",
+      "output": "",
+      "curve": 0,
+      "ox": 920,
+      "oy": 350
+    },
+    {
+      "id": "f18",
+      "from": null,
+      "to": "c9",
+      "kind": "absolute",
+      "rate": "A_v",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 466
+    },
+    {
+      "id": "f19",
+      "from": "c9",
+      "to": "c10",
+      "kind": "per_capita",
+      "rate": "lamv1",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f20",
+      "from": "c9",
+      "to": "c11",
+      "kind": "per_capita",
+      "rate": "lamv2",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f21",
+      "from": "c9",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_v",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 726
+    },
+    {
+      "id": "f22",
+      "from": "c10",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_v",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 646
+    },
+    {
+      "id": "f23",
+      "from": "c11",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_v",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 806
+    }
+  ]
+}

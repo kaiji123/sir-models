@@ -1,0 +1,360 @@
+{
+  "version": 1,
+  "id": "rabies_dog_human_vaccination",
+  "category": "Zoonoses & emerging",
+  "name": "Dog rabies with mass vaccination and dog-to-human transmission",
+  "description": "Rabies, domestic dogs → humans, urban African setting (N'Djaména, Chad).\nTransmission is density-dependent with an explicit area term — beta_d has units km²·dog⁻¹·week⁻¹, so the per-capita hazard is beta_d Id / area.\nParameter values: 0 of 15 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Zinsstag J, Dürr S, Penny MA, Mindekem R, Roth F, Menendez Gonzalez S, Naissengar S, Hattendorf J (2009). Transmission dynamics and economics of rabies control in dogs and humans in an African city. PNAS 106(35):14996–15001",
+  "referenceUrl": "https://doi.org/10.1073/pnas.0904740106",
+  "time": {
+    "start": "0",
+    "stop": "520",
+    "step": "1",
+    "unit": "weeks"
+  },
+  "population": {
+    "name": "N_total"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Sd",
+      "description": "susceptible dogs",
+      "init": "23000",
+      "inN": false,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 220
+    },
+    {
+      "id": "c2",
+      "name": "Ed",
+      "description": "incubating (exposed) dogs",
+      "init": "10",
+      "inN": false,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Id",
+      "description": "rabid, infectious dogs",
+      "init": "2",
+      "inN": false,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 220
+    },
+    {
+      "id": "c4",
+      "name": "Vd",
+      "description": "vaccinated, immune dogs",
+      "init": "0",
+      "inN": false,
+      "color": "#2457C5",
+      "x": 320,
+      "y": 300
+    },
+    {
+      "id": "c5",
+      "name": "Sh",
+      "description": "susceptible humans",
+      "init": "6e5",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 516
+    },
+    {
+      "id": "c6",
+      "name": "Eh",
+      "description": "exposed humans (bitten, incubating)",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 516
+    },
+    {
+      "id": "c7",
+      "name": "Ih",
+      "description": "humans with clinical rabies",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 516
+    },
+    {
+      "id": "c8",
+      "name": "Dh",
+      "description": "cumulative human rabies deaths",
+      "init": "0",
+      "inN": false,
+      "color": "#111111",
+      "x": 720,
+      "y": 516
+    },
+    {
+      "id": "c9",
+      "name": "Dd",
+      "description": "cumulative rabid-dog deaths (for fitting to weekly rabid-dog reports)",
+      "init": "0",
+      "inN": false,
+      "color": "#111111",
+      "x": 720,
+      "y": 220
+    }
+  ],
+  "parameters": [
+    {
+      "name": "beta_d",
+      "symbol": "",
+      "value": "0.0807",
+      "description": "dog-to-dog transmission rate [verified] (estimated by the authors) (km² per dog per week)"
+    },
+    {
+      "name": "beta_dh",
+      "symbol": "",
+      "value": "0.0002",
+      "description": "dog-to-human transmission rate [verified] (km² per dog per week)"
+    },
+    {
+      "name": "area",
+      "symbol": "",
+      "value": "100",
+      "description": "area of the study city, converting counts to densities [illustrative] (km²)"
+    },
+    {
+      "name": "sigma_d",
+      "symbol": "",
+      "value": "1/3.1",
+      "description": "rate of leaving dog incubation (≈22 d mean incubation) [illustrative] (per week)"
+    },
+    {
+      "name": "mu_d",
+      "symbol": "",
+      "value": "1/0.6",
+      "description": "rabies-induced death rate of rabid dogs (≈4 d survival); the sensitivity analysis identifies this as one of the three most influential parameters [verified as i"
+    },
+    {
+      "name": "rd",
+      "symbol": "",
+      "value": "0.49",
+      "description": "probability that an exposed dog develops clinical rabies; also identified as highly influential [verified as influential; value illustrative] (dimensionless)"
+    },
+    {
+      "name": "bd",
+      "symbol": "",
+      "value": "0.0052",
+      "description": "dog birth rate [illustrative] (per week)"
+    },
+    {
+      "name": "md",
+      "symbol": "",
+      "value": "0.0048",
+      "description": "dog non-rabies death rate [illustrative] (per week)"
+    },
+    {
+      "name": "nu_d",
+      "symbol": "",
+      "value": "0",
+      "description": "dog vaccination rate (campaign lever) [illustrative] (per week)"
+    },
+    {
+      "name": "wane_d",
+      "symbol": "",
+      "value": "1/52",
+      "description": "waning of dog vaccine immunity + turnover of vaccinated dogs [illustrative] (per week)"
+    },
+    {
+      "name": "cull_d",
+      "symbol": "",
+      "value": "0",
+      "description": "dog culling rate (alternative control the authors simulate) [illustrative] (per week)"
+    },
+    {
+      "name": "rh",
+      "symbol": "",
+      "value": "0.19",
+      "description": "probability a bitten human develops rabies absent prophylaxis [illustrative] (dimensionless)"
+    },
+    {
+      "name": "pep",
+      "symbol": "",
+      "value": "0",
+      "description": "proportion of exposed humans receiving effective post-exposure prophylaxis [illustrative] (dimensionless)"
+    },
+    {
+      "name": "sigma_h",
+      "symbol": "",
+      "value": "1/6",
+      "description": "rate of leaving human incubation (≈6 weeks) [illustrative] (per week)"
+    },
+    {
+      "name": "mu_h",
+      "symbol": "",
+      "value": "1",
+      "description": "death rate of clinical human rabies (uniformly fatal within days) [illustrative] (per week)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "Nd",
+      "symbol": "",
+      "expr": "Sd + Ed + Id + Vd",
+      "description": "dog population",
+      "output": false
+    },
+    {
+      "name": "N",
+      "symbol": "",
+      "expr": "Sh + Eh + Ih",
+      "description": "human population",
+      "output": false
+    },
+    {
+      "name": "lambda_d",
+      "symbol": "",
+      "expr": "beta_d * Id / area",
+      "description": "dog force of infection (density-dependent: the transmission rate is per unit area)",
+      "output": false
+    },
+    {
+      "name": "lambda_h",
+      "symbol": "",
+      "expr": "beta_dh * Id / area",
+      "description": "human exposure hazard",
+      "output": false
+    },
+    {
+      "name": "Re",
+      "symbol": "",
+      "expr": "beta_d * Sd / (area * mu_d)",
+      "description": "effective reproduction ratio; the authors estimate Re ≈ 1.01 at the onset of observation, consistent with stable endemic dynamics [verified]",
+      "output": false
+    },
+    {
+      "name": "cover",
+      "symbol": "",
+      "expr": "Vd / Nd",
+      "description": "vaccination coverage; a single campaign reaching ≥70% coverage was reported sufficient to interrupt transmission to humans for at least 6 ye",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "bd * Nd",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 90
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lambda_d",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "nu_d",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c4",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "wane_d",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f5",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "sigma_d * rd",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c2",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "sigma_d * (1 - rd)",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f7",
+      "from": "c3",
+      "to": "c9",
+      "kind": "per_capita",
+      "rate": "mu_d",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "md + cull_d",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 350
+    },
+    {
+      "id": "f9",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "lambda_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f10",
+      "from": "c6",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "sigma_h * rh * (1 - pep)",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f11",
+      "from": "c6",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "sigma_h * (1 - rh * (1 - pep))",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f12",
+      "from": "c7",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "mu_h",
+      "output": "",
+      "curve": 0
+    }
+  ]
+}

@@ -1,0 +1,192 @@
+{
+  "version": 1,
+  "id": "seir_seasonal",
+  "category": "Transmission routes",
+  "name": "SEIR with seasonal forcing",
+  "description": "Sinusoidal seasonality in transmission produces multi-annual epidemic cycles (measles-like).",
+  "reference": "Keeling & Rohani (2008), Modeling Infectious Diseases in Humans and Animals, §5.2",
+  "referenceUrl": "",
+  "time": {
+    "start": "0",
+    "stop": "100",
+    "step": "0.01",
+    "unit": "years"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "Susceptible",
+      "init": "6000",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "E",
+      "description": "Exposed",
+      "init": "10",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "I",
+      "description": "Infectious",
+      "init": "10",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "R",
+      "description": "Recovered",
+      "init": "93980",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 720,
+      "y": 140
+    }
+  ],
+  "parameters": [
+    {
+      "name": "beta0",
+      "symbol": "β_0",
+      "value": "1250",
+      "description": "mean transmission rate per year"
+    },
+    {
+      "name": "beta1",
+      "symbol": "β_1",
+      "value": "0.25",
+      "description": "amplitude of seasonality"
+    },
+    {
+      "name": "sigma",
+      "symbol": "",
+      "value": "365 / 8",
+      "description": "1/(latent period) per year"
+    },
+    {
+      "name": "gamma",
+      "symbol": "",
+      "value": "365 / 5",
+      "description": "1/(infectious period) per year"
+    },
+    {
+      "name": "mu",
+      "symbol": "",
+      "value": "1 / 50",
+      "description": "birth = death rate per year"
+    }
+  ],
+  "variables": [
+    {
+      "name": "beta",
+      "symbol": "",
+      "expr": "beta0 * (1 + beta1 * cos(2 * pi * t))",
+      "description": "seasonal transmission rate",
+      "output": false
+    },
+    {
+      "name": "lam",
+      "symbol": "",
+      "expr": "beta * I / N",
+      "description": "force of infection",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "mu * N",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lam",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "sigma",
+      "output": "incidence",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "gamma",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    },
+    {
+      "id": "f6",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 270
+    },
+    {
+      "id": "f7",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 270
+    },
+    {
+      "id": "f8",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 270
+    }
+  ]
+}

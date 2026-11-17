@@ -1,0 +1,228 @@
+{
+  "version": 1,
+  "id": "pertussis_hethcote_mild",
+  "category": "Respiratory",
+  "name": "Pertussis with vaccination, waning, and mild reinfections in partially immune people (Hethcote-style)",
+  "description": "Pertussis.\nHethcote's 1997 paper is age-structured with many age groups.\nParameter values: 0 of 8 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Hethcote HW. \"An age-structured model for pertussis transmission.\" Math Biosci 1997;145:89–136. https://doi.org/10.1016/S0025-5564(97)00014-X",
+  "referenceUrl": "https://doi.org/10.1016/S0025-5564(97",
+  "time": {
+    "start": "0",
+    "stop": "100",
+    "step": "0.1",
+    "unit": "years"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "fully susceptible (never infected or vaccinated)",
+      "init": "0.05*N0",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Ip",
+      "description": "typical (severe) primary infection",
+      "init": "50",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 220
+    },
+    {
+      "id": "c3",
+      "name": "R",
+      "description": "fully immune after infection",
+      "init": "0.5*N0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 520,
+      "y": 220
+    },
+    {
+      "id": "c4",
+      "name": "V",
+      "description": "vaccine-immune",
+      "init": "0.3*N0",
+      "inN": true,
+      "color": "#2457C5",
+      "x": 120,
+      "y": 300
+    },
+    {
+      "id": "c5",
+      "name": "W",
+      "description": "waned, partially immune",
+      "init": "0.15*N0",
+      "inN": true,
+      "color": "#A5D6A7",
+      "x": 720,
+      "y": 220
+    },
+    {
+      "id": "c6",
+      "name": "Im",
+      "description": "mild infection in a waned person",
+      "init": "50",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 920,
+      "y": 220
+    }
+  ],
+  "parameters": [
+    {
+      "name": "R0_p",
+      "symbol": "",
+      "value": "15",
+      "description": "illustrative; the literature for pertussis spans roughly 5–17"
+    },
+    {
+      "name": "g_rec",
+      "symbol": "",
+      "value": "17.4",
+      "description": "21-day infectious period (1/year) [illustrative]"
+    },
+    {
+      "name": "rel_m",
+      "symbol": "",
+      "value": "0.5",
+      "description": "relative infectiousness of mild cases [illustrative]"
+    },
+    {
+      "name": "w_nat",
+      "symbol": "",
+      "value": "1/30",
+      "description": "waning of natural immunity (1/year) [illustrative]"
+    },
+    {
+      "name": "w_vac",
+      "symbol": "",
+      "value": "1/10",
+      "description": "waning of vaccine immunity (1/year) [illustrative]"
+    },
+    {
+      "name": "p_vac",
+      "symbol": "",
+      "value": "0.9",
+      "description": "fraction of births effectively vaccinated [illustrative]"
+    },
+    {
+      "name": "mu",
+      "symbol": "",
+      "value": "0.0133",
+      "description": "birth = death rate (1/year) [illustrative]"
+    },
+    {
+      "name": "N0",
+      "symbol": "",
+      "value": "1e6",
+      "description": "value taken from the notes text [recalled]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "foi",
+      "symbol": "",
+      "expr": "R0_p*(g_rec + mu)*(Ip + rel_m*Im)/N",
+      "description": "",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "(1-p_vac)*mu*N",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": null,
+      "to": "c4",
+      "kind": "absolute",
+      "rate": "p_vac*mu*N",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 170
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "foi",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "g_rec",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c3",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "w_nat",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "w_vac",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "foi",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c6",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "g_rec",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f9",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    }
+  ]
+}

@@ -1,0 +1,367 @@
+{
+  "version": 1,
+  "id": "lyme_tick_mouse",
+  "category": "Vector-borne",
+  "name": "Lyme borreliosis: stage-structured Ixodes ticks with a mouse reservoir and deer as tick-only hosts [ILLUSTRATIVE-COMPOSITE]",
+  "description": "Lyme disease (Borrelia burgdorferi s.l.), temperate woodland in NE USA or Europe.\nParameter values: 0 of 15 checked against the source; the rest are recalled or illustrative.",
+  "reference": "",
+  "referenceUrl": "",
+  "time": {
+    "start": "0",
+    "stop": "7300",
+    "step": "10",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "L",
+      "description": "questing larvae (born uninfected; no transovarial transmission)",
+      "init": "10000",
+      "inN": false,
+      "color": "#E8C468",
+      "x": 120,
+      "y": 220
+    },
+    {
+      "id": "c2",
+      "name": "Ns",
+      "description": "uninfected questing nymphs",
+      "init": "1000",
+      "inN": false,
+      "color": "#DDDDDD",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Ni",
+      "description": "infected questing nymphs",
+      "init": "0",
+      "inN": false,
+      "color": "#DDDDDD",
+      "x": 320,
+      "y": 300
+    },
+    {
+      "id": "c4",
+      "name": "As",
+      "description": "uninfected questing adults",
+      "init": "100",
+      "inN": false,
+      "color": "#E57373",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c5",
+      "name": "Ai",
+      "description": "infected adults",
+      "init": "0",
+      "inN": false,
+      "color": "#E57373",
+      "x": 520,
+      "y": 300
+    },
+    {
+      "id": "c6",
+      "name": "Ms",
+      "description": "susceptible mice (reservoir)",
+      "init": "95",
+      "inN": true,
+      "color": "#F3C6D3",
+      "x": 120,
+      "y": 516
+    },
+    {
+      "id": "c7",
+      "name": "Mi",
+      "description": "infected mice (lifelong)",
+      "init": "5",
+      "inN": true,
+      "color": "#F3C6D3",
+      "x": 320,
+      "y": 516
+    }
+  ],
+  "parameters": [
+    {
+      "name": "a_L",
+      "symbol": "",
+      "value": "1e-4",
+      "description": "larval host-finding rate per mouse"
+    },
+    {
+      "name": "a_N",
+      "symbol": "",
+      "value": "1e-4",
+      "description": "nymphal host-finding rate per mouse"
+    },
+    {
+      "name": "a_A",
+      "symbol": "",
+      "value": "0.005",
+      "description": "adult host-finding rate per deer"
+    },
+    {
+      "name": "Deer",
+      "symbol": "",
+      "value": "5",
+      "description": "deer density, constant; not competent for Borrelia (deer)"
+    },
+    {
+      "name": "s_L",
+      "symbol": "",
+      "value": "0.3",
+      "description": "survival from fed larva to nymph"
+    },
+    {
+      "name": "s_N",
+      "symbol": "",
+      "value": "0.3",
+      "description": "survival from fed nymph to adult"
+    },
+    {
+      "name": "eps_egg",
+      "symbol": "",
+      "value": "1000",
+      "description": "effective larvae per fed adult (larvae/fed adult)"
+    },
+    {
+      "name": "mu_L",
+      "symbol": "",
+      "value": "0.01",
+      "description": "larval death (1/day)"
+    },
+    {
+      "name": "mu_L2",
+      "symbol": "",
+      "value": "4.8e-5",
+      "description": "density-dependent larval death"
+    },
+    {
+      "name": "mu_N",
+      "symbol": "",
+      "value": "0.005",
+      "description": "nymphal death (1/day)"
+    },
+    {
+      "name": "mu_A",
+      "symbol": "",
+      "value": "0.005",
+      "description": "adult death (1/day)"
+    },
+    {
+      "name": "p_NM",
+      "symbol": "",
+      "value": "0.8",
+      "description": "infected nymph → mouse transmission probability"
+    },
+    {
+      "name": "p_ML",
+      "symbol": "",
+      "value": "0.5",
+      "description": "infected mouse → feeding larva transmission probability"
+    },
+    {
+      "name": "mu_m",
+      "symbol": "",
+      "value": "0.005",
+      "description": "mouse death (1/day)"
+    },
+    {
+      "name": "K_m",
+      "symbol": "",
+      "value": "100",
+      "description": "mouse population; recruitment = mu_m·K_m (mice)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "Hm",
+      "symbol": "",
+      "expr": "Ms + Mi",
+      "description": "mice",
+      "output": false
+    },
+    {
+      "name": "Nticks",
+      "symbol": "",
+      "expr": "L + Ns + Ni + As + Ai",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "prev_mouse",
+      "symbol": "",
+      "expr": "Mi/Hm",
+      "description": "mouse infection prevalence",
+      "output": false
+    },
+    {
+      "name": "nip",
+      "symbol": "",
+      "expr": "Ni/(Ns + Ni)",
+      "description": "nymphal infection prevalence (the human-risk index)",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "eps_egg*a_A*Deer*(As + Ai)",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 90
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "a_L*s_L*(Hm - p_ML*Mi)",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "a_L*s_L*p_ML*Mi",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "a_L*Hm*(1 - s_L) + mu_L + mu_L2*L",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 350
+    },
+    {
+      "id": "f5",
+      "from": "c2",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "a_N*s_N*(Hm - p_ML*Mi)",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c2",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "a_N*s_N*p_ML*Mi",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "a_N*Hm*(1 - s_N) + mu_N",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 270
+    },
+    {
+      "id": "f8",
+      "from": "c3",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "a_N*s_N*Hm",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f9",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "a_N*Hm*(1 - s_N) + mu_N",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 430
+    },
+    {
+      "id": "f10",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "a_A*Deer + mu_A",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 270
+    },
+    {
+      "id": "f11",
+      "from": "c5",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "a_A*Deer + mu_A",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 430
+    },
+    {
+      "id": "f12",
+      "from": null,
+      "to": "c6",
+      "kind": "absolute",
+      "rate": "mu_m*K_m",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 386
+    },
+    {
+      "id": "f13",
+      "from": "c6",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "a_N*p_NM*Ni",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f14",
+      "from": "c6",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_m",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 646
+    },
+    {
+      "id": "f15",
+      "from": "c7",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_m",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 646
+    }
+  ]
+}

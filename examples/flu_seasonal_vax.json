@@ -1,0 +1,243 @@
+{
+  "version": 1,
+  "id": "flu_seasonal_vax",
+  "category": "Respiratory",
+  "name": "Seasonal influenza SIRS with sinusoidal forcing and an annual vaccination campaign",
+  "description": "Seasonal influenza.\nvaccinating only S assumes vaccine is not wasted on R.\nParameter values: 0 of 12 checked against the source; the rest are recalled or illustrative.",
+  "reference": "[ILLUSTRATIVE] textbook SIRS-V structure (Keeling & Rohani 2008, Modeling Infectious Diseases in Humans and Animals, Princeton UP, ch. 5). The reproduction-number anchor is Biggerstaff M, Cauchemez S, Reed C, Gambhir M, Finelli L. \"Estimates of the…",
+  "referenceUrl": "https://doi.org/10.1186/1471-2334-14-480",
+  "time": {
+    "start": "0",
+    "stop": "3650",
+    "step": "5",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "solver": {
+    "hmax": "5"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "susceptible",
+      "init": "0.6*1e6",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 220
+    },
+    {
+      "id": "c2",
+      "name": "Ip",
+      "description": "infectious",
+      "init": "100",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "R",
+      "description": "infection-derived immunity",
+      "init": "0.4*1e6",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 520,
+      "y": 220
+    },
+    {
+      "id": "c4",
+      "name": "V",
+      "description": "vaccine-protected",
+      "init": "0",
+      "inN": true,
+      "color": "#2457C5",
+      "x": 320,
+      "y": 300
+    }
+  ],
+  "parameters": [
+    {
+      "name": "R0_base",
+      "symbol": "",
+      "value": "1.3",
+      "description": "mean reproduction number"
+    },
+    {
+      "name": "g_rec",
+      "symbol": "",
+      "value": "0.25",
+      "description": "recovery rate (4 days) (1/day) [illustrative]"
+    },
+    {
+      "name": "amp",
+      "symbol": "",
+      "value": "0.2",
+      "description": "seasonal amplitude [illustrative]"
+    },
+    {
+      "name": "t_peak",
+      "symbol": "",
+      "value": "15",
+      "description": "day of peak transmission (day of year) [illustrative]"
+    },
+    {
+      "name": "two_pi",
+      "symbol": "",
+      "value": "6.283185",
+      "description": "constant"
+    },
+    {
+      "name": "omega_R",
+      "symbol": "",
+      "value": "1/730",
+      "description": "waning of infection immunity, including drift (1/day) [illustrative]"
+    },
+    {
+      "name": "omega_V",
+      "symbol": "",
+      "value": "1/240",
+      "description": "waning of vaccine protection (1/day) [illustrative]"
+    },
+    {
+      "name": "cov",
+      "symbol": "",
+      "value": "0.45",
+      "description": "target coverage per campaign [illustrative]"
+    },
+    {
+      "name": "ve",
+      "symbol": "",
+      "value": "0.5",
+      "description": "vaccine efficacy (all-or-nothing) [illustrative]"
+    },
+    {
+      "name": "camp_start",
+      "symbol": "",
+      "value": "274",
+      "description": "campaign from Oct 1 for 60 days [illustrative]"
+    },
+    {
+      "name": "camp_len",
+      "symbol": "",
+      "value": "60",
+      "description": "campaign from Oct 1 for 60 days (day of year, days) [illustrative]"
+    },
+    {
+      "name": "mu",
+      "symbol": "",
+      "value": "3.9e-5",
+      "description": "birth = death rate (1/day) [illustrative]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "beta_t",
+      "symbol": "",
+      "expr": "R0_base*g_rec*(1 + amp*cos(two_pi*(t - t_peak)/365))",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "tyear",
+      "symbol": "",
+      "expr": "t - 365*floor(t/365)",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "in_camp",
+      "symbol": "",
+      "expr": "(tyear >= camp_start)*(tyear < camp_start + camp_len)",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "vrate",
+      "symbol": "",
+      "expr": "in_camp*(-log(1-cov)/camp_len)",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "foi",
+      "symbol": "",
+      "expr": "beta_t*Ip/N",
+      "description": "",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "mu*N",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 90
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "foi",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "g_rec",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c3",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "omega_R",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f5",
+      "from": "c1",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "ve*vrate",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c4",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "omega_V",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f7",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 350
+    }
+  ]
+}

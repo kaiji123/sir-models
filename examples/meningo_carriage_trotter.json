@@ -1,0 +1,257 @@
+{
+  "version": 1,
+  "id": "meningo_carriage_trotter",
+  "category": "Respiratory",
+  "name": "Meningococcal (serogroup C) carriage SCIS model with conjugate vaccine that protects against carriage (Trotter et al. 2005)",
+  "description": "Neisseria meningitidis C (applies to Hib with relabelling).\nParameter values: 0 of 10 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Trotter CL, Gay NJ, Edmunds WJ. \"Dynamic models of meningococcal carriage, disease, and the impact of serogroup C conjugate vaccination.\" Am J Epidemiol 2005;162:89–100. https://doi.org/10.1093/aje/kwi160 (record: https://researchonline.lshtm.ac.uk/6806/)",
+  "referenceUrl": "https://doi.org/10.1093/aje/kwi160",
+  "time": {
+    "start": "0",
+    "stop": "30",
+    "step": "0.05",
+    "unit": "years"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "susceptible to carriage",
+      "init": "0.6*N0",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Ca",
+      "description": "carrier",
+      "init": "0.01*N0",
+      "inN": true,
+      "color": "#8E0E0E",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Rim",
+      "description": "immune after carriage",
+      "init": "0.39*N0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "V",
+      "description": "vaccinated, protected",
+      "init": "0",
+      "inN": true,
+      "color": "#2457C5",
+      "x": 720,
+      "y": 140
+    },
+    {
+      "id": "c5",
+      "name": "Cases",
+      "description": "cumulative invasive disease cases",
+      "init": "0",
+      "inN": false,
+      "color": "#8E0E0E",
+      "x": 120,
+      "y": 356
+    }
+  ],
+  "parameters": [
+    {
+      "name": "R0_c",
+      "symbol": "",
+      "value": "1.36",
+      "description": "Trotter 2005 abstract"
+    },
+    {
+      "name": "clr",
+      "symbol": "",
+      "value": "2",
+      "description": "carriage clearance (about 6 months) (1/year) [illustrative]"
+    },
+    {
+      "name": "w_nat",
+      "symbol": "",
+      "value": "0.5",
+      "description": "waning of immunity after carriage (1/year) [illustrative]"
+    },
+    {
+      "name": "ve_c",
+      "symbol": "",
+      "value": "0.75",
+      "description": "vaccine efficacy against acquiring carriage [illustrative]"
+    },
+    {
+      "name": "w_vac",
+      "symbol": "",
+      "value": "0.1",
+      "description": "waning of vaccine protection (1/year) [illustrative]"
+    },
+    {
+      "name": "vac_rate",
+      "symbol": "",
+      "value": "0",
+      "description": "catch-up vaccination of S and Rim, e.g. 2 during a campaign (1/year) [illustrative]"
+    },
+    {
+      "name": "p_vac",
+      "symbol": "",
+      "value": "0.9",
+      "description": "fraction of births vaccinated [illustrative]"
+    },
+    {
+      "name": "ccr",
+      "symbol": "",
+      "value": "1e-4",
+      "description": "invasive cases per carriage acquisition (case:carrier ratio) [illustrative]"
+    },
+    {
+      "name": "mu",
+      "symbol": "",
+      "value": "0.0133",
+      "description": "birth = death rate (1/year) [illustrative]"
+    },
+    {
+      "name": "N0",
+      "symbol": "",
+      "value": "1e6",
+      "description": "value taken from the notes text [recalled]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "foi",
+      "symbol": "",
+      "expr": "R0_c*(clr + mu)*Ca/N",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "acq",
+      "symbol": "",
+      "expr": "foi*S + (1-ve_c)*foi*V",
+      "description": "total acquisitions",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "(1-p_vac)*mu*N",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": null,
+      "to": "c4",
+      "kind": "absolute",
+      "rate": "p_vac*mu*N",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 10
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "foi",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c4",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "(1-ve_c)*foi",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f5",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "clr",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c3",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "w_nat",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f7",
+      "from": "c4",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "w_vac",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f8",
+      "from": "c1",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "vac_rate",
+      "output": "",
+      "curve": 50
+    },
+    {
+      "id": "f9",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "vac_rate",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f10",
+      "from": null,
+      "to": "c5",
+      "kind": "absolute",
+      "rate": "ccr*acq",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 226
+    },
+    {
+      "id": "f11",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    }
+  ]
+}

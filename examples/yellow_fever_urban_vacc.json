@@ -1,0 +1,359 @@
+{
+  "version": 1,
+  "id": "yellow_fever_urban_vacc",
+  "category": "Vector-borne",
+  "name": "Urban yellow fever: SEIR humans with severe (toxic) phase and reactive vaccination; Aedes aegypti SEI [ILLUSTRATIVE-COMPOSITE]",
+  "description": "Yellow fever (urban cycle), e.g. Angola/DRC 2016-type outbreak.\nParameter values: 0 of 13 checked against the source; the rest are recalled or illustrative.",
+  "reference": "a standard structure. Natural-history values are recalled, not re-checked this session:",
+  "referenceUrl": "",
+  "time": {
+    "start": "0",
+    "stop": "365",
+    "step": "0.5",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "solver": {
+    "hmax": "0.5"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Sh",
+      "description": "susceptible",
+      "init": "79990",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 220
+    },
+    {
+      "id": "c2",
+      "name": "Eh",
+      "description": "incubating",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Ih",
+      "description": "viraemic (infectious)",
+      "init": "10",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 220
+    },
+    {
+      "id": "c4",
+      "name": "Sev",
+      "description": "severe/toxic phase (assumed non-infectious)",
+      "init": "0",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 720,
+      "y": 220
+    },
+    {
+      "id": "c5",
+      "name": "Rh",
+      "description": "recovered",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 920,
+      "y": 220
+    },
+    {
+      "id": "c6",
+      "name": "Vh",
+      "description": "vaccinated/immune",
+      "init": "20000",
+      "inN": true,
+      "color": "#2457C5",
+      "x": 320,
+      "y": 300
+    },
+    {
+      "id": "c7",
+      "name": "Sv",
+      "description": "susceptible mosquitoes",
+      "init": "200000",
+      "inN": false,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 516
+    },
+    {
+      "id": "c8",
+      "name": "Ev",
+      "description": "exposed mosquitoes",
+      "init": "0",
+      "inN": false,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 516
+    },
+    {
+      "id": "c9",
+      "name": "Iv",
+      "description": "infectious mosquitoes",
+      "init": "0",
+      "inN": false,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 516
+    }
+  ],
+  "parameters": [
+    {
+      "name": "a_bite",
+      "symbol": "",
+      "value": "0.5",
+      "description": " (1/day)"
+    },
+    {
+      "name": "p_vh",
+      "symbol": "",
+      "value": "0.5",
+      "description": "mosquito → human"
+    },
+    {
+      "name": "p_hv",
+      "symbol": "",
+      "value": "0.5",
+      "description": "human → mosquito"
+    },
+    {
+      "name": "nu_h",
+      "symbol": "",
+      "value": "0.2326",
+      "description": "1/4.3 d intrinsic incubation (Johansson 2010) (1/day)"
+    },
+    {
+      "name": "gam_h",
+      "symbol": "",
+      "value": "0.2222",
+      "description": "1/4.5 d viraemia (1/day)"
+    },
+    {
+      "name": "p_sev",
+      "symbol": "",
+      "value": "0.12",
+      "description": "fraction entering the severe phase (Johansson 2014)"
+    },
+    {
+      "name": "cfr_sev",
+      "symbol": "",
+      "value": "0.47",
+      "description": "case fatality among severe (Johansson 2014)"
+    },
+    {
+      "name": "w_sev",
+      "symbol": "",
+      "value": "0.1429",
+      "description": "1/7 d duration of the severe phase (1/day)"
+    },
+    {
+      "name": "nu_v",
+      "symbol": "",
+      "value": "0.1",
+      "description": "1/10 d EIP (Johansson 2010) (1/day)"
+    },
+    {
+      "name": "mu_v",
+      "symbol": "",
+      "value": "0.0714",
+      "description": " (1/day)"
+    },
+    {
+      "name": "v_rate",
+      "symbol": "",
+      "value": "0.01",
+      "description": "campaign vaccination rate (1/day)"
+    },
+    {
+      "name": "v_eff",
+      "symbol": "",
+      "value": "0.99",
+      "description": "vaccine efficacy (WHO)"
+    },
+    {
+      "name": "t_vac",
+      "symbol": "",
+      "value": "60",
+      "description": "campaign start (day)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "Nh",
+      "symbol": "",
+      "expr": "Sh + Eh + Ih + Sev + Rh + Vh",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "Nv",
+      "symbol": "",
+      "expr": "Sv + Ev + Iv",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "lambda_h",
+      "symbol": "",
+      "expr": "a_bite*p_vh*Iv/Nh",
+      "description": "human force of infection",
+      "output": false
+    },
+    {
+      "name": "lambda_v",
+      "symbol": "",
+      "expr": "a_bite*p_hv*Ih/Nh",
+      "description": "mosquito force of infection",
+      "output": false
+    },
+    {
+      "name": "vacc",
+      "symbol": "",
+      "expr": "ifelse(t >= t_vac, v_rate*v_eff, 0)",
+      "description": "effective vaccination rate",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lambda_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "vacc",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "nu_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "p_sev*gam_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c3",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "(1 - p_sev)*gam_h",
+      "output": "",
+      "curve": 50
+    },
+    {
+      "id": "f6",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "cfr_sev*w_sev",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 350
+    },
+    {
+      "id": "f7",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "(1 - cfr_sev)*w_sev",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": null,
+      "to": "c7",
+      "kind": "absolute",
+      "rate": "mu_v*Nv",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 386
+    },
+    {
+      "id": "f9",
+      "from": "c7",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "lambda_v",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f10",
+      "from": "c8",
+      "to": "c9",
+      "kind": "per_capita",
+      "rate": "nu_v",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f11",
+      "from": "c7",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_v",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 646
+    },
+    {
+      "id": "f12",
+      "from": "c8",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_v",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 646
+    },
+    {
+      "id": "f13",
+      "from": "c9",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_v",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 646
+    }
+  ]
+}

@@ -1,0 +1,200 @@
+{
+  "version": 1,
+  "id": "carrier",
+  "category": "Natural history",
+  "name": "SICR (chronic carriers)",
+  "description": "A proportion q of acute infections become long-term carriers (hepatitis B / typhoid-like).",
+  "reference": "Anderson & May (1991), Infectious Diseases of Humans, ch. 6; Keeling & Rohani (2008), Modeling Infectious Diseases in Humans and Animals, §3.2",
+  "referenceUrl": "",
+  "time": {
+    "start": "0",
+    "stop": "150",
+    "step": "0.1",
+    "unit": "years"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "Susceptible",
+      "init": "99000",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 220
+    },
+    {
+      "id": "c2",
+      "name": "I",
+      "description": "Acute infection",
+      "init": "10",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 220
+    },
+    {
+      "id": "c3",
+      "name": "C",
+      "description": "Chronic carrier",
+      "init": "990",
+      "inN": true,
+      "color": "#8E0E0E",
+      "x": 520,
+      "y": 300
+    },
+    {
+      "id": "c4",
+      "name": "R",
+      "description": "Recovered",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 520,
+      "y": 140
+    }
+  ],
+  "parameters": [
+    {
+      "name": "beta",
+      "symbol": "",
+      "value": "4",
+      "description": "transmission rate per year"
+    },
+    {
+      "name": "eps",
+      "symbol": "ε",
+      "value": "0.1",
+      "description": "relative infectiousness of carriers"
+    },
+    {
+      "name": "gamma",
+      "symbol": "",
+      "value": "6",
+      "description": "rate of leaving acute infection per year (2 months)"
+    },
+    {
+      "name": "q",
+      "symbol": "",
+      "value": "0.1",
+      "description": "proportion becoming carriers"
+    },
+    {
+      "name": "gammaC",
+      "symbol": "γ_C",
+      "value": "0.025",
+      "description": "rate of carriers clearing infection per year"
+    },
+    {
+      "name": "mu",
+      "symbol": "",
+      "value": "1 / 70",
+      "description": "birth = death rate per year"
+    }
+  ],
+  "variables": [
+    {
+      "name": "lam",
+      "symbol": "",
+      "expr": "beta * (I + eps * C) / N",
+      "description": "force of infection",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "mu * N",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 90
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lam",
+      "output": "incidence",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "gamma * (1 - q)",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "gamma * q",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "gammaC",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 350
+    },
+    {
+      "id": "f7",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 350
+    },
+    {
+      "id": "f8",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 430
+    },
+    {
+      "id": "f9",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 10
+    }
+  ]
+}

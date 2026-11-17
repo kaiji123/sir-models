@@ -1,0 +1,266 @@
+{
+  "version": 1,
+  "id": "polio_wpv_opv",
+  "category": "Water, enteric & NTDs",
+  "name": "Wild poliovirus with OPV vaccine virus and circulating vaccine-derived (cVDPV) lineage",
+  "description": "Poliomyelitis (WPV, Sabin OPV, cVDPV).\nParameter values: 0 of 11 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Structure inspired by Fine PEM, Carneiro IAM. Transmissibility and persistence of oral polio vaccine viruses: implications for the global poliomyelitis eradication initiative. Am J Epidemiol 1999;150(10):1001–1021",
+  "referenceUrl": "https://doi.org/10.1093/oxfordjournals.aje.a009924",
+  "time": {
+    "start": "0",
+    "stop": "20",
+    "step": "0.02",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "susceptible to intestinal infection",
+      "init": "0.1*N0",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 300
+    },
+    {
+      "id": "c2",
+      "name": "IW",
+      "description": "wild-type infection",
+      "init": "10",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "IV",
+      "description": "OPV (Sabin-like) infection",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 300
+    },
+    {
+      "id": "c4",
+      "name": "IVD",
+      "description": "cVDPV (reverted) infection",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 460
+    },
+    {
+      "id": "c5",
+      "name": "R",
+      "description": "intestinally immune",
+      "init": "0.9*N0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 520,
+      "y": 300
+    }
+  ],
+  "parameters": [
+    {
+      "name": "mu_h",
+      "symbol": "",
+      "value": "1/(50*365)",
+      "description": "birth/death [I] (day^-1)"
+    },
+    {
+      "name": "gam_p",
+      "symbol": "",
+      "value": "1/28",
+      "description": "recovery (about 4 weeks of excretion) [M] (day^-1)"
+    },
+    {
+      "name": "R0_w",
+      "symbol": "",
+      "value": "6",
+      "description": "WPV R0; reported range about 4–13 in high-transmission settings [M]"
+    },
+    {
+      "name": "rel_v",
+      "symbol": "",
+      "value": "0.4",
+      "description": "Sabin virus transmissibility relative to WPV [I]"
+    },
+    {
+      "name": "rel_vd",
+      "symbol": "",
+      "value": "0.9",
+      "description": "cVDPV transmissibility relative to WPV [I]"
+    },
+    {
+      "name": "p_rev",
+      "symbol": "",
+      "value": "0.01",
+      "description": "fraction of Sabin onward transmissions producing revertant (cVDPV) virus [I]"
+    },
+    {
+      "name": "p_opv",
+      "symbol": "",
+      "value": "0.8",
+      "description": "routine OPV coverage at birth (cohort) [I]"
+    },
+    {
+      "name": "take_v",
+      "symbol": "",
+      "value": "0.5",
+      "description": "per-dose take, intestinal infection [I]"
+    },
+    {
+      "name": "omega_p",
+      "symbol": "",
+      "value": "1/(5*365)",
+      "description": "waning of intestinal immunity [I] (day^-1)"
+    },
+    {
+      "name": "par_ratio",
+      "symbol": "",
+      "value": "0.005",
+      "description": "paralysis-to-infection ratio, about 1/200 for WPV1 [M, widely cited]"
+    },
+    {
+      "name": "N0",
+      "symbol": "",
+      "value": "100000",
+      "description": "total initial population [illustrative default]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "bw",
+      "symbol": "",
+      "expr": "R0_w*gam_p",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "bv",
+      "symbol": "",
+      "expr": "rel_v*R0_w*gam_p",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "bvd",
+      "symbol": "",
+      "expr": "rel_vd*R0_w*gam_p",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "inc_par",
+      "symbol": "",
+      "expr": "par_ratio*(bw*IW + bvd*IVD)/N*S",
+      "description": "paralytic incidence",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "mu_h*N*(1 - p_opv*take_v)",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 170
+    },
+    {
+      "id": "f2",
+      "from": null,
+      "to": "c3",
+      "kind": "absolute",
+      "rate": "mu_h*N*p_opv*take_v",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 170
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "bw*IW/N",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c1",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "bv*IV/N*(1 - p_rev)",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c1",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "bv*IV/N*p_rev + bvd*IVD/N",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c2",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "gam_p",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": "c3",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "gam_p",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "gam_p",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f9",
+      "from": "c5",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "omega_p",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f10",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_h",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 430
+    }
+  ]
+}

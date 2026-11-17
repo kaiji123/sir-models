@@ -1,0 +1,356 @@
+{
+  "version": 1,
+  "id": "syphilis_staged_garnett",
+  "category": "Sexually transmitted & blood-borne",
+  "name": "Syphilis with incubating, primary, secondary, early/late latent stages and waning immunity",
+  "description": "Syphilis.\nParameter values: 6 of 11 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Garnett GP, Aral SO, Hoyle DV, Cates W Jr, Anderson RM. The natural history of syphilis: implications for the transmission dynamics and control of infection. Sex Transm Dis 1997;24(4):185–200",
+  "referenceUrl": "https://doi.org/10.1097/00007435-199704000-00002",
+  "time": {
+    "start": "0",
+    "stop": "30",
+    "step": "0.05",
+    "unit": "years"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "susceptible",
+      "init": "0.99",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "E",
+      "description": "incubating",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "P1",
+      "description": "primary (infectious)",
+      "init": "0.005",
+      "inN": true,
+      "color": "#F0A35E",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "P2",
+      "description": "secondary (infectious)",
+      "init": "0.005",
+      "inN": true,
+      "color": "#F0A35E",
+      "x": 720,
+      "y": 140
+    },
+    {
+      "id": "c5",
+      "name": "Le",
+      "description": "early latent (non-infectious; relapse possible)",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 920,
+      "y": 140
+    },
+    {
+      "id": "c6",
+      "name": "Ll",
+      "description": "late latent",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 1120,
+      "y": 140
+    },
+    {
+      "id": "c7",
+      "name": "R",
+      "description": "treated, temporarily immune",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 1320,
+      "y": 140
+    }
+  ],
+  "parameters": [
+    {
+      "name": "cp",
+      "symbol": "",
+      "value": "15",
+      "description": "mean partner change rate (MSM, Ontario) (partners/yr) [verified]"
+    },
+    {
+      "name": "beta_s",
+      "symbol": "",
+      "value": "0.3",
+      "description": "transmission probability (per partnership) [illustrative]"
+    },
+    {
+      "name": "sig_inc",
+      "symbol": "",
+      "value": "365/25",
+      "description": "1/incubation period (25 days) (/yr) [verified]"
+    },
+    {
+      "name": "d_inf",
+      "symbol": "",
+      "value": "154/365",
+      "description": "total primary + secondary infectious period (yr) [verified]"
+    },
+    {
+      "name": "f_prim",
+      "symbol": "",
+      "value": "0.3",
+      "description": "fraction of d_inf spent in primary stage [illustrative]"
+    },
+    {
+      "name": "tau",
+      "symbol": "",
+      "value": "0.4",
+      "description": "treatment rate of infectious and early-latent cases (/yr) [verified]"
+    },
+    {
+      "name": "tau_l",
+      "symbol": "",
+      "value": "0.1",
+      "description": "treatment rate in late latent (/yr) [illustrative]"
+    },
+    {
+      "name": "rel",
+      "symbol": "",
+      "value": "0.25",
+      "description": "relapse rate early latent to secondary (/yr) [illustrative]"
+    },
+    {
+      "name": "el",
+      "symbol": "",
+      "value": "1",
+      "description": "progression early to late latent (early latent about 1 yr) (/yr) [illustrative]"
+    },
+    {
+      "name": "w_imm",
+      "symbol": "",
+      "value": "1/5",
+      "description": "waning of post-treatment immunity (5 yr) (/yr) [verified]"
+    },
+    {
+      "name": "mu",
+      "symbol": "",
+      "value": "5831/366279",
+      "description": "entry/exit rate (/yr) [verified]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "foi",
+      "symbol": "",
+      "expr": "cp*beta_s*(P1 + P2)/N",
+      "description": "force of infection",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "mu*N",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "foi",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "sig_inc",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "1/(f_prim*d_inf)",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "1/((1-f_prim)*d_inf)",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c5",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "rel",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f7",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "el",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c3",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "tau",
+      "output": "",
+      "curve": 50
+    },
+    {
+      "id": "f9",
+      "from": "c4",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "tau",
+      "output": "",
+      "curve": 50
+    },
+    {
+      "id": "f10",
+      "from": "c5",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "tau",
+      "output": "",
+      "curve": 50
+    },
+    {
+      "id": "f11",
+      "from": "c6",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "tau_l",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f12",
+      "from": "c7",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "w_imm",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f13",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    },
+    {
+      "id": "f14",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 270
+    },
+    {
+      "id": "f15",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 270
+    },
+    {
+      "id": "f16",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 270
+    },
+    {
+      "id": "f17",
+      "from": "c5",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 920,
+      "oy": 270
+    },
+    {
+      "id": "f18",
+      "from": "c6",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 1120,
+      "oy": 270
+    },
+    {
+      "id": "f19",
+      "from": "c7",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 1320,
+      "oy": 270
+    }
+  ]
+}

@@ -1,0 +1,241 @@
+{
+  "version": 1,
+  "id": "sars_chowell_seijr",
+  "category": "Respiratory",
+  "name": "SARS SEIJR model with diagnosis/isolation and two susceptibility classes (Chowell et al. 2003/2004)",
+  "description": "SARS (the template also suits MERS).\nParameter values: 0 of 11 checked against the source; the rest are recalled or illustrative.",
+  "reference": "",
+  "referenceUrl": "",
+  "time": {
+    "start": "0",
+    "stop": "150",
+    "step": "0.2",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S1",
+      "description": "high-risk susceptible",
+      "init": "rho_hr*N0",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "S2",
+      "description": "lower-risk susceptible (relative susceptibility p_low)",
+      "init": "(1-rho_hr)*N0",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 300
+    },
+    {
+      "id": "c3",
+      "name": "E",
+      "description": "exposed, low infectivity",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 220
+    },
+    {
+      "id": "c4",
+      "name": "Ip",
+      "description": "symptomatic infectious, undiagnosed",
+      "init": "1",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 220
+    },
+    {
+      "id": "c5",
+      "name": "J",
+      "description": "diagnosed and isolated",
+      "init": "0",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 720,
+      "y": 220
+    },
+    {
+      "id": "c6",
+      "name": "R",
+      "description": "recovered",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 920,
+      "y": 140
+    },
+    {
+      "id": "c7",
+      "name": "Dead",
+      "description": "SARS deaths",
+      "init": "0",
+      "inN": false,
+      "color": "#111111",
+      "x": 920,
+      "y": 300
+    }
+  ],
+  "parameters": [
+    {
+      "name": "beta_s",
+      "symbol": "",
+      "value": "0.25",
+      "description": "transmission rate (1/day)"
+    },
+    {
+      "name": "q_e",
+      "symbol": "",
+      "value": "0.1",
+      "description": "relative infectiousness of E"
+    },
+    {
+      "name": "l_iso",
+      "symbol": "",
+      "value": "0.43",
+      "description": "relative infectiousness of J"
+    },
+    {
+      "name": "p_low",
+      "symbol": "",
+      "value": "1/3",
+      "description": "relative susceptibility of S2"
+    },
+    {
+      "name": "rho_hr",
+      "symbol": "",
+      "value": "0.77",
+      "description": "initial fraction in S1"
+    },
+    {
+      "name": "k_inc",
+      "symbol": "",
+      "value": "0.15707",
+      "description": "E to Ip (6.4-day incubation) (1/day)"
+    },
+    {
+      "name": "alpha_d",
+      "symbol": "",
+      "value": "0.2061",
+      "description": "diagnosis and isolation (4.85 days); Toronto used 1/3 after controls (1/day)"
+    },
+    {
+      "name": "g1",
+      "symbol": "",
+      "value": "0.035285",
+      "description": "recovery from Ip (1/day)"
+    },
+    {
+      "name": "g2",
+      "symbol": "",
+      "value": "0.0426",
+      "description": "recovery from J (1/day)"
+    },
+    {
+      "name": "delta_d",
+      "symbol": "",
+      "value": "0.0279",
+      "description": "disease death rate (1/day)"
+    },
+    {
+      "name": "N0",
+      "symbol": "",
+      "value": "6.7e6",
+      "description": "value taken from the notes text [recalled]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "foi",
+      "symbol": "",
+      "expr": "beta_s*(Ip + q_e*E + l_iso*J)/N",
+      "description": "",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "foi",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "p_low*foi",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "k_inc",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "alpha_d",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c4",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "g1",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c4",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "delta_d",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "g2",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c5",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "delta_d",
+      "output": "",
+      "curve": 0
+    }
+  ]
+}

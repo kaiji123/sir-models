@@ -1,0 +1,206 @@
+{
+  "version": 1,
+  "id": "amr_bonhoeffer",
+  "category": "Classic extensions",
+  "name": "sensitive and resistant strains with treatment and de novo resistance (single drug)",
+  "description": "bacterial infection with antibiotic treatment.\nResistance takes over when f·h > Δr, as the ρ equation shows.\nParameter values: 0 of 9 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Bonhoeffer S., Lipsitch M., Levin B.R. (1997) \"Evaluating treatment protocols to prevent antibiotic resistance\", PNAS 94(22):12106–12111",
+  "referenceUrl": "https://doi.org/10.1073/pnas.94.22.12106",
+  "time": {
+    "start": "0",
+    "stop": "100",
+    "step": "0.1",
+    "unit": "weeks"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "X",
+      "description": "uninfected hosts",
+      "init": "99",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Yw",
+      "description": "infected with wild-type (sensitive)",
+      "init": "1",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Yr",
+      "description": "infected with resistant strain",
+      "init": "0",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 520,
+      "y": 140
+    }
+  ],
+  "parameters": [
+    {
+      "name": "lambda_in",
+      "symbol": "",
+      "value": "100",
+      "description": "entry of uninfected hosts (hosts/time)"
+    },
+    {
+      "name": "d_x",
+      "symbol": "",
+      "value": "1",
+      "description": "death/removal of uninfected (1/time)"
+    },
+    {
+      "name": "c_inf",
+      "symbol": "",
+      "value": "1.5",
+      "description": "death/removal of infected hosts (1/time)"
+    },
+    {
+      "name": "b_tr",
+      "symbol": "",
+      "value": "0.05",
+      "description": "mass-action transmission [illustrative]"
+    },
+    {
+      "name": "h_max",
+      "symbol": "",
+      "value": "1",
+      "description": "cure rate under treatment (1/time)"
+    },
+    {
+      "name": "f_tr",
+      "symbol": "",
+      "value": "0.5",
+      "description": "fraction of infected treated [illustrative]"
+    },
+    {
+      "name": "s_res",
+      "symbol": "",
+      "value": "0.001",
+      "description": "fraction of treated wild-type infections that acquire resistance"
+    },
+    {
+      "name": "r_w",
+      "symbol": "",
+      "value": "0",
+      "description": "spontaneous recovery, wild-type (1/time)"
+    },
+    {
+      "name": "r_r",
+      "symbol": "",
+      "value": "0.1",
+      "description": "spontaneous recovery, resistant (cost of resistance Δr = r_r − r_w) (1/time)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "res_frac",
+      "symbol": "",
+      "expr": "Yr/(Yw + Yr)",
+      "description": "proportion of infections that are resistant (ρ)",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "lambda_in",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "d_x",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "b_tr*Yw",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c1",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "b_tr*Yr",
+      "output": "",
+      "curve": 50
+    },
+    {
+      "id": "f5",
+      "from": "c2",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "r_w + f_tr*h_max*(1 - s_res)",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f6",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "f_tr*h_max*s_res",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": "c3",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "r_r",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f8",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "c_inf",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 270
+    },
+    {
+      "id": "f9",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "c_inf",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 270
+    }
+  ]
+}

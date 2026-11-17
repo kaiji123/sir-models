@@ -1,0 +1,213 @@
+{
+  "version": 1,
+  "id": "amr_hospital_lipsitch",
+  "category": "Classic extensions",
+  "name": "hospital colonisation with sensitive and resistant bacteria and patient turnover",
+  "description": "nosocomial antibiotic-resistant bacteria (e.g. VRE, MRSA).\nTotal admissions equal total discharges, so N is constant.\nParameter values: 0 of 8 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Lipsitch M., Bergstrom C.T., Levin B.R. (2000) \"The epidemiology of antibiotic resistance in hospitals: paradoxes and prescriptions\", PNAS 97(4):1938–1943",
+  "referenceUrl": "https://doi.org/10.1073/pnas.97.4.1938",
+  "time": {
+    "start": "0",
+    "stop": "365",
+    "step": "0.5",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "X",
+      "description": "uncolonised patients",
+      "init": "90",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 120,
+      "y": 220
+    },
+    {
+      "id": "c2",
+      "name": "Sc",
+      "description": "colonised with sensitive strain",
+      "init": "9",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Rc",
+      "description": "colonised with resistant strain",
+      "init": "1",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 320,
+      "y": 300
+    }
+  ],
+  "parameters": [
+    {
+      "name": "mu_d",
+      "symbol": "",
+      "value": "0.1",
+      "description": "discharge rate = admission rate (10-day stay) (1/day) [illustrative]"
+    },
+    {
+      "name": "m_s",
+      "symbol": "",
+      "value": "0.10",
+      "description": "fraction admitted colonised with sensitive [illustrative]"
+    },
+    {
+      "name": "m_r",
+      "symbol": "",
+      "value": "0.01",
+      "description": "fraction admitted colonised with resistant [illustrative]"
+    },
+    {
+      "name": "beta_s",
+      "symbol": "",
+      "value": "1.0",
+      "description": "transmission, sensitive (1/day) [illustrative]"
+    },
+    {
+      "name": "beta_r",
+      "symbol": "",
+      "value": "1.0",
+      "description": "transmission, resistant (1/day) [illustrative]"
+    },
+    {
+      "name": "tau1",
+      "symbol": "",
+      "value": "0.1",
+      "description": "treatment rate with drug 1 (clears sensitive only) (1/day) [illustrative]"
+    },
+    {
+      "name": "tau2",
+      "symbol": "",
+      "value": "0.05",
+      "description": "treatment rate with drug 2 (clears both) (1/day) [illustrative]"
+    },
+    {
+      "name": "gamma",
+      "symbol": "",
+      "value": "0.03",
+      "description": "spontaneous clearance (1/day) [illustrative]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "prop_res",
+      "symbol": "",
+      "expr": "Rc/(Sc + Rc)",
+      "description": "",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "(1 - m_s - m_r)*mu_d*N",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 90
+    },
+    {
+      "id": "f2",
+      "from": null,
+      "to": "c2",
+      "kind": "absolute",
+      "rate": "m_s*mu_d*N",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 10
+    },
+    {
+      "id": "f3",
+      "from": null,
+      "to": "c3",
+      "kind": "absolute",
+      "rate": "m_r*mu_d*N",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 170
+    },
+    {
+      "id": "f4",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "beta_s*Sc/N",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c1",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "beta_r*Rc/N",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c2",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "tau1 + tau2 + gamma",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f7",
+      "from": "c3",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "tau2 + gamma",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f8",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_d",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 350
+    },
+    {
+      "id": "f9",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_d",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 270
+    },
+    {
+      "id": "f10",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_d",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 430
+    }
+  ]
+}

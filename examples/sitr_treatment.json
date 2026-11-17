@@ -1,0 +1,171 @@
+{
+  "version": 1,
+  "id": "sitr_treatment",
+  "category": "Classic extensions",
+  "name": "SEITR influenza-type model with antiviral treatment",
+  "description": "pandemic/seasonal influenza, antiviral treatment.\nClosed population, so N is constant.\nParameter values: 0 of 6 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Brauer F. (2008) \"Compartmental models in epidemiology\", in Brauer, van den Driessche & Wu (eds), Mathematical Epidemiology, Lecture Notes in Mathematics 1945, Springer, pp. 19–79",
+  "referenceUrl": "https://doi.org/10.1007/978-3-540-78911-6_2",
+  "time": {
+    "start": "0",
+    "stop": "200",
+    "step": "0.2",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "susceptible",
+      "init": "9990",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "E",
+      "description": "latent",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "I",
+      "description": "infectious, untreated",
+      "init": "10",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "Tr",
+      "description": "infectious, under treatment",
+      "init": "0",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 720,
+      "y": 140
+    },
+    {
+      "id": "c5",
+      "name": "R",
+      "description": "recovered",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 920,
+      "y": 140
+    }
+  ],
+  "parameters": [
+    {
+      "name": "beta",
+      "symbol": "",
+      "value": "0.5",
+      "description": "transmission rate (1/day) [illustrative]"
+    },
+    {
+      "name": "kappa",
+      "symbol": "",
+      "value": "1/1.5",
+      "description": "progression from latent (1/day) [illustrative]"
+    },
+    {
+      "name": "tau",
+      "symbol": "",
+      "value": "0.3",
+      "description": "treatment uptake rate (1/day) [illustrative]"
+    },
+    {
+      "name": "alpha",
+      "symbol": "",
+      "value": "1/4",
+      "description": "untreated recovery rate (1/day) [illustrative]"
+    },
+    {
+      "name": "eta",
+      "symbol": "",
+      "value": "1/2.5",
+      "description": "recovery rate under treatment (1/day) [illustrative]"
+    },
+    {
+      "name": "delta",
+      "symbol": "",
+      "value": "0.5",
+      "description": "relative infectiousness of treated people [illustrative]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "lambda",
+      "symbol": "",
+      "expr": "beta*(I + delta*Tr)/N",
+      "description": "force of infection",
+      "output": false
+    },
+    {
+      "name": "R0",
+      "symbol": "",
+      "expr": "beta*(1/(alpha+tau) + delta*tau/((alpha+tau)*eta))",
+      "description": "basic reproduction number (about 1.26 with these values; set beta = 0.8 for about 2.0)",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lambda",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "kappa",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "tau",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c3",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "alpha",
+      "output": "",
+      "curve": 50
+    },
+    {
+      "id": "f5",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "eta",
+      "output": "",
+      "curve": 0
+    }
+  ]
+}

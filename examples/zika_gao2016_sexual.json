@@ -1,0 +1,350 @@
+{
+  "version": 1,
+  "id": "zika_gao2016_sexual",
+  "category": "Vector-borne",
+  "name": "Zika with mosquito-borne and sexual transmission (Gao et al. 2016) [VERIFIED-PARAMS]",
+  "description": "Zika virus, Latin America 2015–16 (fitted to Brazil, Colombia, El Salvador).\nParameter values: 0 of 15 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Gao D, Lou Y, He D, Porco TC, Kuang Y, Chowell G, Ruan S (2016). Prevention and control of Zika as a mosquito-borne and sexually transmitted disease: a mathematical modeling analysis. Sci Rep 6:28070. https://doi.org/10.1038/srep28070 ; PMC:…",
+  "referenceUrl": "https://doi.org/10.1038/srep28070",
+  "time": {
+    "start": "0",
+    "stop": "365",
+    "step": "0.5",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Sh",
+      "description": "susceptible humans",
+      "init": "99990",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 220
+    },
+    {
+      "id": "c2",
+      "name": "Eh",
+      "description": "exposed humans (mildly infectious to mosquitoes and sexually)",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 220
+    },
+    {
+      "id": "c3",
+      "name": "I1",
+      "description": "symptomatic acute",
+      "init": "10",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "I2",
+      "description": "convalescent (sexually infectious only)",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 720,
+      "y": 220
+    },
+    {
+      "id": "c5",
+      "name": "Ah",
+      "description": "asymptomatic",
+      "init": "0",
+      "inN": true,
+      "color": "#E57373",
+      "x": 520,
+      "y": 300
+    },
+    {
+      "id": "c6",
+      "name": "Rh",
+      "description": "recovered",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 920,
+      "y": 220
+    },
+    {
+      "id": "c7",
+      "name": "Sv",
+      "description": "susceptible mosquitoes",
+      "init": "500000",
+      "inN": false,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 516
+    },
+    {
+      "id": "c8",
+      "name": "Ev",
+      "description": "exposed mosquitoes",
+      "init": "0",
+      "inN": false,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 516
+    },
+    {
+      "id": "c9",
+      "name": "Iv",
+      "description": "infectious mosquitoes",
+      "init": "0",
+      "inN": false,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 516
+    }
+  ],
+  "parameters": [
+    {
+      "name": "a_bite",
+      "symbol": "",
+      "value": "0.5",
+      "description": ""
+    },
+    {
+      "name": "b_vh",
+      "symbol": "",
+      "value": "0.4",
+      "description": "P(mosquito → human) per bite"
+    },
+    {
+      "name": "p_hv",
+      "symbol": "",
+      "value": "0.5",
+      "description": "P(symptomatic human → mosquito) per bite"
+    },
+    {
+      "name": "eta",
+      "symbol": "",
+      "value": "0.1",
+      "description": "relative human → mosquito infectivity of Eh"
+    },
+    {
+      "name": "bet_sex",
+      "symbol": "",
+      "value": "0.05",
+      "description": "sexual transmission rate from symptomatic humans"
+    },
+    {
+      "name": "kappa",
+      "symbol": "",
+      "value": "0.6",
+      "description": "relative sexual infectivity of Eh"
+    },
+    {
+      "name": "tau_c",
+      "symbol": "",
+      "value": "0.3",
+      "description": "relative sexual infectivity of convalescent I2"
+    },
+    {
+      "name": "theta",
+      "symbol": "",
+      "value": "0.18",
+      "description": "proportion symptomatic"
+    },
+    {
+      "name": "m_ratio",
+      "symbol": "",
+      "value": "5",
+      "description": ""
+    },
+    {
+      "name": "nu_h",
+      "symbol": "",
+      "value": "0.2",
+      "description": "1/(5 d) intrinsic incubation [2–7 d] (1/day)"
+    },
+    {
+      "name": "nu_v",
+      "symbol": "",
+      "value": "0.1",
+      "description": "1/(10 d) extrinsic incubation [8–12 d] (1/day)"
+    },
+    {
+      "name": "gam_h1",
+      "symbol": "",
+      "value": "0.2",
+      "description": "1/(5 d) acute phase [3–7 d] (1/day)"
+    },
+    {
+      "name": "gam_h2",
+      "symbol": "",
+      "value": "0.05",
+      "description": "1/(20 d) convalescent phase [14–30 d] (1/day)"
+    },
+    {
+      "name": "gam_ha",
+      "symbol": "",
+      "value": "0.1429",
+      "description": "1/(7 d) asymptomatic infection [5–10 d] (1/day)"
+    },
+    {
+      "name": "mu_v",
+      "symbol": "",
+      "value": "0.0714",
+      "description": "1/(14 d) mosquito life [4–35 d] (1/day)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "Nh",
+      "symbol": "",
+      "expr": "Sh + Eh + I1 + I2 + Ah + Rh",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "Nv",
+      "symbol": "",
+      "expr": "Sv + Ev + Iv",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "lambda_h",
+      "symbol": "",
+      "expr": "a_bite*b_vh*Iv/Nh + bet_sex*(kappa*Eh + I1 + tau_c*I2)/Nh",
+      "description": "vector-borne plus sexual force of infection",
+      "output": false
+    },
+    {
+      "name": "lambda_v",
+      "symbol": "",
+      "expr": "a_bite*p_hv*(eta*Eh + I1)/Nh",
+      "description": "mosquito force of infection",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lambda_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "theta*nu_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "(1 - theta)*nu_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "gam_h1",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c4",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "gam_h2",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "gam_ha",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": null,
+      "to": "c7",
+      "kind": "absolute",
+      "rate": "mu_v*Nv",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 386
+    },
+    {
+      "id": "f8",
+      "from": "c7",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "lambda_v",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f9",
+      "from": "c8",
+      "to": "c9",
+      "kind": "per_capita",
+      "rate": "nu_v",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f10",
+      "from": "c7",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_v",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 646
+    },
+    {
+      "id": "f11",
+      "from": "c8",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_v",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 646
+    },
+    {
+      "id": "f12",
+      "from": "c9",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_v",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 646
+    }
+  ]
+}

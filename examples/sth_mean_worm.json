@@ -1,0 +1,159 @@
+{
+  "version": 1,
+  "id": "sth_mean_worm",
+  "category": "Water, enteric & NTDs",
+  "name": "Soil-transmitted helminths: mean worm burden with environmental reservoir of infective stages (Anderson & May)",
+  "description": "Ascaris / Trichuris / hookworm.\nParameter values: 0 of 8 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Anderson RM, May RM. Infectious Diseases of Humans: Dynamics and Control. Oxford University Press, 1991, chapters 16–17 (mean-worm-burden ODE with free-living reservoir, density-dependent fecundity and negative-binomial aggregation) [M]. Implemented for…",
+  "referenceUrl": "https://doi.org/10.1186/1756-3305-7-266",
+  "time": {
+    "start": "0",
+    "stop": "30",
+    "step": "0.05",
+    "unit": "years"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Mw",
+      "description": "mean worm burden per host",
+      "init": "10",
+      "inN": false,
+      "color": "#F3C6D3",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Lr",
+      "description": "infective stages in the environment, normalised per host",
+      "init": "5",
+      "inN": false,
+      "color": "#E8C468",
+      "x": 120,
+      "y": 356
+    }
+  ],
+  "parameters": [
+    {
+      "name": "R0_sth",
+      "symbol": "",
+      "value": "3",
+      "description": "basic reproduction number (Ascaris about 1–5) [M]"
+    },
+    {
+      "name": "mu_w",
+      "symbol": "",
+      "value": "1",
+      "description": "adult worm death (Ascaris about 1 year) [M] (yr^-1)"
+    },
+    {
+      "name": "mu_h",
+      "symbol": "",
+      "value": "0.02",
+      "description": "host death [I] (yr^-1)"
+    },
+    {
+      "name": "mu_l",
+      "symbol": "",
+      "value": "6",
+      "description": "infective-stage loss (about 2 months) [I] (yr^-1)"
+    },
+    {
+      "name": "k_agg",
+      "symbol": "",
+      "value": "0.5",
+      "description": "aggregation [M]"
+    },
+    {
+      "name": "z_dd",
+      "symbol": "",
+      "value": "0.93",
+      "description": "per-worm density-dependent fecundity factor, exp(−γ) [M/I]"
+    },
+    {
+      "name": "lam_e",
+      "symbol": "",
+      "value": "1",
+      "description": "egg output [I; normalisation] (stages per worm per yr, normalised)"
+    },
+    {
+      "name": "tau_m",
+      "symbol": "",
+      "value": "0",
+      "description": "continuous MDA kill rate. Pulsed alternative: ifelse((t - floor(t)) < 0.02, -log(1 - 0.750.95)/0.02, 0) (75% coverage, 95% efficacy of albendazole against Ascar"
+    }
+  ],
+  "variables": [
+    {
+      "name": "beta_l",
+      "symbol": "",
+      "expr": "R0_sth*(mu_w + mu_h)*mu_l/lam_e",
+      "description": "uptake rate of infective stages (18.36/yr)",
+      "output": false
+    },
+    {
+      "name": "fdd",
+      "symbol": "",
+      "expr": "(1 + Mw*(1 - z_dd)/k_agg)^(-(k_agg + 1))",
+      "description": "density-dependent fecundity under negative-binomial aggregation",
+      "output": false
+    },
+    {
+      "name": "prev_sth",
+      "symbol": "",
+      "expr": "1 - (1 + Mw/k_agg)^(-k_agg)",
+      "description": "prevalence of infection",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "beta_l*Lr",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_w + mu_h + tau_m",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    },
+    {
+      "id": "f3",
+      "from": null,
+      "to": "c2",
+      "kind": "absolute",
+      "rate": "lam_e*Mw*fdd",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 226
+    },
+    {
+      "id": "f4",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_l",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 486
+    }
+  ]
+}

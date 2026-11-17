@@ -1,0 +1,226 @@
+{
+  "version": 1,
+  "id": "tb",
+  "category": "Natural history",
+  "name": "Tuberculosis (fast and slow progression)",
+  "description": "New infections progress rapidly to disease with probability p, otherwise enter long-term latency (L)\nwith slow reactivation; treated/self-cured cases can relapse.",
+  "reference": "Vynnycky & White (2010), An Introduction to Infectious Disease Modelling, ch. 3; Blower et al. (1995), Nature Medicine 1:815-821",
+  "referenceUrl": "",
+  "time": {
+    "start": "0",
+    "stop": "200",
+    "step": "0.1",
+    "unit": "years"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "Susceptible",
+      "init": "99990",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 220
+    },
+    {
+      "id": "c2",
+      "name": "L",
+      "description": "Latent infection",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 300
+    },
+    {
+      "id": "c3",
+      "name": "I",
+      "description": "Active TB",
+      "init": "10",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 220
+    },
+    {
+      "id": "c4",
+      "name": "R",
+      "description": "Recovered",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 720,
+      "y": 220
+    }
+  ],
+  "parameters": [
+    {
+      "name": "beta",
+      "symbol": "",
+      "value": "10",
+      "description": "effective contacts per case per year"
+    },
+    {
+      "name": "p",
+      "symbol": "",
+      "value": "0.1",
+      "description": "proportion progressing rapidly to disease"
+    },
+    {
+      "name": "v",
+      "symbol": "",
+      "value": "0.001",
+      "description": "reactivation rate per year"
+    },
+    {
+      "name": "r",
+      "symbol": "",
+      "value": "0.5",
+      "description": "rate of cure / self-cure per year"
+    },
+    {
+      "name": "relapse",
+      "symbol": "",
+      "value": "0.002",
+      "description": "relapse rate per year"
+    },
+    {
+      "name": "mu",
+      "symbol": "",
+      "value": "1 / 70",
+      "description": "background death rate per year"
+    },
+    {
+      "name": "muTB",
+      "symbol": "μ_TB",
+      "value": "0.2",
+      "description": "TB mortality rate per year"
+    }
+  ],
+  "variables": [
+    {
+      "name": "lam",
+      "symbol": "",
+      "expr": "beta * I / N",
+      "description": "force of infection",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "mu * N + muTB * I",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 90
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "p * lam",
+      "output": "fast_cases",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "(1 - p) * lam",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "v",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "r",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c4",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "relapse",
+      "output": "",
+      "curve": 40
+    },
+    {
+      "id": "f7",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 350
+    },
+    {
+      "id": "f8",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 430
+    },
+    {
+      "id": "f9",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 490,
+      "oy": 90
+    },
+    {
+      "id": "f10",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "muTB",
+      "output": "",
+      "curve": 0,
+      "ox": 550,
+      "oy": 90
+    },
+    {
+      "id": "f11",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 350
+    }
+  ]
+}

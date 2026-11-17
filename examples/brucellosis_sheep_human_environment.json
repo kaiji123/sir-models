@@ -1,0 +1,396 @@
+{
+  "version": 1,
+  "id": "brucellosis_sheep_human_environment",
+  "category": "Zoonoses & emerging",
+  "name": "Brucellosis in small ruminants with an environmental reservoir and human cases",
+  "description": "Brucellosis, sheep/goats → humans, with Brucella in the environment.\nThe structural signature of this family is the additive direct + indirect force of infection with an explicit environmental bacterial compartment W, and the result that vaccination and disinfection of adults alone cannot eradicate because y\nParameter values: 0 of 17 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Hou Q, Sun X, Zhang J, Liu Y, Wang Y, Jin Z (2013). Modeling the transmission dynamics of sheep brucellosis in Inner Mongolia Autonomous Region, China. Mathematical Biosciences 242(1):51–58",
+  "referenceUrl": "https://doi.org/10.1016/j.mbs.2012.11.012",
+  "time": {
+    "start": "0",
+    "stop": "30",
+    "step": "0.05",
+    "unit": "years"
+  },
+  "population": {
+    "name": "N_total"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Ss",
+      "description": "susceptible sheep",
+      "init": "1e6",
+      "inN": false,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 220
+    },
+    {
+      "id": "c2",
+      "name": "Es",
+      "description": "exposed/latently infected sheep",
+      "init": "1e4",
+      "inN": false,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Is",
+      "description": "infectious sheep (shedding; abortion/parturition products)",
+      "init": "1e3",
+      "inN": false,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 220
+    },
+    {
+      "id": "c4",
+      "name": "Vs",
+      "description": "vaccinated sheep",
+      "init": "0",
+      "inN": false,
+      "color": "#2457C5",
+      "x": 320,
+      "y": 300
+    },
+    {
+      "id": "c5",
+      "name": "W",
+      "description": "Brucella in the environment (bacterial load, arbitrary units)",
+      "init": "1e3",
+      "inN": false,
+      "color": "#A5D6A7",
+      "x": 120,
+      "y": 516
+    },
+    {
+      "id": "c6",
+      "name": "Sh",
+      "description": "susceptible humans",
+      "init": "2e6",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 732
+    },
+    {
+      "id": "c7",
+      "name": "Eh",
+      "description": "exposed humans",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 732
+    },
+    {
+      "id": "c8",
+      "name": "Iah",
+      "description": "acutely infected humans",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 732
+    },
+    {
+      "id": "c9",
+      "name": "Ich",
+      "description": "chronically infected humans",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 720,
+      "y": 732
+    }
+  ],
+  "parameters": [
+    {
+      "name": "As",
+      "symbol": "",
+      "value": "2.5e5",
+      "description": "sheep recruitment (lambs + purchases) [illustrative] (sheep per year)"
+    },
+    {
+      "name": "mu_s",
+      "symbol": "",
+      "value": "0.4",
+      "description": "sheep removal rate (slaughter + natural death) [illustrative] (per year)"
+    },
+    {
+      "name": "beta_ss",
+      "symbol": "",
+      "value": "2e-7",
+      "description": "direct sheep-to-sheep transmission coefficient [illustrative] (per sheep per year)"
+    },
+    {
+      "name": "beta_sw",
+      "symbol": "",
+      "value": "1e-6",
+      "description": "indirect (environment-to-sheep) transmission coefficient [illustrative] (per unit load per year)"
+    },
+    {
+      "name": "sigma_s",
+      "symbol": "",
+      "value": "2.0",
+      "description": "rate exposed sheep become infectious (≈6-month latency) [illustrative] (per year)"
+    },
+    {
+      "name": "nu_s",
+      "symbol": "",
+      "value": "0",
+      "description": "sheep vaccination rate (control lever; S19/Rev-1) [illustrative] (per year)"
+    },
+    {
+      "name": "wane_s",
+      "symbol": "",
+      "value": "0.5",
+      "description": "waning of sheep vaccine protection [illustrative] (per year)"
+    },
+    {
+      "name": "shed",
+      "symbol": "",
+      "value": "15",
+      "description": "environmental shedding rate [illustrative] (load units per infectious sheep per year)"
+    },
+    {
+      "name": "decay",
+      "symbol": "",
+      "value": "3.0",
+      "description": "natural decay of Brucella in the environment [illustrative] (per year)"
+    },
+    {
+      "name": "disinf",
+      "symbol": "",
+      "value": "0",
+      "description": "additional removal of environmental load by disinfection (control lever) [illustrative] (per year)"
+    },
+    {
+      "name": "beta_hs",
+      "symbol": "",
+      "value": "1e-8",
+      "description": "sheep-to-human transmission coefficient (occupational contact) [illustrative] (per sheep per year)"
+    },
+    {
+      "name": "beta_hw",
+      "symbol": "",
+      "value": "1e-8",
+      "description": "environment-to-human transmission coefficient [illustrative] (per unit load per year)"
+    },
+    {
+      "name": "sigma_h",
+      "symbol": "",
+      "value": "4.0",
+      "description": "rate exposed → acute human case (≈0.25 year onset) [verified as a published value for this quantity in the related literature] (per year)"
+    },
+    {
+      "name": "chron",
+      "symbol": "",
+      "value": "1.0",
+      "description": "rate acute → chronic human infection [illustrative] (per year)"
+    },
+    {
+      "name": "gamma_a",
+      "symbol": "",
+      "value": "2.0",
+      "description": "recovery rate from acute infection [illustrative] (per year)"
+    },
+    {
+      "name": "gamma_c",
+      "symbol": "",
+      "value": "0.4",
+      "description": "recovery rate from chronic infection [illustrative] (per year)"
+    },
+    {
+      "name": "mu_h",
+      "symbol": "",
+      "value": "0.006",
+      "description": "human natural death rate [verified as a published value in the related literature] (per year)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "Ns",
+      "symbol": "",
+      "expr": "Ss + Es + Is + Vs",
+      "description": "sheep population",
+      "output": false
+    },
+    {
+      "name": "N",
+      "symbol": "",
+      "expr": "Sh + Eh + Iah + Ich",
+      "description": "human population",
+      "output": false
+    },
+    {
+      "name": "lambda_s",
+      "symbol": "",
+      "expr": "beta_ss * Is + beta_sw * W",
+      "description": "sheep force of infection",
+      "output": false
+    },
+    {
+      "name": "lambda_h",
+      "symbol": "",
+      "expr": "beta_hs * Is + beta_hw * W",
+      "description": "human force of infection",
+      "output": false
+    },
+    {
+      "name": "R0s",
+      "symbol": "",
+      "expr": "(beta_ss + beta_sw * shed / (decay + disinf)) * As * sigma_s / (mu_s * (mu_s + sigma_s + nu_s) * (mu_s + shed * 0 + 1e-12) )",
+      "description": "sheep reproduction number (write out explicitly in the generator; the point is that R0s has a direct and an indirect additive component, whi",
+      "output": false
+    },
+    {
+      "name": "CHh_rate",
+      "symbol": "",
+      "expr": "(sigma_h) * Eh",
+      "description": "rate of new cumulative reported human cases (integrate with cumsum for the cumulative count)",
+      "output": true
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "As",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 90
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lambda_s",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "nu_s",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c4",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "wane_s",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f5",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "sigma_s",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_s",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 350
+    },
+    {
+      "id": "f7",
+      "from": null,
+      "to": "c5",
+      "kind": "absolute",
+      "rate": "shed * Is",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 386
+    },
+    {
+      "id": "f8",
+      "from": "c5",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "decay + disinf",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 646
+    },
+    {
+      "id": "f9",
+      "from": "c6",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "lambda_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f10",
+      "from": "c7",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "sigma_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f11",
+      "from": "c8",
+      "to": "c9",
+      "kind": "per_capita",
+      "rate": "chron",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f12",
+      "from": "c8",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "gamma_a",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f13",
+      "from": "c9",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "gamma_c",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f14",
+      "from": "c6",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_h",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 862
+    }
+  ]
+}

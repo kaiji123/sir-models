@@ -1,0 +1,211 @@
+{
+  "version": 1,
+  "id": "hcv_neumann_interferon",
+  "category": "Within-host",
+  "name": "Hepatitis C within-host dynamics under interferon-α therapy",
+  "description": "Hepatitis C virus within-host dynamics.\nStructurally identical to the HIV target-cell model — the scientific content is in how therapy enters.\nParameter values: 0 of 10 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Neumann AU, Lam NP, Dahari H, Gretch DR, Wiley TE, Layden TJ, Perelson AS (1998). Hepatitis C viral dynamics in vivo and the antiviral efficacy of interferon-α therapy. Science 282(5386):103–107",
+  "referenceUrl": "https://doi.org/10.1126/science.282.5386.103",
+  "time": {
+    "start": "0",
+    "stop": "28",
+    "step": "0.05",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "solver": {
+    "hmax": "0.05"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Tc",
+      "description": "uninfected target hepatocytes (cells per mL)",
+      "init": "1e7",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Ii",
+      "description": "productively infected hepatocytes (cells per mL)",
+      "init": "1e6",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "V",
+      "description": "free virions (IU or copies per mL)",
+      "init": "1e6",
+      "inN": true,
+      "color": "#2457C5",
+      "x": 120,
+      "y": 356
+    }
+  ],
+  "parameters": [
+    {
+      "name": "sh",
+      "symbol": "",
+      "value": "1e5",
+      "description": "hepatocyte production rate [illustrative] (cells mL⁻¹ day⁻¹)"
+    },
+    {
+      "name": "dh",
+      "symbol": "",
+      "value": "0.01",
+      "description": "death rate of uninfected hepatocytes [illustrative] (per day)"
+    },
+    {
+      "name": "beta",
+      "symbol": "",
+      "value": "1e-7",
+      "description": "infection rate constant [illustrative] (mL virion⁻¹ day⁻¹)"
+    },
+    {
+      "name": "delta",
+      "symbol": "",
+      "value": "0.14",
+      "description": "death/loss rate of infected hepatocytes; the authors estimated a wide range across patients (≈0.01–0.5 per day), corresponding to infected-cell half-lives of ≈1"
+    },
+    {
+      "name": "p",
+      "symbol": "",
+      "value": "100",
+      "description": "virion production rate per infected cell [illustrative] (virions cell⁻¹ day⁻¹)"
+    },
+    {
+      "name": "cV",
+      "symbol": "",
+      "value": "6.2",
+      "description": "virion clearance rate, implying a plasma virion half-life of ≈2.7 hours [unverified; 6.2/day is the headline estimate conventionally attributed to this paper] ("
+    },
+    {
+      "name": "eta",
+      "symbol": "",
+      "value": "0.95",
+      "description": "interferon efficacy in blocking virion production (dimensionless, 0–1) [recalled]"
+    },
+    {
+      "name": "eps",
+      "symbol": "",
+      "value": "0",
+      "description": "efficacy in blocking new infections (found to be the minor mechanism) [illustrative] (dimensionless, 0–1)"
+    },
+    {
+      "name": "tau_rx",
+      "symbol": "",
+      "value": "0",
+      "description": "therapy start time [illustrative] (days)"
+    },
+    {
+      "name": "tau_lag",
+      "symbol": "",
+      "value": "0.3",
+      "description": "pharmacological delay before the drug acts (the authors needed a delay to fit the first hours) [illustrative] (days)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "on_rx",
+      "symbol": "",
+      "expr": "ifelse(t < tau_rx + tau_lag, 0, 1)",
+      "description": "therapy switch including the delay",
+      "output": false
+    },
+    {
+      "name": "en",
+      "symbol": "",
+      "expr": "eta * on_rx",
+      "description": "effective production-blocking efficacy",
+      "output": false
+    },
+    {
+      "name": "ei",
+      "symbol": "",
+      "expr": "eps * on_rx",
+      "description": "effective infection-blocking efficacy",
+      "output": false
+    },
+    {
+      "name": "R0v",
+      "symbol": "",
+      "expr": "beta * p * (sh / dh) / (cV * delta)",
+      "description": "within-host reproductive ratio",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "sh",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "dh",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "beta * (1 - ei) * V",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "delta",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 270
+    },
+    {
+      "id": "f5",
+      "from": null,
+      "to": "c3",
+      "kind": "absolute",
+      "rate": "p * (1 - en) * Ii",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 226
+    },
+    {
+      "id": "f6",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "cV",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 486
+    }
+  ]
+}

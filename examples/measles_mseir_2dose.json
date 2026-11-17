@@ -1,0 +1,257 @@
+{
+  "version": 1,
+  "id": "measles_mseir_2dose",
+  "category": "Respiratory",
+  "name": "Measles MSEIR with two-dose vaccination (dose-1 failures eligible for dose 2)",
+  "description": "Measles.\nParameter values: 0 of 10 checked against the source; the rest are recalled or illustrative.",
+  "reference": "[ILLUSTRATIVE] MSEIR structure from Hethcote HW, \"The mathematics of infectious diseases,\" SIAM Review 2000;42:599–653, https://doi.org/10.1137/S0036144500371907. The values below are from my recall and were not fetched this session:",
+  "referenceUrl": "https://doi.org/10.1137/S0036144500371907",
+  "time": {
+    "start": "0",
+    "stop": "50",
+    "step": "0.05",
+    "unit": "years"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "M",
+      "description": "maternally protected",
+      "init": "0.01*N0",
+      "inN": true,
+      "color": "#F3C6D3",
+      "x": 120,
+      "y": 220
+    },
+    {
+      "id": "c2",
+      "name": "S0",
+      "description": "susceptible, unvaccinated",
+      "init": "0.05*N0",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 320,
+      "y": 220
+    },
+    {
+      "id": "c3",
+      "name": "Sf",
+      "description": "susceptible after failed or missed dose 1, eligible for dose 2",
+      "init": "0.01*N0",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 520,
+      "y": 220
+    },
+    {
+      "id": "c4",
+      "name": "V",
+      "description": "vaccine-immune",
+      "init": "0.6*N0",
+      "inN": true,
+      "color": "#2457C5",
+      "x": 720,
+      "y": 140
+    },
+    {
+      "id": "c5",
+      "name": "E",
+      "description": "exposed",
+      "init": "10",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 720,
+      "y": 300
+    },
+    {
+      "id": "c6",
+      "name": "Ip",
+      "description": "infectious",
+      "init": "10",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 920,
+      "y": 220
+    },
+    {
+      "id": "c7",
+      "name": "R",
+      "description": "recovered",
+      "init": "0.33*N0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 1120,
+      "y": 220
+    }
+  ],
+  "parameters": [
+    {
+      "name": "R0_m",
+      "symbol": "",
+      "value": "15",
+      "description": "Guerra 2017 range (recall)"
+    },
+    {
+      "name": "sig_lat",
+      "symbol": "",
+      "value": "365/8",
+      "description": "8-day latent period (1/year) [illustrative]"
+    },
+    {
+      "name": "g_rec",
+      "symbol": "",
+      "value": "365/5",
+      "description": "5-day infectious period (1/year) [illustrative]"
+    },
+    {
+      "name": "xi_m",
+      "symbol": "",
+      "value": "2",
+      "description": "loss of maternal antibody at about 6 months (1/year) [illustrative]"
+    },
+    {
+      "name": "nu1",
+      "symbol": "",
+      "value": "1.5",
+      "description": "per-capita dose-1 rate in S0 (1/year) [illustrative]"
+    },
+    {
+      "name": "nu2",
+      "symbol": "",
+      "value": "0.3",
+      "description": "dose-2 rate in Sf (1/year) [illustrative]"
+    },
+    {
+      "name": "e1",
+      "symbol": "",
+      "value": "0.93",
+      "description": "efficacy of dose 1, and of dose 2 given to a dose-1 failure"
+    },
+    {
+      "name": "e2",
+      "symbol": "",
+      "value": "0.97",
+      "description": "efficacy of dose 1, and of dose 2 given to a dose-1 failure"
+    },
+    {
+      "name": "mu",
+      "symbol": "",
+      "value": "0.0133",
+      "description": "birth = death rate (1/year) [illustrative]"
+    },
+    {
+      "name": "N0",
+      "symbol": "",
+      "value": "1e6",
+      "description": "value taken from the notes text [recalled]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "foi",
+      "symbol": "",
+      "expr": "R0_m*(g_rec + mu)*Ip/N",
+      "description": "",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "mu*N",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 90
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "xi_m",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "e1*nu1",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "(1-e1)*nu1",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "e2*nu2",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c2",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "foi",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": "c3",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "foi",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "sig_lat",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f9",
+      "from": "c6",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "g_rec",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f10",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 350
+    }
+  ]
+}

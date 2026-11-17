@@ -1,0 +1,241 @@
+{
+  "version": 1,
+  "id": "svirs_waning_vaccine",
+  "category": "Classic extensions",
+  "name": "SVIRS with imperfect (leaky) and waning vaccine and waning natural immunity",
+  "description": "e.g. influenza, pertussis-like.\nN is constant. This differs from the existing \"SVIR leaky vaccine\" model in having vaccine waning, newborn vaccination and waning natural immunity.\nParameter values: 0 of 8 checked against the source; the rest are recalled or illustrative.",
+  "reference": "The structure follows Arino J., McCluskey C.C., van den Driessche P. (2003) \"Global results for an epidemic model with vaccination that exhibits backward bifurcation\", SIAM J. Appl. Math. 64:260–276",
+  "referenceUrl": "https://doi.org/10.1137/S0036139902413829",
+  "time": {
+    "start": "0",
+    "stop": "100",
+    "step": "0.1",
+    "unit": "years"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "susceptible",
+      "init": "9000",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "V",
+      "description": "vaccinated (partially protected)",
+      "init": "0",
+      "inN": true,
+      "color": "#2457C5",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "I",
+      "description": "infectious",
+      "init": "10",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "R",
+      "description": "recovered",
+      "init": "990",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 720,
+      "y": 140
+    }
+  ],
+  "parameters": [
+    {
+      "name": "mu",
+      "symbol": "",
+      "value": "1/70",
+      "description": "birth = death rate (1/yr) [illustrative]"
+    },
+    {
+      "name": "p_nb",
+      "symbol": "",
+      "value": "0.5",
+      "description": "fraction of newborns vaccinated [illustrative]"
+    },
+    {
+      "name": "nu_v",
+      "symbol": "",
+      "value": "0.1",
+      "description": "vaccination rate of susceptibles (1/yr) [illustrative]"
+    },
+    {
+      "name": "theta_v",
+      "symbol": "",
+      "value": "0.2",
+      "description": "vaccine waning (mean 5 y) (1/yr) [illustrative]"
+    },
+    {
+      "name": "sigma_v",
+      "symbol": "",
+      "value": "0.2",
+      "description": "relative susceptibility of vaccinees (vaccine efficacy 80%) [illustrative]"
+    },
+    {
+      "name": "beta",
+      "symbol": "",
+      "value": "100",
+      "description": "transmission rate (1/yr) [illustrative]"
+    },
+    {
+      "name": "gamma",
+      "symbol": "",
+      "value": "365/7",
+      "description": "recovery (7-day infectious period) (1/yr) [illustrative]"
+    },
+    {
+      "name": "omega_r",
+      "symbol": "",
+      "value": "0.1",
+      "description": "natural immunity waning (1/yr) [illustrative]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "lambda",
+      "symbol": "",
+      "expr": "beta*I/N",
+      "description": "force of infection",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "(1 - p_nb)*mu*N",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": null,
+      "to": "c2",
+      "kind": "absolute",
+      "rate": "p_nb*mu*N",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 10
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "nu_v",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c2",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "theta_v",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f5",
+      "from": "c1",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "lambda",
+      "output": "",
+      "curve": 50
+    },
+    {
+      "id": "f6",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "sigma_v*lambda",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "gamma",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c4",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "omega_r",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f9",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    },
+    {
+      "id": "f10",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 270
+    },
+    {
+      "id": "f11",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 270
+    },
+    {
+      "id": "f12",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 270
+    }
+  ]
+}

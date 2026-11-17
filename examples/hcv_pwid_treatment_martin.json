@@ -1,0 +1,526 @@
+{
+  "version": 1,
+  "id": "hcv_pwid_treatment_martin",
+  "category": "Sexually transmitted & blood-borne",
+  "name": "Hepatitis C among PWID with risk groups and DAA treatment as prevention",
+  "description": "HCV in people who inject drugs.\nParameter values: 9 of 11 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Martin NK, Vickerman P, Grebely J, Hellard M, Hutchinson SJ, Lima VD, Foster GR, Dillon JF, Goldberg DJ, Dore GJ, Hickman M. Hepatitis C virus treatment for prevention among people who inject drugs: modeling treatment scale-up in the age of direct-acting…",
+  "referenceUrl": "https://doi.org/10.1002/hep.26431",
+  "time": {
+    "start": "0",
+    "stop": "30",
+    "step": "0.05",
+    "unit": "years"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "X0",
+      "description": "uninfected, low risk",
+      "init": "503",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "A0",
+      "description": "acute HCV, low risk",
+      "init": "5",
+      "inN": true,
+      "color": "#E57373",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Ch0",
+      "description": "chronic HCV, low risk",
+      "init": "150",
+      "inN": true,
+      "color": "#8E0E0E",
+      "x": 720,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "Tx0",
+      "description": "on treatment, low risk",
+      "init": "0",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 920,
+      "y": 140
+    },
+    {
+      "id": "c5",
+      "name": "Fail0",
+      "description": "failed treatment, low risk",
+      "init": "12",
+      "inN": true,
+      "color": "#5D4037",
+      "x": 1120,
+      "y": 220
+    },
+    {
+      "id": "c6",
+      "name": "X1",
+      "description": "uninfected, high risk",
+      "init": "230",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 120,
+      "y": 220
+    },
+    {
+      "id": "c7",
+      "name": "A1",
+      "description": "acute, high risk",
+      "init": "5",
+      "inN": true,
+      "color": "#E57373",
+      "x": 320,
+      "y": 300
+    },
+    {
+      "id": "c8",
+      "name": "Ch1",
+      "description": "chronic, high risk",
+      "init": "90",
+      "inN": true,
+      "color": "#8E0E0E",
+      "x": 520,
+      "y": 300
+    },
+    {
+      "id": "c9",
+      "name": "Tx1",
+      "description": "on treatment, high risk",
+      "init": "0",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 720,
+      "y": 300
+    },
+    {
+      "id": "c10",
+      "name": "Fail1",
+      "description": "failed treatment, high risk",
+      "init": "5",
+      "inN": true,
+      "color": "#5D4037",
+      "x": 920,
+      "y": 300
+    }
+  ],
+  "parameters": [
+    {
+      "name": "pi_inf",
+      "symbol": "",
+      "value": "0.2",
+      "description": "infection rate coefficient (/yr) [illustrative]"
+    },
+    {
+      "name": "Pi_h",
+      "symbol": "",
+      "value": "3.6",
+      "description": "relative risk for high-risk PWID [verified]"
+    },
+    {
+      "name": "kappa",
+      "symbol": "",
+      "value": "12/14",
+      "description": "high to low risk (duration 14 months) (/yr) [verified]"
+    },
+    {
+      "name": "f_high",
+      "symbol": "",
+      "value": "0.33",
+      "description": "fraction of new injectors entering high risk [illustrative]"
+    },
+    {
+      "name": "delta_c",
+      "symbol": "",
+      "value": "0.26",
+      "description": "proportion of acute infections clearing spontaneously [verified]"
+    },
+    {
+      "name": "psi_a",
+      "symbol": "",
+      "value": "2",
+      "description": "exit from acute (6 months) (/yr) [verified]"
+    },
+    {
+      "name": "mu1",
+      "symbol": "",
+      "value": "1/11",
+      "description": "permanent cessation of injecting (11 yr career) (/yr) [verified]"
+    },
+    {
+      "name": "mu2",
+      "symbol": "",
+      "value": "0.01",
+      "description": "death rate (/yr) [verified]"
+    },
+    {
+      "name": "phi_tx",
+      "symbol": "",
+      "value": "8",
+      "description": "treatments started per year (per 1000 PWID per yr) [verified]"
+    },
+    {
+      "name": "omega",
+      "symbol": "",
+      "value": "52/12",
+      "description": "1/treatment duration (12 weeks for IFN-free DAA) (/yr) [verified]"
+    },
+    {
+      "name": "alpha_svr",
+      "symbol": "",
+      "value": "0.9",
+      "description": "SVR with IFN-free DAAs [verified]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "Ntot",
+      "symbol": "",
+      "expr": "X0+A0+Ch0+Tx0+Fail0+X1+A1+Ch1+Tx1+Fail1",
+      "description": "total PWID",
+      "output": false
+    },
+    {
+      "name": "Chtot",
+      "symbol": "",
+      "expr": "Ch0+Ch1",
+      "description": "total chronic infections",
+      "output": false
+    },
+    {
+      "name": "Infectious",
+      "symbol": "",
+      "expr": "A0+A1+Ch0+Ch1+Fail0+Fail1+(1-alpha_svr)*(Tx0+Tx1)",
+      "description": "those on treatment who will achieve SVR are non-infectious [verified assumption]",
+      "output": false
+    },
+    {
+      "name": "foi0",
+      "symbol": "",
+      "expr": "pi_inf*Infectious/Ntot",
+      "description": "force of infection, low risk",
+      "output": false
+    },
+    {
+      "name": "foi1",
+      "symbol": "",
+      "expr": "Pi_h*pi_inf*Infectious/Ntot",
+      "description": "force of infection, high risk",
+      "output": false
+    },
+    {
+      "name": "tx_pc",
+      "symbol": "",
+      "expr": "pmin(phi_tx/1000*Ntot/max(Chtot, 1e-6), 52)",
+      "description": "per-capita treatment rate implementing a fixed number treated per year; capped",
+      "output": false
+    },
+    {
+      "name": "exit_r",
+      "symbol": "",
+      "expr": "mu1 + mu2",
+      "description": "total exit rate (cessation plus death)",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "(1-f_high)*exit_r*Ntot",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": null,
+      "to": "c6",
+      "kind": "absolute",
+      "rate": "f_high*exit_r*Ntot",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 90
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "foi0",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c6",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "foi1",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c2",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "delta_c*psi_a",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f6",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "(1-delta_c)*psi_a",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": "c7",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "delta_c*psi_a",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f8",
+      "from": "c7",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "(1-delta_c)*psi_a",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f9",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "tx_pc",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f10",
+      "from": "c8",
+      "to": "c9",
+      "kind": "per_capita",
+      "rate": "tx_pc",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f11",
+      "from": "c4",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "alpha_svr*omega",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f12",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "(1-alpha_svr)*omega",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f13",
+      "from": "c9",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "alpha_svr*omega",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f14",
+      "from": "c9",
+      "to": "c10",
+      "kind": "per_capita",
+      "rate": "(1-alpha_svr)*omega",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f15",
+      "from": "c6",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "kappa",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f16",
+      "from": "c7",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "kappa",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f17",
+      "from": "c8",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "kappa",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f18",
+      "from": "c9",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "kappa",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f19",
+      "from": "c10",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "kappa",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f20",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "exit_r",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 270
+    },
+    {
+      "id": "f21",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "exit_r",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 270
+    },
+    {
+      "id": "f22",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "exit_r",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 270
+    },
+    {
+      "id": "f23",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "exit_r",
+      "output": "",
+      "curve": 0,
+      "ox": 920,
+      "oy": 270
+    },
+    {
+      "id": "f24",
+      "from": "c5",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "exit_r",
+      "output": "",
+      "curve": 0,
+      "ox": 1120,
+      "oy": 350
+    },
+    {
+      "id": "f25",
+      "from": "c6",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "exit_r",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 350
+    },
+    {
+      "id": "f26",
+      "from": "c7",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "exit_r",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 430
+    },
+    {
+      "id": "f27",
+      "from": "c8",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "exit_r",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 430
+    },
+    {
+      "id": "f28",
+      "from": "c9",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "exit_r",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 430
+    },
+    {
+      "id": "f29",
+      "from": "c10",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "exit_r",
+      "output": "",
+      "curve": 0,
+      "ox": 920,
+      "oy": 430
+    }
+  ]
+}

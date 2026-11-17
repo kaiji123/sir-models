@@ -1,0 +1,150 @@
+{
+  "version": 1,
+  "id": "seir_lockdown",
+  "category": "Interventions",
+  "name": "SEIR with a temporary lockdown",
+  "description": "Contacts fall by a proportion eff between days t_on and t_off.",
+  "reference": "Flaxman et al. (2020), Nature 584:257-261 (concept)",
+  "referenceUrl": "",
+  "time": {
+    "start": "0",
+    "stop": "365",
+    "step": "1",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "Susceptible",
+      "init": "999990",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "E",
+      "description": "Exposed",
+      "init": "10",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "I",
+      "description": "Infectious",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "R",
+      "description": "Recovered",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 720,
+      "y": 140
+    }
+  ],
+  "parameters": [
+    {
+      "name": "R0",
+      "symbol": "",
+      "value": "2.5",
+      "description": "basic reproduction number"
+    },
+    {
+      "name": "sigma",
+      "symbol": "",
+      "value": "1 / 5",
+      "description": "1/(latent period)"
+    },
+    {
+      "name": "gamma",
+      "symbol": "",
+      "value": "1 / 5",
+      "description": "1/(infectious period)"
+    },
+    {
+      "name": "eff",
+      "symbol": "",
+      "value": "0.6",
+      "description": "proportional reduction in contacts during lockdown"
+    },
+    {
+      "name": "t_on",
+      "symbol": "",
+      "value": "50",
+      "description": "day lockdown starts"
+    },
+    {
+      "name": "t_off",
+      "symbol": "",
+      "value": "120",
+      "description": "day lockdown ends"
+    }
+  ],
+  "variables": [
+    {
+      "name": "contact",
+      "symbol": "",
+      "expr": "1 - eff * (t >= t_on & t < t_off)",
+      "description": "relative contact rate",
+      "output": false
+    },
+    {
+      "name": "lam",
+      "symbol": "",
+      "expr": "contact * R0 * gamma * I / N",
+      "description": "force of infection",
+      "output": false
+    },
+    {
+      "name": "Rt",
+      "symbol": "",
+      "expr": "contact * R0 * S / N",
+      "description": "effective reproduction number",
+      "output": true
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lam",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "sigma",
+      "output": "incidence",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "gamma",
+      "output": "",
+      "curve": 0
+    }
+  ]
+}

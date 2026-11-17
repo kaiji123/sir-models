@@ -1,0 +1,286 @@
+{
+  "version": 1,
+  "id": "cholera_andrews_basu2011",
+  "category": "Water, enteric & NTDs",
+  "name": "Haiti cholera with water reservoir, vaccination and water-sanitation intervention",
+  "description": "Cholera, Haiti 2010–11.\nParameter values: 0 of 15 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Andrews JR, Basu S. Transmission dynamics and control of cholera in Haiti: an epidemic model. Lancet 2011;377(9773):1248–1255",
+  "referenceUrl": "https://doi.org/10.1016/S0140-6736(11",
+  "time": {
+    "start": "0",
+    "stop": "300",
+    "step": "0.5",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "susceptible",
+      "init": "9",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 300
+    },
+    {
+      "id": "c2",
+      "name": "I",
+      "description": "symptomatic infected",
+      "init": "1000",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "A",
+      "description": "asymptomatic infected",
+      "init": "0",
+      "inN": true,
+      "color": "#E57373",
+      "x": 320,
+      "y": 300
+    },
+    {
+      "id": "c4",
+      "name": "R",
+      "description": "recovered/immune",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 520,
+      "y": 300
+    },
+    {
+      "id": "c5",
+      "name": "V",
+      "description": "vaccinated (OCV)",
+      "init": "0",
+      "inN": true,
+      "color": "#2457C5",
+      "x": 320,
+      "y": 460
+    },
+    {
+      "id": "c6",
+      "name": "W",
+      "description": "V. cholerae concentration in the water reservoir (cells/ml)",
+      "init": "1e3",
+      "inN": false,
+      "color": "#A5D6A7",
+      "x": 120,
+      "y": 676
+    }
+  ],
+  "parameters": [
+    {
+      "name": "beta_w",
+      "symbol": "",
+      "value": "1.0",
+      "description": "contaminated-water exposure rate (fitted in the paper) [I] (day^-1)"
+    },
+    {
+      "name": "beta_h",
+      "symbol": "",
+      "value": "0.1",
+      "description": "direct (short-cycle) transmission [I] (day^-1)"
+    },
+    {
+      "name": "kap_w",
+      "symbol": "",
+      "value": "1e6",
+      "description": "half-saturation dose, as in Codeço [M] (cells/ml)"
+    },
+    {
+      "name": "p_sym",
+      "symbol": "",
+      "value": "0.2",
+      "description": "fraction of infections that are symptomatic [I]"
+    },
+    {
+      "name": "rel_a",
+      "symbol": "",
+      "value": "0.1",
+      "description": "relative shedding/infectiousness of asymptomatic infections [I]"
+    },
+    {
+      "name": "gam_c",
+      "symbol": "",
+      "value": "0.2",
+      "description": "recovery rate (5 days) [M] (day^-1)"
+    },
+    {
+      "name": "cfr_rate",
+      "symbol": "",
+      "value": "0.002",
+      "description": "symptomatic death rate (fitted in the paper) [I] (day^-1)"
+    },
+    {
+      "name": "xi_w",
+      "symbol": "",
+      "value": "10",
+      "description": "shedding [I] (cells ml^-1 day^-1 per symptomatic person)"
+    },
+    {
+      "name": "del_w",
+      "symbol": "",
+      "value": "0.033",
+      "description": "vibrio decay rate (30-day survival) [M, as used in Hartley/Morris/Smith 2006-style models] (day^-1)"
+    },
+    {
+      "name": "omega_r",
+      "symbol": "",
+      "value": "1/1095",
+      "description": "waning of natural immunity (about 3 years) [M] (day^-1)"
+    },
+    {
+      "name": "nu_v",
+      "symbol": "",
+      "value": "0",
+      "description": "vaccination rate; try 0.001 [I] (day^-1)"
+    },
+    {
+      "name": "eff_v",
+      "symbol": "",
+      "value": "0.65",
+      "description": "vaccine efficacy [I]"
+    },
+    {
+      "name": "omega_v",
+      "symbol": "",
+      "value": "1/1095",
+      "description": "vaccine waning [I] (day^-1)"
+    },
+    {
+      "name": "red_w",
+      "symbol": "",
+      "value": "0.001436",
+      "description": "equals −log(0.99)/7, a 1%/week reduction in contaminated-water consumption [V for the 1%/week scenario] (day^-1)"
+    },
+    {
+      "name": "t_int",
+      "symbol": "",
+      "value": "120",
+      "description": "start of the water intervention [I] (day)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "water_mult",
+      "symbol": "",
+      "expr": "exp(-red_w*max(t - t_int, 0))",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "lam",
+      "symbol": "",
+      "expr": "beta_w*water_mult*W/(kap_w + W) + beta_h*(I + rel_a*A)/N",
+      "description": "",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "p_sym*lam",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "(1 - p_sym)*lam",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "gam_c",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "cfr_rate",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 270
+    },
+    {
+      "id": "f5",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "gam_c",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c4",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "omega_r",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f7",
+      "from": "c1",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "nu_v*eff_v",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c5",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "omega_v",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f9",
+      "from": null,
+      "to": "c6",
+      "kind": "absolute",
+      "rate": "xi_w*(I + rel_a*A)",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 546
+    },
+    {
+      "id": "f10",
+      "from": "c6",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "del_w",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 806
+    }
+  ]
+}

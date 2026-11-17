@@ -1,0 +1,771 @@
+# Zoonoses & emerging infections, animal/wildlife disease, and within-host dynamics
+
+16 implementation-ready deterministic ODE specifications for the R/deSolve generator.
+Already implemented and deliberately **not** duplicated: Ebola Legrand et al. 2007 (community/hospital/funeral), rabies SEI density-dependent in foxes (Anderson et al. 1981).
+
+## How to read the provenance tags
+
+Only a subset of primary-source full texts could be opened in this session (several publisher/PubMed fetches failed). Every parameter value therefore carries one of:
+
+- **[verified]** — value appears in a source retrieved in this session (quoted below in "Sources and parameter provenance").
+- **[unverified]** — value is the one commonly attributed to the cited paper in the secondary literature, but was **not** confirmed against the primary full text in this session. Treat as a default to be checked before publication.
+- **[illustrative]** — no published value found for this quantity; the number is a plausible default chosen to make the model run and reproduce qualitative behaviour. **Not from the source.**
+
+Where a paper's structure is well established but its exact parameter table was unavailable, the structure is given as published and the numbers are tagged `[unverified]` or `[illustrative]`. Nothing here is invented and presented as sourced.
+
+Naming: no identifier is `F`, `T`, `c`, `t`, `pi`, `TRUE`, `FALSE`, `NA`, `Inf`, or an R function name. Target cells are `Tc`, virion clearance `cV`, CTL killing `pz`.
+
+---
+
+## Models
+
+### ebola_chowell_2004 — Ebola SEIR with intervention-time switch (Congo 1995 / Uganda 2000)
+
+- Disease/area: Ebola virus disease, human | Category: Zoonoses & emerging
+- Source: Chowell G, Hengartner NW, Castillo-Chavez C, Fenimore PW, Hyman JM (2004). The basic reproductive number of Ebola and the effects of public health measures: the cases of Congo and Uganda. *J Theor Biol* 229(1):119–126. DOI 10.1016/j.jtbi.2004.03.006
+- Time unit: days ; suggested simulation length: 250 days
+- Compartments:
+  - `S` — susceptible — 5364500 (Congo 1995 population used by the authors) [unverified]
+  - `E` — infected, not yet infectious (latent) — 0
+  - `I` — infectious (symptomatic, in community) — 1
+  - `R` — recovered, immune — 0
+  - `D` — died of disease (absorbing; cumulative deaths) — 0 — not in N
+  - `CC` — cumulative cases (bookkeeping for fitting to cumulative case curves) — 0 — not in N
+- Parameters:
+  - `beta0` = 0.33 (per day) — transmission rate before interventions (Congo 1995; 0.30 commonly quoted for Uganda 2000) [unverified]
+  - `q` = 0.98 (per day) — exponential decay rate of transmission after interventions begin [unverified]
+  - `tau` = 130 (days) — day interventions begin (relative to epidemic start used in the fit) [unverified]
+  - `k` = 1/5.3 = 0.1887 (per day) — rate of leaving latency (mean incubation 5.3 d) [unverified]
+  - `gamma` = 1/5.61 = 0.1783 (per day) — rate of leaving infectiousness (mean infectious period 5.61 d) [unverified]
+  - `cfr` = 0.67 (dimensionless) — proportion of infectious cases that die (Congo 1995; ≈0.53 Uganda 2000) [unverified]
+- Derived variables:
+  - `N` = `S + E + I + R` — living population
+  - `beta_t` = `ifelse(t < tau, beta0, beta0 * exp(-q * (t - tau)))` — time-varying transmission rate
+  - `lambda` = `beta_t * I / N` — force of infection
+  - `R0` = `beta0 / gamma` — basic reproduction number (authors report ≈1.83 Congo 1995, ≈1.34 Uganda 2000) [unverified]
+- Flows:
+  - `S > E : lambda`
+  - `E > I : k`
+  - `E > CC : k` (absolute: `k * E`) — cumulative-case counter
+  - `I > D : gamma * cfr`
+  - `I > R : gamma * (1 - cfr)`
+- Notes: The single structural feature that distinguishes this model is the step-then-exponential-decay transmission rate, implemented with `ifelse` on `t`. No demography (epidemic timescale). No hospital or funeral compartments — that is the Legrand 2007 model already implemented. `CC` and `D` are accumulators and must be excluded from `N`. The authors fitted `beta0`, `q`, `tau` and the initial conditions to cumulative case/death series; `k` and `gamma` were fixed from clinical data.
+
+### ebola_rivers_2014_intervention — Ebola West Africa 2014 with case isolation and vaccination (Legrand extension)
+
+- Disease/area: Ebola virus disease, human, Liberia/Sierra Leone 2014 | Category: Zoonoses & emerging
+- Source: Rivers CM, Lofgren ET, Marathe M, Eubank S, Lewis BL (2014). Modeling the impact of interventions on an epidemic of Ebola in Sierra Leone and Liberia. *PLOS Currents Outbreaks*, Oct 16 ed. DOI 10.1371/currents.outbreaks.fd38dd85078565450b0be3fcd78f5ccf
+- Time unit: days ; suggested simulation length: 365 days
+- Compartments:
+  - `S` — susceptible — 1e6 [illustrative; authors used country populations]
+  - `E` — latent (infected, not infectious) — 0
+  - `I` — infectious in the community — 10
+  - `H` — hospitalised / isolated infectious — 0
+  - `Fn` — deceased, not yet buried (funeral-transmission compartment) — 0
+  - `R` — removed (recovered or safely buried) — 0
+  - `V` — vaccinated, immune — 0
+- Parameters:
+  - `beta_i` = 0.16 (per day) — community transmission rate [unverified]
+  - `beta_h` = 0.062 (per day) — transmission rate from hospitalised cases (reflects imperfect infection control) [unverified]
+  - `beta_f` = 0.489 (per day) — transmission rate at funerals/from unburied bodies [unverified]
+  - `alpha` = 1/11 (per day) — rate of leaving latency (mean incubation ≈11 d) [unverified]
+  - `theta` = 0.248 (dimensionless) — proportion of cases hospitalised/isolated [unverified]
+  - `gamma_h` = 1/4.12 (per day) — rate community case → hospital [unverified]
+  - `gamma_i` = 1/10 (per day) — rate of leaving community infectiousness [unverified]
+  - `gamma_d` = 1/8 (per day) — rate infectious → death (community) [unverified]
+  - `gamma_dh` = 1/6 (per day) — rate hospitalised → death [unverified]
+  - `gamma_f` = 1/2.01 (per day) — rate of burial (removal of `Fn`) [unverified]
+  - `cfr` = 0.7 (dimensionless) — case fatality proportion [unverified]
+  - `nu` = 0 (per day) — per-capita vaccination rate (intervention lever; set >0 to simulate a campaign) [illustrative]
+  - `eff` = 0.9 (dimensionless) — vaccine efficacy (take) [illustrative]
+- Derived variables:
+  - `N` = `S + E + I + H + R + V` — living population
+  - `lambda` = `(beta_i * I + beta_h * H + beta_f * Fn) / N` — total force of infection
+- Flows:
+  - `S > E : lambda`
+  - `S > V : nu * eff`
+  - `E > I : alpha`
+  - `I > H : gamma_h * theta`
+  - `I > Fn : gamma_d * cfr * (1 - theta)`
+  - `I > R : gamma_i * (1 - cfr) * (1 - theta)`
+  - `H > Fn : gamma_dh * cfr`
+  - `H > R : gamma_dh * (1 - cfr)`
+  - `Fn > R : gamma_f`
+- Notes: **Overlaps substantially with the already-implemented Legrand 2007 model** — the compartment skeleton (S,E,I,H,F,R) is the same; the additions are the `V` compartment with a vaccination lever and the 2014 West-African parameterisation. Include only if a distinct 2014 parameter set plus a vaccination intervention is wanted; otherwise skip to avoid duplication. The published model is deterministic ODE, so it maps cleanly. The three separate transmission routes make the force of infection the key object. Rate splitting above (dividing a single exit into hospitalisation/death/recovery branches) is a conventional ODE re-expression; the paper writes a mathematically equivalent form.
+
+### nipah_bat_pig_human — Nipah virus bat → pig → human spillover with nosocomial transmission
+
+- Disease/area: Nipah virus, *Pteropus* bats / pigs / humans | Category: Zoonoses & emerging
+- Source: Structure after Pulliam JRC, Epstein JH, Dushoff J, Rahman SA, Bunning M, Jamaluddin AA, Hyatt AD, Field HE, Dobson AP, Daszak P, Henipavirus Ecology Research Group (2012). Agricultural intensification, priming for persistence and the emergence of Nipah virus: a lethal bat-borne zoonosis. *J R Soc Interface* 9(66):89–101. DOI 10.1098/rsif.2011.0223. Human nosocomial amplification after Nikolay B et al. (2019). Transmission of Nipah virus — 14 years of investigations in Bangladesh. *N Engl J Med* 380:1804–1814. DOI 10.1056/NEJMoa1805376
+- Time unit: days ; suggested simulation length: 730 days
+- Compartments:
+  - `Sb` — susceptible bats — 9000 — not in N
+  - `Ib` — infectious bats — 100 — not in N
+  - `Rb` — immune bats — 900 — not in N
+  - `Sp` — susceptible pigs — 10000 — not in N
+  - `Ep` — latent pigs — 0 — not in N
+  - `Ip` — infectious pigs — 0 — not in N
+  - `Rp` — recovered/immune pigs — 0 — not in N
+  - `Sh` — susceptible humans — 50000
+  - `Eh` — latent humans — 0
+  - `Ih` — infectious humans in the community — 0
+  - `Hh` — hospitalised humans (source of nosocomial transmission) — 0
+  - `Rh` — recovered humans — 0
+  - `Dh` — human deaths (cumulative) — 0 — not in N
+- Parameters:
+  - `beta_bb` = 0.02 (per day) — bat-to-bat transmission rate [illustrative]
+  - `gamma_b` = 1/14 (per day) — bat recovery rate [illustrative]
+  - `mu_b` = 1/2920 (per day) — bat birth = death rate (8-year lifespan) [illustrative]
+  - `wane_b` = 1/365 (per day) — loss of bat immunity (drives periodic reintroduction) [illustrative]
+  - `beta_bp` = 5e-5 (per bat per day) — bat-to-pig spillover coefficient (contaminated fruit/urine route) [illustrative]
+  - `beta_pp` = 1.2 (per day) — pig-to-pig transmission rate (highly transmissible in intensive piggeries) [illustrative]
+  - `sigma_p` = 1/7 (per day) — pig latency rate [illustrative]
+  - `gamma_p` = 1/10 (per day) — pig recovery rate [illustrative]
+  - `mu_p` = 1/180 (per day) — pig turnover (birth = offtake), drives susceptible replenishment [illustrative]
+  - `beta_ph` = 1e-6 (per pig per day) — pig-to-human transmission coefficient (occupational contact) [illustrative]
+  - `beta_hh` = 0.02 (per day) — community human-to-human transmission rate [illustrative]
+  - `beta_hosp` = 0.15 (per day) — nosocomial/caregiver transmission rate from `Hh` [illustrative]
+  - `sigma_h` = 1/9 (per day) — human latency rate (incubation ≈9 d) [illustrative]
+  - `eta_h` = 1/4 (per day) — rate community case → hospital [illustrative]
+  - `gamma_h` = 1/14 (per day) — human removal rate [illustrative]
+  - `cfr_h` = 0.7 (dimensionless) — human case fatality (Bangladesh outbreaks ≈70%) [unverified]
+- Derived variables:
+  - `Nb` = `Sb + Ib + Rb` — bat population
+  - `Np` = `Sp + Ep + Ip + Rp` — pig population
+  - `N` = `Sh + Eh + Ih + Hh + Rh` — living human population
+  - `lambda_b` = `beta_bb * Ib / Nb` — bat force of infection
+  - `lambda_p` = `beta_pp * Ip / Np + beta_bp * Ib` — pig force of infection (within-herd frequency-dependent plus spillover)
+  - `lambda_h` = `beta_ph * Ip + beta_hh * Ih / N + beta_hosp * Hh / N` — human force of infection
+- Flows:
+  - ` > Sb : mu_b * Nb` (absolute) — bat births
+  - `Sb > Ib : lambda_b`
+  - `Ib > Rb : gamma_b`
+  - `Rb > Sb : wane_b`
+  - `Sb > : mu_b` ; `Ib > : mu_b` ; `Rb > : mu_b` — bat mortality
+  - ` > Sp : mu_p * Np` (absolute) — pig recruitment
+  - `Sp > Ep : lambda_p`
+  - `Ep > Ip : sigma_p`
+  - `Ip > Rp : gamma_p`
+  - `Sp > : mu_p` ; `Ep > : mu_p` ; `Ip > : mu_p` ; `Rp > : mu_p` — pig offtake/mortality
+  - `Sh > Eh : lambda_h`
+  - `Eh > Ih : sigma_h`
+  - `Ih > Hh : eta_h`
+  - `Ih > Rh : gamma_h`
+  - `Hh > Dh : gamma_h * cfr_h`
+  - `Hh > Rh : gamma_h * (1 - cfr_h)`
+- Notes: 13 compartments — at the structural limit, so the pig `Rp` and bat `Rb` classes can be dropped for a leaner variant. Three nested host populations each with their own total, so bat and pig compartments are marked "not in N" and `Nb`, `Np` are derived. Bat-to-pig and pig-to-human terms are **density-dependent** (coefficient × number infected) because spillover scales with reservoir abundance, not prevalence; within-species terms are frequency-dependent. Pulliam et al. 2012 is the canonical bat-population-dynamics-plus-piggery model, but their published parameterisation is for the bat and pig layers with an episodic-introduction framing rather than the flat three-layer chain written here; the human SEIHR layer with nosocomial transmission is assembled from the Bangladesh epidemiology, not from a single ODE paper. **All rate values here are illustrative** and should be re-fitted.
+
+### mers_camel_human_hospital — MERS-CoV with camel spillover and hospital amplification
+
+- Disease/area: Middle East respiratory syndrome coronavirus, dromedary camels → humans | Category: Zoonoses & emerging
+- Source: Chowell G, Blumberg S, Simonsen L, Miller MA, Viboud C (2014). Synthesizing data and models for the spread of MERS-CoV, 2013: key role of index cases and hospital transmission. *Epidemics* 9:40–51. DOI 10.1016/j.epidem.2014.09.011 (note: this is *Epidemics*, not BMC Medicine; the 2015 Chowell et al. *BMC Medicine* paper is a healthcare-setting comparative study with no camel layer). Camel seroprevalence/infection-duration context: Müller MA et al. (2014) *Lancet Infect Dis* 14:559. DOI 10.1016/S1473-3099(14)70090-3
+- Time unit: days ; suggested simulation length: 400 days
+- Compartments:
+  - `Sc` — susceptible camels — 9000 — not in N
+  - `Ic` — infectious camels (actively shedding, mostly juveniles) — 1000 — not in N
+  - `Rc` — immune camels — 0 — not in N
+  - `S` — susceptible humans — 1e6
+  - `E` — latent humans — 0
+  - `Ii` — infectious humans in the community — 0
+  - `Hh` — hospitalised humans (amplification setting) — 0
+  - `R` — recovered humans — 0
+  - `D` — human deaths (cumulative) — 0 — not in N
+  - `CZ` — cumulative zoonotic (index) cases — 0 — not in N
+  - `CS` — cumulative secondary (human-acquired) cases — 0 — not in N
+- Parameters:
+  - `beta_cc` = 0.25 (per day) — camel-to-camel transmission rate [illustrative]
+  - `gamma_c` = 1/14 (per day) — camel recovery rate [illustrative]
+  - `mu_c` = 1/1825 (per day) — camel birth = death rate, replenishes susceptible calves [illustrative]
+  - `wane_c` = 1/730 (per day) — loss of camel immunity [illustrative]
+  - `beta_ch` = 2e-9 (per camel per day) — camel-to-human spillover coefficient [illustrative]
+  - `beta_com` = 0.04 (per day) — human-to-human transmission rate in the community [unverified]
+  - `beta_hosp` = 0.55 (per day) — human-to-human transmission rate in hospital [unverified]
+  - `sigma` = 1/5.2 (per day) — latency rate (mean incubation ≈5.2 d) [unverified]
+  - `eta` = 1/5 (per day) — rate community case → hospitalisation (mean ≈5 d onset-to-admission) [unverified]
+  - `gamma_i` = 1/10 (per day) — community removal rate [unverified]
+  - `gamma_h` = 1/13 (per day) — hospital removal rate [unverified]
+  - `cfr` = 0.4 (dimensionless) — case fatality among hospitalised cases [unverified]
+- Derived variables:
+  - `Nc` = `Sc + Ic + Rc` — camel population
+  - `N` = `S + E + Ii + Hh + R` — living human population
+  - `lambda_c` = `beta_cc * Ic / Nc` — camel force of infection
+  - `lambda_z` = `beta_ch * Ic` — zoonotic hazard to a susceptible human
+  - `lambda_s` = `beta_com * Ii / N + beta_hosp * Hh / N` — human-to-human force of infection
+  - `Rhuman` = `beta_com / (eta + gamma_i) + (eta / (eta + gamma_i)) * beta_hosp / gamma_h` — human-to-human reproduction number (authors' headline result: overall R below or near 1, ≈0.4–1.5 across published estimates, with hospital amplification doing most of the work)
+- Flows:
+  - ` > Sc : mu_c * Nc` (absolute) — camel births
+  - `Sc > Ic : lambda_c` ; `Ic > Rc : gamma_c` ; `Rc > Sc : wane_c`
+  - `Sc > : mu_c` ; `Ic > : mu_c` ; `Rc > : mu_c`
+  - `S > E : lambda_z + lambda_s`
+  - `S > CZ : lambda_z` (zoonotic-case accumulator)
+  - `S > CS : lambda_s` (secondary-case accumulator)
+  - `E > Ii : sigma`
+  - `Ii > Hh : eta`
+  - `Ii > R : gamma_i`
+  - `Hh > D : gamma_h * cfr`
+  - `Hh > R : gamma_h * (1 - cfr)`
+- Notes: The paper's central structural claim — repeated zoonotic index cases plus sub-critical human-to-human spread with hospital-based amplification — is captured by the two separate forces of infection and the two case accumulators, which let the generator reproduce the index-vs-secondary case split the authors fit. The camel layer is an SIRS with calf-driven susceptible turnover; MERS in camels is a short, mostly juvenile, non-fatal infection. Chowell et al. modelled the reservoir as an exogenous introduction process rather than an explicit camel SIR, so the camel compartments here are an addition; set `beta_cc = 0` and hold `Ic` constant for a closer match to the published formulation. Numeric values for the human layer were not confirmed against the full text.
+
+### h5n1_poultry_human_iwami — Avian influenza in poultry with human spillover and a mutant human-transmissible strain
+
+- Disease/area: Highly pathogenic avian influenza H5N1, poultry → humans | Category: Zoonoses & emerging
+- Source: Iwami S, Takeuchi Y, Liu X (2007). Avian–human influenza epidemic model. *Mathematical Biosciences* 207(1):1–25. DOI 10.1016/j.mbs.2006.08.001 (note: the 2008 companion on prevention policy, Takeuchi, Iwami, Korobeinikov & Liu, is the *J Theor Biol* paper)
+- Time unit: days ; suggested simulation length: 365 days
+- Compartments:
+  - `Sa` — susceptible birds — 1e5 — not in N
+  - `Ia` — infected birds — 10 — not in N
+  - `S` — susceptible humans — 1e6
+  - `Ii` — humans infected with the avian (non-transmissible) strain — 0
+  - `Im` — humans infected with the mutant human-transmissible strain — 0
+  - `R` — recovered humans — 0
+  - `D` — cumulative human deaths — 0 — not in N
+- Parameters:
+  - `ca` = 1000 (birds per day) — recruitment of susceptible birds (poultry restocking); named `ca` because `c` is reserved [illustrative]
+  - `mu_a` = 1/500 (per day) — natural bird death rate [illustrative]
+  - `beta_a` = 2e-5 (per bird per day) — bird-to-bird transmission coefficient (mass action) [illustrative]
+  - `delta_a` = 0.4 (per day) — disease-induced bird death rate (HPAI kills within days) [illustrative]
+  - `cull` = 0 (per day) — additional culling rate applied to birds (policy lever from the 2008 companion paper) [illustrative]
+  - `ch` = 100 (humans per day) — human recruitment [illustrative]
+  - `mu_h` = 1/25550 (per day) — natural human death rate (70-year life expectancy) [illustrative]
+  - `beta_ah` = 1e-8 (per bird per day) — bird-to-human transmission coefficient [illustrative]
+  - `beta_m` = 2e-7 (per human per day) — mutant human-to-human transmission coefficient [illustrative]
+  - `nu` = 1e-4 (per day) — rate at which an avian-strain human case yields mutant-strain infection (mutation) [illustrative]
+  - `delta_i` = 0.5 (per day) — disease death rate, avian-strain human cases (H5N1 CFR ≈60%) [illustrative]
+  - `delta_m` = 0.1 (per day) — disease death rate, mutant-strain cases [illustrative]
+  - `gamma_m` = 1/7 (per day) — recovery rate, mutant-strain cases [illustrative]
+- Derived variables:
+  - `Na` = `Sa + Ia` — bird population
+  - `N` = `S + Ii + Im + R` — living human population
+  - `lambda_a` = `beta_a * Ia` — bird force of infection (density-dependent)
+  - `lambda_ah` = `beta_ah * Ia` — spillover hazard to humans
+  - `lambda_m` = `beta_m * Im` — mutant-strain force of infection
+  - `R0a` = `beta_a * ca / ((mu_a + delta_a + cull) * mu_a)` — bird-strain reproduction number
+  - `R0m` = `beta_m * ch / ((mu_h + delta_m + gamma_m) * mu_h)` — mutant-strain reproduction number
+- Flows:
+  - ` > Sa : ca` (absolute) — poultry recruitment
+  - `Sa > Ia : lambda_a`
+  - `Sa > : mu_a + cull`
+  - `Ia > : mu_a + delta_a + cull`
+  - ` > S : ch` (absolute) — human recruitment
+  - `S > Ii : lambda_ah`
+  - `S > Im : lambda_m`
+  - `Ii > Im : nu`
+  - `Ii > : mu_h + delta_i`
+  - `Im > R : gamma_m`
+  - `Im > D : delta_m`
+  - `Im > : mu_h`
+  - `S > : mu_h` ; `R > : mu_h`
+- Notes: The paper's point is that `Ii` is a dead-end (no human-to-human spread) while `Im` is not, so two outbreak regimes are possible depending on whether `R0m` exceeds 1. Birds use **mass-action (density-dependent)** incidence with constant recruitment, which is the authors' formulation and means `beta_a` carries units of per-bird per-day. Birds are not in human `N`. `cull` is a policy lever (the elimination policy of the 2008 companion); a quarantine policy is implemented instead by reducing `beta_ah`. No latent classes in the original. All numeric values illustrative — the paper's own table was not retrieved.
+
+### mpox_human_animal_reservoir — Mpox with a rodent reservoir and residual smallpox vaccination immunity
+
+- Disease/area: Mpox (monkeypox), rodent reservoir → humans | Category: Zoonoses & emerging
+- Source: Bhunu CP, Mushayabasa S (2011). Modelling the transmission dynamics of pox-like infections. *IAENG International Journal of Applied Mathematics* 41(2):141–149. URL https://www.iaeng.org/IJAM/issues_v41/issue_2/IJAM_41_2_09.pdf . Historical human-to-human reproduction-number context: Jezek Z, Grab B, Dixon H (1987). Stochastic model for interhuman spread of monkeypox. *Am J Epidemiol* 126(6):1082–1092. DOI 10.1093/oxfordjournals.aje.a114747
+- Time unit: days ; suggested simulation length: 1825 days (5 years)
+- Compartments:
+  - `Sr` — susceptible rodents — 10000 — not in N
+  - `Er` — latent rodents — 0 — not in N
+  - `Ir` — infectious rodents — 100 — not in N
+  - `S` — susceptible humans — 1e5
+  - `V` — humans with vaccine-derived (smallpox) protection — 2e4
+  - `E` — latent humans — 0
+  - `Ii` — infectious humans — 0
+  - `R` — recovered humans — 0
+  - `D` — cumulative human mpox deaths — 0 — not in N
+- Parameters:
+  - `br` = 0.004 (per day) — rodent birth rate [illustrative]
+  - `mu_r` = 0.004 (per day) — rodent natural death rate [illustrative]
+  - `beta_rr` = 0.15 (per day) — rodent-to-rodent transmission rate [illustrative]
+  - `sigma_r` = 1/7 (per day) — rodent latency rate [illustrative]
+  - `gamma_r` = 1/21 (per day) — rodent recovery/removal rate [illustrative]
+  - `beta_rh` = 2e-6 (per rodent per day) — rodent-to-human spillover coefficient (hunting/bushmeat) [illustrative]
+  - `beta_hh` = 0.035 (per day) — human-to-human transmission rate [illustrative]
+  - `sigma_h` = 1/8.5 (per day) — human latency rate (incubation ≈8.5 d) [illustrative]
+  - `gamma_h` = 1/21 (per day) — human removal rate (rash duration 2–4 weeks) [illustrative]
+  - `cfr` = 0.035 (dimensionless) — human case fatality (clade I historical ≈1–10%) [illustrative]
+  - `nu` = 0 (per day) — vaccination rate of susceptibles (ring/targeted campaign lever) [illustrative]
+  - `eps_v` = 0.85 (dimensionless) — vaccine protection against infection (smallpox vaccine cross-protection ≈85%) [unverified]
+  - `wane_v` = 1/7300 (per day) — waning of vaccine protection (20-year mean) [illustrative]
+  - `mu_h` = 1/21900 (per day) — human natural death rate [illustrative]
+  - `bh` = 5 (humans per day) — human recruitment [illustrative]
+- Derived variables:
+  - `Nr` = `Sr + Er + Ir` — rodent population
+  - `N` = `S + V + E + Ii + R` — living human population
+  - `lambda_r` = `beta_rr * Ir / Nr` — rodent force of infection
+  - `lambda_h` = `beta_rh * Ir + beta_hh * Ii / N` — human force of infection
+  - `R0h` = `beta_hh / (gamma_h + mu_h)` — human-to-human reproduction number (historically ≈0.3; a 2022-type MSM-outbreak scenario is produced by raising `beta_hh` so that `R0h > 1`)
+- Flows:
+  - ` > Sr : br * Nr` (absolute)
+  - `Sr > Er : lambda_r` ; `Er > Ir : sigma_r` ; `Ir > : gamma_r`
+  - `Sr > : mu_r` ; `Er > : mu_r` ; `Ir > : mu_r`
+  - ` > S : bh` (absolute)
+  - `S > E : lambda_h`
+  - `S > V : nu`
+  - `V > E : lambda_h * (1 - eps_v)`
+  - `V > S : wane_v`
+  - `E > Ii : sigma_h`
+  - `Ii > R : gamma_h * (1 - cfr)`
+  - `Ii > D : gamma_h * cfr`
+  - `S > : mu_h` ; `V > : mu_h` ; `E > : mu_h` ; `Ii > : mu_h` ; `R > : mu_h`
+- Notes: Two usable regimes from one structure: (a) the classical African setting — spillover-driven, `R0h < 1`, outbreaks that fade without the reservoir term; (b) a 2022-style outbreak — set `beta_rh = 0`, raise `beta_hh` above threshold, and read `S` as a high-contact subpopulation rather than the general population. The `V` compartment with leaky protection (`1 - eps_v`) represents residual/renewed smallpox-vaccine immunity; waning of that immunity is the mechanism usually invoked for rising mpox susceptibility. The Bhunu & Mushayabasa paper is in a low-visibility journal and its parameter table was not retrieved, so **all values here are illustrative** except the vaccine-effectiveness figure.
+
+### smallpox_emergency_vaccination_response — Smallpox outbreak response: traced (ring) versus mass vaccination
+
+- Disease/area: Smallpox, human; emergency public-health vaccination response | Category: Zoonoses & emerging
+- Source: Kaplan EH, Craft DL, Wein LM (2002). Emergency response to a smallpox attack: the case for mass vaccination. *PNAS* 99(16):10935–10940. DOI 10.1073/pnas.162282799. Natural-history parameters from Fenner F et al. (1988) *Smallpox and its Eradication*, WHO. URL https://iris.who.int/handle/10665/39485
+- Time unit: days ; suggested simulation length: 180 days
+- Compartments:
+  - `S` — susceptible, not yet vaccinated — 1e7
+  - `E` — infected, latent (not infectious, not yet symptomatic) — 0
+  - `Ii` — infectious, in the community — 10
+  - `Q` — isolated/removed from circulation (hospitalised or quarantined) — 0
+  - `V` — vaccinated and protected — 0
+  - `R` — recovered, immune — 0
+  - `D` — cumulative deaths — 0 — not in N
+  - `CV` — cumulative vaccine doses delivered — 0 — not in N
+- Parameters:
+  - `beta` = 0.105 (per day) — transmission rate (gives roughly 3 secondary cases per infectious person over the symptomatic period) [illustrative]
+  - `sigma` = 1/14 (per day) — rate of leaving latency (mean latent period ≈14 d) [unverified]
+  - `theta` = 1/3 (per day) — rate at which symptomatic cases are detected and isolated (≈3 d from rash to isolation) [illustrative]
+  - `gamma` = 1/14 (per day) — rate of resolution (recovery or death) in isolation [illustrative]
+  - `cfr` = 0.3 (dimensionless) — case fatality of ordinary variola major [unverified]
+  - `eps_pre` = 0.95 (dimensionless) — efficacy of vaccination of a susceptible [illustrative]
+  - `eps_post` = 0.5 (dimensionless) — efficacy of post-exposure vaccination of a latent individual (protection declines sharply after the first few days) [illustrative]
+  - `tau_v` = 7 (days) — delay before the vaccination campaign starts [illustrative]
+  - `nu_ring` = 4 (contacts traced and vaccinated per isolated case per day) — traced-vaccination intensity [illustrative]
+  - `nu_mass` = 0 (per day) — per-capita mass-vaccination rate once the campaign is running [illustrative]
+  - `cap` = 2e5 (doses per day) — maximum daily vaccination throughput [illustrative]
+- Derived variables:
+  - `N` = `S + E + Ii + Q + V + R` — living population
+  - `active` = `ifelse(t < tau_v, 0, 1)` — campaign switch
+  - `want` = `active * (nu_mass * (S + E) + nu_ring * theta * Ii)` — doses demanded per day
+  - `rate_v` = `pmin(want, cap) / pmax(S + E, 1)` — per-capita vaccination rate, capped by logistic throughput
+  - `lambda` = `beta * Ii / N` — force of infection
+- Flows:
+  - `S > E : lambda`
+  - `S > V : rate_v * eps_pre`
+  - `E > V : rate_v * eps_post`
+  - `E > Ii : sigma`
+  - `Ii > Q : theta`
+  - `Q > D : gamma * cfr`
+  - `Q > R : gamma * (1 - cfr)`
+  - ` > CV : pmin(want, cap)` (absolute) — dose counter
+- Notes: This is a **public-health response-logistics model**: the policy question it answers is whether contact-traced vaccination or population-wide vaccination averts more deaths given a finite daily vaccination capacity. The two strategies are the same structure with different `nu_ring` / `nu_mass`, and the `pmin(..., cap)` term is what makes the comparison non-trivial — without a capacity ceiling mass vaccination always wins trivially. The original paper is a far richer discrete-time compartmental queueing model with explicit tracing queues, vaccinator staffing and separate disease stages; **this is a deliberate ODE simplification** that keeps the capacity constraint and the traced-vs-mass contrast and drops the queueing detail. Post-exposure vaccination efficacy declining with time since exposure is a known feature of smallpox that this single `eps_post` cannot represent. `CV` and `D` are accumulators outside `N`. Initial conditions are a generic seeded outbreak; the model is scenario-agnostic.
+
+### brucellosis_sheep_human_environment — Brucellosis in small ruminants with an environmental reservoir and human cases
+
+- Disease/area: Brucellosis, sheep/goats → humans, with *Brucella* in the environment | Category: Animal & wildlife (zoonotic)
+- Source: Hou Q, Sun X, Zhang J, Liu Y, Wang Y, Jin Z (2013). Modeling the transmission dynamics of sheep brucellosis in Inner Mongolia Autonomous Region, China. *Mathematical Biosciences* 242(1):51–58. DOI 10.1016/j.mbs.2012.11.012. Human-compartment extension and Hinggan League parameterisation: Li M-T, Sun G-Q, Zhang J, Jin Z, Sun X-D, Wang Y-M, Huang B-X, Zheng Y-H (2014). Transmission dynamics and control for a brucellosis model in Hinggan League of Inner Mongolia, China. *Math Biosci Eng* 11(5):1115–1137. DOI 10.3934/mbe.2014.11.1115
+- Time unit: years ; suggested simulation length: 30 years
+- Compartments:
+  - `Ss` — susceptible sheep — 1e6 — not in N
+  - `Es` — exposed/latently infected sheep — 1e4 — not in N
+  - `Is` — infectious sheep (shedding; abortion/parturition products) — 1e3 — not in N
+  - `Vs` — vaccinated sheep — 0 — not in N
+  - `W` — *Brucella* in the environment (bacterial load, arbitrary units) — 1e3 — not in N
+  - `Sh` — susceptible humans — 2e6
+  - `Eh` — exposed humans — 0
+  - `Iah` — acutely infected humans — 0
+  - `Ich` — chronically infected humans — 0
+  - `CHh` — cumulative reported human cases — 0 — not in N
+- Parameters:
+  - `As` = 2.5e5 (sheep per year) — sheep recruitment (lambs + purchases) [illustrative]
+  - `mu_s` = 0.4 (per year) — sheep removal rate (slaughter + natural death) [illustrative]
+  - `beta_ss` = 2e-7 (per sheep per year) — direct sheep-to-sheep transmission coefficient [illustrative]
+  - `beta_sw` = 1e-6 (per unit load per year) — indirect (environment-to-sheep) transmission coefficient [illustrative]
+  - `sigma_s` = 2.0 (per year) — rate exposed sheep become infectious (≈6-month latency) [illustrative]
+  - `nu_s` = 0 (per year) — sheep vaccination rate (control lever; S19/Rev-1) [illustrative]
+  - `wane_s` = 0.5 (per year) — waning of sheep vaccine protection [illustrative]
+  - `shed` = 15 (load units per infectious sheep per year) — environmental shedding rate [illustrative]
+  - `decay` = 3.0 (per year) — natural decay of *Brucella* in the environment [illustrative]
+  - `disinf` = 0 (per year) — additional removal of environmental load by disinfection (control lever) [illustrative]
+  - `beta_hs` = 1e-8 (per sheep per year) — sheep-to-human transmission coefficient (occupational contact) [illustrative]
+  - `beta_hw` = 1e-8 (per unit load per year) — environment-to-human transmission coefficient [illustrative]
+  - `sigma_h` = 4.0 (per year) — rate exposed → acute human case (≈0.25 year onset) [verified as a published value for this quantity in the related literature]
+  - `chron` = 1.0 (per year) — rate acute → chronic human infection [illustrative]
+  - `gamma_a` = 2.0 (per year) — recovery rate from acute infection [illustrative]
+  - `gamma_c` = 0.4 (per year) — recovery rate from chronic infection [illustrative]
+  - `mu_h` = 0.006 (per year) — human natural death rate [verified as a published value in the related literature]
+- Derived variables:
+  - `Ns` = `Ss + Es + Is + Vs` — sheep population
+  - `N` = `Sh + Eh + Iah + Ich` — human population
+  - `lambda_s` = `beta_ss * Is + beta_sw * W` — sheep force of infection
+  - `lambda_h` = `beta_hs * Is + beta_hw * W` — human force of infection
+  - `R0s` = `(beta_ss + beta_sw * shed / (decay + disinf)) * As * sigma_s / (mu_s * (mu_s + sigma_s + nu_s) * (mu_s + shed * 0 + 1e-12) )` — sheep reproduction number (write out explicitly in the generator; the point is that `R0s` has a direct and an indirect additive component, which is the paper's central result)
+- Flows:
+  - ` > Ss : As` (absolute) — sheep recruitment
+  - `Ss > Es : lambda_s`
+  - `Ss > Vs : nu_s`
+  - `Vs > Ss : wane_s`
+  - `Es > Is : sigma_s`
+  - `Ss > : mu_s` ; `Es > : mu_s` ; `Is > : mu_s` ; `Vs > : mu_s`
+  - ` > W : shed * Is` (absolute) — environmental shedding
+  - `W > : decay + disinf`
+  - `Sh > Eh : lambda_h`
+  - `Eh > Iah : sigma_h`
+  - `Iah > Ich : chron`
+  - `Iah > Sh : gamma_a` — recovery without lasting immunity (brucellosis reinfection is possible)
+  - `Ich > Sh : gamma_c`
+  - `Eh > CHh : sigma_h` (case counter)
+  - `Sh > : mu_h` ; `Eh > : mu_h` ; `Iah > : mu_h` ; `Ich > : mu_h`
+- Notes: The structural signature of this family is the **additive direct + indirect force of infection** with an explicit environmental bacterial compartment `W`, and the result that vaccination and disinfection of adults alone cannot eradicate because young animals keep recruiting into the susceptible class. Humans are an epidemiological dead end (no human-to-human transmission) and recover to susceptible rather than immune. Time unit is years, matching the annual sheep demographic and reporting data. Hou 2013 covers the sheep + environment layers; the human acute/chronic layer and the Hinggan League numbers come from Li et al. 2014. **The full parameter tables of neither paper were retrieved in this session** — the human death rate (0.006/year) and the ≈0.25-year acute-onset period are the only two values confirmed as published in this literature. The `R0s` expression above should be re-derived symbolically rather than copied.
+
+### rabies_dog_human_vaccination — Dog rabies with mass vaccination and dog-to-human transmission
+
+- Disease/area: Rabies, domestic dogs → humans, urban African setting (N'Djaména, Chad) | Category: Zoonoses & emerging
+- Source: Zinsstag J, Dürr S, Penny MA, Mindekem R, Roth F, Menendez Gonzalez S, Naissengar S, Hattendorf J (2009). Transmission dynamics and economics of rabies control in dogs and humans in an African city. *PNAS* 106(35):14996–15001. DOI 10.1073/pnas.0904740106. Free full text: https://pmc.ncbi.nlm.nih.gov/articles/PMC2728111
+- Time unit: weeks ; suggested simulation length: 520 weeks (10 years)
+- Compartments:
+  - `Sd` — susceptible dogs — 23000 — not in N
+  - `Ed` — incubating (exposed) dogs — 10 — not in N
+  - `Id` — rabid, infectious dogs — 2 — not in N
+  - `Vd` — vaccinated, immune dogs — 0 — not in N
+  - `Sh` — susceptible humans — 6e5
+  - `Eh` — exposed humans (bitten, incubating) — 0
+  - `Ih` — humans with clinical rabies — 0
+  - `Dh` — cumulative human rabies deaths — 0 — not in N
+  - `Dd` — cumulative rabid-dog deaths (for fitting to weekly rabid-dog reports) — 0 — not in N
+- Parameters:
+  - `beta_d` = 0.0807 (km² per dog per week) — dog-to-dog transmission rate **[verified]** (estimated by the authors)
+  - `beta_dh` = 0.0002 (km² per dog per week) — dog-to-human transmission rate **[verified]**
+  - `area` = 100 (km²) — area of the study city, converting counts to densities [illustrative]
+  - `sigma_d` = 1/3.1 (per week) — rate of leaving dog incubation (≈22 d mean incubation) [illustrative]
+  - `mu_d` = 1/0.6 (per week) — rabies-induced death rate of rabid dogs (≈4 d survival); the sensitivity analysis identifies this as one of the three most influential parameters **[verified as influential; value illustrative]**
+  - `rd` = 0.49 (dimensionless) — probability that an exposed dog develops clinical rabies; also identified as highly influential **[verified as influential; value illustrative]**
+  - `bd` = 0.0052 (per week) — dog birth rate [illustrative]
+  - `md` = 0.0048 (per week) — dog non-rabies death rate [illustrative]
+  - `nu_d` = 0 (per week) — dog vaccination rate (campaign lever) [illustrative]
+  - `wane_d` = 1/52 (per week) — waning of dog vaccine immunity + turnover of vaccinated dogs [illustrative]
+  - `cull_d` = 0 (per week) — dog culling rate (alternative control the authors simulate) [illustrative]
+  - `rh` = 0.19 (dimensionless) — probability a bitten human develops rabies absent prophylaxis [illustrative]
+  - `pep` = 0 (dimensionless) — proportion of exposed humans receiving effective post-exposure prophylaxis [illustrative]
+  - `sigma_h` = 1/6 (per week) — rate of leaving human incubation (≈6 weeks) [illustrative]
+  - `mu_h` = 1 (per week) — death rate of clinical human rabies (uniformly fatal within days) [illustrative]
+- Derived variables:
+  - `Nd` = `Sd + Ed + Id + Vd` — dog population
+  - `N` = `Sh + Eh + Ih` — human population
+  - `lambda_d` = `beta_d * Id / area` — dog force of infection (density-dependent: the transmission rate is per unit area)
+  - `lambda_h` = `beta_dh * Id / area` — human exposure hazard
+  - `Re` = `beta_d * Sd / (area * mu_d)` — effective reproduction ratio; the authors estimate `Re ≈ 1.01` at the onset of observation, consistent with stable endemic dynamics **[verified]**
+  - `cover` = `Vd / Nd` — vaccination coverage; a single campaign reaching ≥70% coverage was reported sufficient to interrupt transmission to humans for at least 6 years **[verified]**
+- Flows:
+  - ` > Sd : bd * Nd` (absolute) — dog births
+  - `Sd > Ed : lambda_d`
+  - `Sd > Vd : nu_d`
+  - `Vd > Sd : wane_d`
+  - `Ed > Id : sigma_d * rd`
+  - `Ed > Sd : sigma_d * (1 - rd)` — exposed dogs that do not develop disease
+  - `Id > Dd : mu_d`
+  - `Sd > : md + cull_d` ; `Ed > : md + cull_d` ; `Vd > : md + cull_d`
+  - `Sh > Eh : lambda_h`
+  - `Eh > Ih : sigma_h * rh * (1 - pep)`
+  - `Eh > Sh : sigma_h * (1 - rh * (1 - pep))`
+  - `Ih > Dh : mu_h`
+- Notes: Transmission is **density-dependent with an explicit area term** — `beta_d` has units km²·dog⁻¹·week⁻¹, so the per-capita hazard is `beta_d * Id / area`. Keep that unit convention or the two verified transmission estimates are meaningless. Only a fraction `rd` of exposed dogs progress; the rest return to susceptible, which is why `Re` sits near 1 at realistic bite rates. Humans are a dead end. `pep` and `nu_d` are the two cost-effectiveness levers the authors compare (human post-exposure prophylaxis alone versus dog mass vaccination); the generator can reproduce the headline policy comparison with a 70% pulse applied to `Vd`. Pulsed campaigns are better represented as a time-dependent `nu_d` via `ifelse` on `t` than as a constant rate.
+
+### btb_cattle_badger — Bovine tuberculosis in cattle and badgers with test-and-slaughter
+
+- Disease/area: *Mycobacterium bovis*, cattle ↔ European badger (*Meles meles*) | Category: Animal & wildlife (zoonotic)
+- Source: Cox DR, Donnelly CA, Bourne FJ, Gettinby G, McInerney JP, Morrison WI, Woodroffe R (2005). Simple model for tuberculosis in cattle and badgers. *PNAS* 102(49):17588–17593. DOI 10.1073/pnas.0509003102. Free full text: https://pmc.ncbi.nlm.nih.gov/articles/PMC1308899
+- Time unit: years ; suggested simulation length: 40 years
+- Compartments:
+  - `Sc` — susceptible cattle — 10000
+  - `Ec` — cattle infected but test-negative (occult/early infection) — 0
+  - `Ic` — cattle infected and test-positive / infectious — 10
+  - `Sb` — susceptible badgers — 1000 — not in N
+  - `Eb` — badgers infected, not yet excreting — 0 — not in N
+  - `Ib` — badgers excreting *M. bovis* — 20 — not in N
+  - `CRc` — cumulative cattle reactors removed (herd-breakdown counter) — 0 — not in N
+- Parameters:
+  - `beta_cc` = 0.4 (per year) — cattle-to-cattle transmission rate [illustrative]
+  - `beta_bc` = 0.02 (per badger per year) — badger-to-cattle transmission coefficient [illustrative]
+  - `beta_bb` = 0.6 (per year) — badger-to-badger transmission rate [illustrative]
+  - `beta_cb` = 0.002 (per cattle per year) — cattle-to-badger transmission coefficient [illustrative]
+  - `sigma_c` = 2.0 (per year) — rate cattle progress from test-negative to test-positive [illustrative]
+  - `test` = 1.0 (per year) — herd-testing frequency × test sensitivity, i.e. rate at which `Ic` animals are detected and slaughtered [illustrative]
+  - `mu_c` = 0.25 (per year) — cattle turnover (culling/sale, 4-year productive life) [illustrative]
+  - `sigma_b` = 1.5 (per year) — badger progression rate to excreting state [illustrative]
+  - `mu_b` = 0.3 (per year) — badger natural death rate [illustrative]
+  - `alpha_b` = 0.2 (per year) — additional disease-induced badger death rate [illustrative]
+  - `cull_b` = 0 (per year) — badger culling rate (the intervention the trial was designed to evaluate) [illustrative]
+  - `perturb` = 0 (dimensionless) — proportional increase in `beta_bc` caused by culling-induced badger ranging ("perturbation effect"); e.g. 0.3 [illustrative]
+- Derived variables:
+  - `N` = `Sc + Ec + Ic` — cattle herd size
+  - `Nb` = `Sb + Eb + Ib` — badger population
+  - `lambda_c` = `beta_cc * Ic / N + beta_bc * (1 + perturb * (cull_b > 0)) * Ib` — cattle force of infection
+  - `lambda_b` = `beta_bb * Ib / Nb + beta_cb * Ic` — badger force of infection
+- Flows:
+  - ` > Sc : mu_c * N + test * Ic` (absolute) — restocking: replacements for natural turnover and for slaughtered reactors
+  - `Sc > Ec : lambda_c`
+  - `Ec > Ic : sigma_c`
+  - `Ic > CRc : test` — detection and slaughter of reactors
+  - `Sc > : mu_c` ; `Ec > : mu_c` ; `Ic > : mu_c`
+  - ` > Sb : (mu_b * Nb + alpha_b * Ib + cull_b * Nb)` (absolute) — badger recruitment holding the population near carrying capacity
+  - `Sb > Eb : lambda_b`
+  - `Eb > Ib : sigma_b`
+  - `Sb > : mu_b + cull_b` ; `Eb > : mu_b + cull_b` ; `Ib > : mu_b + alpha_b + cull_b`
+- Notes: The two-host coupling is the whole point: the paper examines how much of cattle infection is attributable to badgers versus within-herd spread, and how badger culling changes that. The `perturb` term encodes the trial's most important empirical finding — that culling can *increase* cattle risk by disrupting badger social groups — implemented here as a multiplier switched on when culling is active (`(cull_b > 0)` evaluates to 1/0, which the allowed comparison operators support). The `Ec`/`Ic` split represents the test-negative-then-reactor progression that makes test-and-slaughter leaky. Cattle restocking is written so herd size stays roughly constant, as in a managed herd. **The published parameter table was not retrieved; all rate values are illustrative** and chosen to give slow endemic persistence with periodic herd breakdowns.
+
+### asf_wild_boar_carcass — African swine fever in wild boar with carcass-mediated environmental transmission
+
+- Disease/area: African swine fever virus, Eurasian wild boar (*Sus scrofa*) | Category: Animal & wildlife
+- Source: O'Neill X, White A, Ruiz-Fons F, Gortázar C (2020). Modelling the transmission and persistence of African swine fever in wild boar in contrasting European scenarios. *Scientific Reports* 10:5895. DOI 10.1038/s41598-020-62736-y. Complementary carcass-persistence analysis: Pepin KM, Golnar AJ, Abdo Z, Podgórski T (2020). Ecological drivers of African swine fever virus persistence in wild boar populations: insight for control. *Ecology and Evolution* 10(6):2846–2859. DOI 10.1002/ece3.6100
+- Time unit: days ; suggested simulation length: 1095 days (3 years)
+- Compartments:
+  - `S` — susceptible wild boar — 2000
+  - `E` — exposed (infected, not yet infectious) — 0
+  - `Ii` — infectious wild boar — 2
+  - `R` — recovered/immune survivors — 0
+  - `Cr` — infectious carcasses in the environment — 0 — not in N
+- Parameters:
+  - `beta_dir` = 0.3 (per day) — direct boar-to-boar transmission rate [illustrative]
+  - `beta_car` = 0.05 (per carcass per day) — carcass-to-boar transmission coefficient (rooting/sniffing contact) [illustrative]
+  - `sigma` = 1/4 (per day) — rate of leaving the exposed class (incubation ≈4 d) [illustrative]
+  - `gamma` = 1/5 (per day) — rate of leaving infectiousness (≈5 d) [illustrative]
+  - `cfr` = 0.95 (dimensionless) — case fatality (ASF genotype II is near-uniformly lethal) [unverified]
+  - `decay_c` = 1/90 (per day) — carcass decay/removal rate (seasonally variable; much slower in winter) [illustrative]
+  - `remove_c` = 0 (per day) — active carcass-removal rate (the main control lever) [illustrative]
+  - `bb` = 0.004 (per day) — boar birth rate (strongly seasonal in reality) [illustrative]
+  - `mub` = 0.002 (per day) — boar natural death rate [illustrative]
+  - `hunt` = 0 (per day) — hunting/culling rate [illustrative]
+  - `Kb` = 2000 (boar) — carrying capacity [illustrative]
+- Derived variables:
+  - `N` = `S + E + Ii + R` — living boar population
+  - `lambda` = `beta_dir * Ii / N + beta_car * Cr` — total force of infection (frequency-dependent direct term plus density-dependent carcass term)
+  - `dens` = `bb * (1 - N / Kb)` — density-dependent per-capita birth rate
+- Flows:
+  - ` > S : pmax(dens, 0) * N` (absolute) — births, logistic
+  - `S > E : lambda`
+  - `E > Ii : sigma`
+  - `Ii > Cr : gamma * cfr` — dying animals become infectious carcasses
+  - `Ii > R : gamma * (1 - cfr)`
+  - `S > : mub + hunt` ; `E > : mub + hunt` ; `R > : mub + hunt`
+  - `Ii > : mub + hunt`
+  - `Cr > : decay_c + remove_c`
+- Notes: The key structural feature is that **dead infectious hosts move into a long-lived environmental compartment** rather than out of the system: `Ii > Cr` is the flow that lets ASF persist at very low host density, because `Cr` decays on a timescale of months while infection lasts days. The ratio `decay_c / gamma` therefore controls persistence, and carcass removal (`remove_c`) is the control that the modelling literature identifies as effective — raising `hunt` alone can be counterproductive because it reduces density without removing virus. Seasonality in both births and carcass decay matters in the published versions and can be added as `bb * (1 + a1 * cos(2 * pi_const * t / 365))` with a user-defined constant (note: the identifier `pi` is reserved, so define e.g. `pi_const = 3.141593`). Only the case-fatality figure is well established in the literature; **rate values are illustrative** and the two cited papers' own parameter tables were not retrieved.
+
+### cwd_deer_environmental — Chronic wasting disease in deer with environmental prion accumulation
+
+- Disease/area: Chronic wasting disease (prion), mule deer / white-tailed deer | Category: Animal & wildlife
+- Source: Miller MW, Hobbs NT, Tavener SJ (2006). Dynamics of prion disease transmission in mule deer. *Ecological Applications* 16(6):2208–2214. DOI 10.1890/1051-0761(2006)016[2208:DOPDTI]2.0.CO;2. Environmental-persistence parameterisation: Almberg ES, Cross PC, Johnson CJ, Heisey DM, Richards BJ (2011). Modeling routes of chronic wasting disease transmission: environmental prion persistence promotes deer population decline and extinction. *PLoS ONE* 6(5):e19896. DOI 10.1371/journal.pone.0019896. Free full text: https://pmc.ncbi.nlm.nih.gov/articles/PMC3094393
+- Time unit: years ; suggested simulation length: 100 years
+- Compartments:
+  - `S` — susceptible deer — 1000
+  - `Ii` — infected deer (long subclinical + clinical infection, assumed infectious throughout) — 1
+  - `Ev` — environmental prion load (infectious units; `E` avoided for clarity) — 0 — not in N
+- Parameters:
+  - `beta_dir` = 0.0008 (per deer per year) — direct deer-to-deer transmission coefficient (density-dependent) [illustrative]
+  - `beta_env` = 0.0002 (per prion unit per year) — environment-to-deer transmission coefficient [illustrative]
+  - `alpha` = 0.55 (per year) — CWD-induced mortality rate (mean time from infection to death ≈2 years) [unverified]
+  - `mu` = 0.15 (per year) — natural (non-CWD) mortality rate [illustrative]
+  - `bdeer` = 0.35 (per year) — maximum per-capita birth rate [illustrative]
+  - `Kd` = 1500 (deer) — carrying capacity [illustrative]
+  - `shed` = 1.0 (prion units per infected deer per year) — shedding from live infected animals (saliva, urine, faeces) [illustrative]
+  - `carc` = 10.0 (prion units per CWD death) — prion deposited by a carcass [illustrative]
+  - `decay_e` = 0.05 (per year) — loss of environmental infectivity (prions persist for years; this is the parameter the literature identifies as pivotal) [illustrative]
+  - `harvest` = 0 (per year) — hunter harvest rate (control lever; can be applied preferentially to `Ii`) [illustrative]
+- Derived variables:
+  - `N` = `S + Ii` — deer population
+  - `lambda` = `beta_dir * Ii + beta_env * Ev` — force of infection (direct + indirect, additive)
+  - `births` = `bdeer * N * pmax(1 - N / Kd, 0)` — logistic recruitment
+  - `prev` = `Ii / pmax(N, 1e-9)` — prevalence
+- Flows:
+  - ` > S : births` (absolute)
+  - `S > Ii : lambda`
+  - `S > : mu + harvest`
+  - `Ii > : mu + alpha + harvest`
+  - ` > Ev : shed * Ii + carc * alpha * Ii` (absolute) — shedding by live animals plus carcass deposition
+  - `Ev > : decay_e`
+- Notes: Only 3 compartments, which makes this the cleanest demonstration of an environmental-reservoir model: with `beta_env = 0` the epidemic is density-dependent and self-limiting, while with slow prion decay the environmental term creates a **ratchet** — infectivity accumulates faster than it decays and can drive the population to local extinction even as host density falls. That contrast is the published result and is the reason to include this model. Miller et al. 2006 used a minimal Kermack–McKendrick structure fitted by model selection to cumulative mortality in two captive mule deer herds and found support for indirect (environmental) transmission; the version above adds explicit shedding and carcass terms in the style of Almberg et al. 2011. No latent class (CWD's long incubation is absorbed into the single `Ii` compartment with a slow `alpha`); add an `E` class if a 1.5–2-year non-infectious period is wanted. **Parameter values were taken from neither full text** — all are illustrative except the approximate course-of-disease duration.
+
+### chytrid_amphibian_zoospore — Amphibian chytridiomycosis with free-living zoospores
+
+- Disease/area: *Batrachochytrium dendrobatidis* in a common toad (*Bufo bufo*) breeding population | Category: Animal & wildlife
+- Source: Mitchell KM, Churcher TS, Garner TWJ, Fisher MC (2008). Persistence of the emerging pathogen *Batrachochytrium dendrobatidis* outside the amphibian host greatly increases the probability of host extinction. *Proc R Soc B* 275(1632):329–334. DOI 10.1098/rspb.2007.1356. Free full text: https://pmc.ncbi.nlm.nih.gov/articles/PMC2593721
+- Time unit: days ; suggested simulation length: 3650 days (10 years)
+- Compartments:
+  - `S` — susceptible toads — 1000
+  - `Ii` — infected toads — 5
+  - `Zs` — free-living zoospores in water (`Z` written `Zs` for clarity) — 0 — not in N
+- Parameters:
+  - `beta_hh` = 1e-4 (per toad per day) — host-to-host transmission coefficient [illustrative]
+  - `beta_z` = 1e-7 (per zoospore per day) — zoospore-to-host transmission coefficient [illustrative]
+  - `alpha_z` = 0.02 (per day) — disease-induced host death rate [illustrative]
+  - `mu_z` = 1/2920 (per day) — natural host death rate (8-year life span) [illustrative]
+  - `bz` = 1/2920 (per day) — host birth rate [illustrative]
+  - `Kz` = 1000 (toads) — host carrying capacity [illustrative]
+  - `prod` = 100 (zoospores per infected host per day) — zoospore release by infected hosts [illustrative]
+  - `rz` = 0.1 (per day) — maximum saprobic (host-independent) zoospore reproduction rate — **this term is the paper's distinctive contribution** [illustrative]
+  - `phi` = 1e-5 (per zoospore) — density-dependence of saprobic reproduction; appears as `exp(-phi * Zs)` **[verified: the paper uses a density-dependent term of the form exp(−φZ(t))]**
+  - `clear_z` = 0.1 (per day) — zoospore death/loss rate (the survival time this implies is the key parameter the authors vary) [illustrative]
+  - `rec` = 0 (per day) — host recovery rate (set 0 for the baseline; chytrid clearance is limited) [illustrative]
+- Derived variables:
+  - `N` = `S + Ii` — host population
+  - `lambda` = `beta_hh * Ii + beta_z * Zs` — force of infection (direct + zoospore pool)
+  - `sapro` = `rz * Zs * exp(-phi * Zs)` — density-limited saprobic zoospore reproduction
+- Flows:
+  - ` > S : bz * N * pmax(1 - N / Kz, 0)` (absolute) — host recruitment
+  - `S > Ii : lambda`
+  - `Ii > S : rec`
+  - `S > : mu_z`
+  - `Ii > : mu_z + alpha_z`
+  - ` > Zs : prod * Ii + sapro` (absolute) — zoospore production by hosts plus saprobic growth
+  - `Zs > : clear_z`
+- Notes: Structurally an Anderson & May "model G" host–free-living-stage system. The published finding is that **the longer zoospores persist outside the host — whether through a lower `clear_z` or a positive `rz` — the higher the probability of host extinction**, and that endemic infection with a severely depressed host population is an attainable equilibrium matching field observations. The `exp(-phi * Zs)` self-limitation on saprobic growth is confirmed from the source. Later critiques (e.g. Louca et al. 2014) note the model ignores infected adults as a separate class, within-host dynamics, and variation in individual zoospore burden — worth stating in generator documentation. The authors parameterised from laboratory infection and transmission experiments on *B. bufo*; **those values were not retrieved**, so the numbers above are illustrative and only the functional forms are verified.
+
+### hiv_target_cell_therapy — HIV-1 target-cell-limited model with antiretroviral therapy
+
+- Disease/area: HIV-1 within-host viral dynamics | Category: Within-host
+- Source: Perelson AS, Neumann AU, Markowitz M, Leonard JM, Ho DD (1996). HIV-1 dynamics in vivo: virion clearance rate, infected cell life-span, and viral generation time. *Science* 271(5255):1582–1586. DOI 10.1126/science.271.5255.1582. Model formulation also in Nowak MA, May RM (2000). *Virus Dynamics: Mathematical Principles of Immunology and Virology*, Oxford University Press. ISBN 9780198504177
+- Time unit: days ; suggested simulation length: 60 days (set-point run) or 14 days (post-therapy decay fit)
+- Compartments:
+  - `Tc` — uninfected target cells (CD4+ T cells, per µL) — 1000 — not in N
+  - `Ii` — productively infected cells (per µL) — 0 — not in N
+  - `V` — free virions (copies per mL) — 1e-3 — not in N
+- Parameters:
+  - `lam` = 10 (cells µL⁻¹ day⁻¹) — target-cell production rate [illustrative]
+  - `dT` = 0.01 (per day) — natural death rate of uninfected target cells [illustrative]
+  - `beta` = 2.4e-5 (mL copies⁻¹ day⁻¹) — infection rate constant [illustrative]
+  - `delta` = 0.5 (per day) — death rate of productively infected cells; the authors' estimate implies an infected-cell half-life of ≈1.6 days **[unverified; 0.5/day is the value conventionally cited from this paper]**
+  - `p` = 1000 (virions cell⁻¹ day⁻¹) — virion production rate per infected cell [illustrative]
+  - `cV` = 3.07 (per day) — virion clearance rate from plasma (`c` is reserved, hence `cV`) **[unverified; 3.07/day is the value conventionally cited from this paper]**
+  - `eps_rt` = 0 (dimensionless, 0–1) — efficacy of a reverse-transcriptase inhibitor (blocks new infection) [illustrative]
+  - `eps_pi` = 0 (dimensionless, 0–1) — efficacy of a protease inhibitor (blocks production of infectious virions) [illustrative]
+  - `tau_rx` = 30 (days) — time therapy starts [illustrative]
+- Derived variables:
+  - `on_rx` = `ifelse(t < tau_rx, 0, 1)` — therapy switch
+  - `er` = `eps_rt * on_rx` — effective RT-inhibitor efficacy at time t
+  - `ep` = `eps_pi * on_rx` — effective PI efficacy at time t
+  - `R0v` = `beta * p * (lam / dT) / (cV * delta)` — basic reproductive ratio of the virus within host
+  - `Tc_star` = `cV * delta / (beta * p)` — infected steady-state target-cell level
+- Flows:
+  - ` > Tc : lam` (absolute) — target-cell production
+  - `Tc > : dT`
+  - `Tc > Ii : beta * (1 - er) * V`
+  - `Ii > : delta`
+  - ` > V : p * (1 - ep) * Ii` (absolute) — virion production (total, not per-capita in V)
+  - `V > : cV`
+- Notes: The canonical three-equation target-cell-limited system. Note the two **absolute** flows: target-cell production `lam` and virion production `p * (1 - ep) * Ii`, the latter being a flow into `V` whose rate is proportional to a *different* compartment — exactly the case the "absolute" marker exists for. Units differ between compartments (`Tc`, `Ii` per µL; `V` per mL), so `beta` absorbs the conversion; the generator should state the convention rather than treat the three as one population. `p` and `cV` are **not separately identifiable** from plasma viral-load data alone — only the combination that sets the set point is — so `p` should be treated as a derived quantity when fitting. Therapy is implemented as two independent efficacy terms with a time switch, which reproduces the paper's biphasic post-treatment viral decay with slopes set by `cV` (fast) and `delta` (slow). The strict `V` decay after perfect therapy (`ep = 1`) is the regime from which the authors estimated `cV`.
+
+### influenza_within_host_teiv — Influenza A target-cell-limited model with an eclipse phase (TEIV)
+
+- Disease/area: Influenza A within-host dynamics in experimentally infected humans | Category: Within-host
+- Source: Baccam P, Beauchemin C, Macken CA, Hayden FG, Perelson AS (2006). Kinetics of influenza A virus infection in humans. *Journal of Virology* 80(15):7590–7599. DOI 10.1128/JVI.01623-05. Free full text: https://pmc.ncbi.nlm.nih.gov/articles/PMC1563736
+- Time unit: days ; suggested simulation length: 10 days
+- Compartments:
+  - `Tc` — uninfected target (epithelial) cells — 4e8 **[unverified: 4e8 cells is the value attributed to this paper]** — not in N
+  - `I1` — infected cells in the eclipse phase (not yet producing virus) — 0 — not in N
+  - `I2` — productively infected cells — 0 — not in N
+  - `V` — infectious virus titre (TCID50 per mL of nasal wash) — 7.5e-2 — not in N
+- Parameters:
+  - `beta` = 2.7e-5 (mL TCID50⁻¹ day⁻¹) — infection rate constant **[unverified — see note; a secondary source reports ≈1.13e-6 for an adjusted version of this parameter set]**
+  - `k` = 4.0 (per day) — rate of transition from eclipse to productively infected [unverified]
+  - `delta` = 2.4 (per day) — death rate of productively infected cells (a secondary source reports the original estimate as 0.167 per hour ≈ 4.0 per day and notes it implies an implausibly short 6-hour infected-cell lifetime, with later work using 0.1 per hour ≈ 2.4 per day) **[unverified; conflicting values in the literature]**
+  - `p` = 1.2e-2 (TCID50 mL⁻¹ day⁻¹ per infected cell) — virion production rate per productively infected cell **[unverified; secondary source reports ≈9.9e4 and ≈5e4 for differently scaled versions]**
+  - `cV` = 3.0 (per day) — viral clearance rate (secondary source: 0.125 per hour = 3.0 per day) **[unverified]**
+- Derived variables:
+  - `R0v` = `beta * p * Tc0 / (cV * delta)` — within-host basic reproductive ratio, with `Tc0` the initial target-cell count (this expression for `R0` is confirmed in the derived literature)
+  - `logV` = `log(pmax(V, 1e-12))` — log10-scale output is what the data are fitted on (divide by `log(10)`)
+- Flows:
+  - `Tc > I1 : beta * V`
+  - `I1 > I2 : k`
+  - `I2 > : delta`
+  - ` > V : p * I2` (absolute) — virion production
+  - `V > : cV`
+- Notes: Four compartments, no target-cell regeneration and no host death terms — over a 7–10 day infection, target-cell depletion alone terminates the infection, which is the model's central claim. The eclipse phase (`I1`) is what lets the model reproduce the observed ≈2-day delay to peak titre; the simpler TIV version without `I1` fits less well. **The parameter values are the weakest part of this entry**: sources disagree on both scaling and units (per hour vs per day) and on `delta`, and `p` and `cV` are only identifiable as a ratio from viral-load data. One secondary parameter set in circulation is β ≈ 1.13e-6, δ = 0.1 h⁻¹, p ≈ 9.9e4, c = 0.125 h⁻¹, T0 = 4e8, explicitly described as adjusted from the original to fix an implausible cell lifetime and to match `R0`. The primary table must be read from the PMC full text before any of these numbers are shipped as "from Baccam et al." Baccam et al. also fit a second model with an interferon response (an extra equation for IFN that reduces virion production), which would be a natural variant.
+
+### hcv_neumann_interferon — Hepatitis C within-host dynamics under interferon-α therapy
+
+- Disease/area: Hepatitis C virus within-host dynamics | Category: Within-host
+- Source: Neumann AU, Lam NP, Dahari H, Gretch DR, Wiley TE, Layden TJ, Perelson AS (1998). Hepatitis C viral dynamics in vivo and the antiviral efficacy of interferon-α therapy. *Science* 282(5386):103–107. DOI 10.1126/science.282.5386.103
+- Time unit: days ; suggested simulation length: 28 days (therapy run)
+- Compartments:
+  - `Tc` — uninfected target hepatocytes (cells per mL) — 1e7 [illustrative]
+  - `Ii` — productively infected hepatocytes (cells per mL) — 1e6 [illustrative]
+  - `V` — free virions (IU or copies per mL) — 1e6 [illustrative; pre-treatment set point is patient-specific]
+- Parameters:
+  - `sh` = 1e5 (cells mL⁻¹ day⁻¹) — hepatocyte production rate [illustrative]
+  - `dh` = 0.01 (per day) — death rate of uninfected hepatocytes [illustrative]
+  - `beta` = 1e-7 (mL virion⁻¹ day⁻¹) — infection rate constant [illustrative]
+  - `delta` = 0.14 (per day) — death/loss rate of infected hepatocytes; the authors estimated a wide range across patients (≈0.01–0.5 per day), corresponding to infected-cell half-lives of ≈1.7 to 70 days **[unverified; 0.14/day is the commonly cited central estimate from this paper]**
+  - `p` = 100 (virions cell⁻¹ day⁻¹) — virion production rate per infected cell [illustrative]
+  - `cV` = 6.2 (per day) — virion clearance rate, implying a plasma virion half-life of ≈2.7 hours **[unverified; 6.2/day is the headline estimate conventionally attributed to this paper]**
+  - `eta` = 0.95 (dimensionless, 0–1) — interferon efficacy in **blocking virion production** — the paper's key finding is that IFN acts chiefly here, with efficacy rising with dose (reaching ≈0.95–0.99 at the highest doses studied) **[unverified]**
+  - `eps` = 0 (dimensionless, 0–1) — efficacy in blocking new infections (found to be the minor mechanism) [illustrative]
+  - `tau_rx` = 0 (days) — therapy start time [illustrative]
+  - `tau_lag` = 0.3 (days) — pharmacological delay before the drug acts (the authors needed a delay to fit the first hours) [illustrative]
+- Derived variables:
+  - `on_rx` = `ifelse(t < tau_rx + tau_lag, 0, 1)` — therapy switch including the delay
+  - `en` = `eta * on_rx` — effective production-blocking efficacy
+  - `ei` = `eps * on_rx` — effective infection-blocking efficacy
+  - `R0v` = `beta * p * (sh / dh) / (cV * delta)` — within-host reproductive ratio
+- Flows:
+  - ` > Tc : sh` (absolute)
+  - `Tc > : dh`
+  - `Tc > Ii : beta * (1 - ei) * V`
+  - `Ii > : delta`
+  - ` > V : p * (1 - en) * Ii` (absolute)
+  - `V > : cV`
+- Notes: Structurally identical to the HIV target-cell model — the scientific content is in how therapy enters. The paper's contribution was separating the two possible drug mechanisms and showing that interferon mainly **blocks production** (`eta`) rather than infection (`eps`), which is identifiable because the two produce distinguishable first- and second-phase decay shapes. The first phase of viral decline has slope set by `cV`, the second by `delta`, and the magnitude of the first-phase drop reads off `eta` directly. The short pharmacological delay `tau_lag` is needed to fit the first hours and is implemented inside the `ifelse` switch. Only `cV = 6.2/day`, the central `delta`, and the high-dose efficacy range are literature values (unverified against the full text); everything describing the uninfected-hepatocyte turnover is illustrative because it is not identifiable from a 4-week viral-load series.
+
+### hiv_ctl_nowak_bangham — Virus dynamics with a CTL immune response
+
+- Disease/area: Within-host virus–immune-response dynamics (formulated for HIV/HTLV-1 and LCMV) | Category: Within-host
+- Source: Nowak MA, Bangham CRM (1996). Population dynamics of immune responses to persistent viruses. *Science* 272(5258):74–79. DOI 10.1126/science.272.5258.74. Parameter discussion in Nowak MA, May RM (2000). *Virus Dynamics*, Oxford University Press. ISBN 9780198504177
+- Time unit: days ; suggested simulation length: 200 days
+- Compartments:
+  - `Tc` — uninfected target cells — 1000 — not in N
+  - `Ii` — infected cells — 0 — not in N
+  - `V` — free virus — 1e-3 — not in N
+  - `Zc` — virus-specific cytotoxic T lymphocytes (CTL) — 1 — not in N
+- Parameters:
+  - `lam` = 10 (cells day⁻¹) — target-cell production [illustrative]
+  - `dT` = 0.1 (per day) — target-cell death rate [illustrative]
+  - `beta` = 0.002 (per virus per day) — infection rate constant [illustrative]
+  - `aI` = 0.5 (per day) — infected-cell death rate in the absence of CTL [illustrative]
+  - `pz` = 1.0 (per CTL per day) — rate of CTL-mediated killing of infected cells (`pz` because `p` is used for production and `c` is reserved) [illustrative]
+  - `kv` = 50 (virions cell⁻¹ day⁻¹) — virus production per infected cell [illustrative]
+  - `uV` = 5 (per day) — virus clearance rate [illustrative]
+  - `cz` = 0.1 (per infected cell per day) — rate of CTL proliferation driven by antigen [illustrative]
+  - `bz` = 0.05 (per day) — CTL death rate [illustrative]
+- Derived variables:
+  - `R0v` = `beta * kv * (lam / dT) / (uV * aI)` — reproductive ratio without immune control
+  - `Istar_imm` = `bz / cz` — infected-cell abundance at the immune-controlled equilibrium: a key published insight is that this level is set **entirely by CTL parameters**, independent of viral replication rate
+  - `Zstar` = `(beta * Tc * V / Ii - aI) / pz` — equilibrium CTL level (evaluate symbolically, not in the ODE)
+- Flows:
+  - ` > Tc : lam` (absolute)
+  - `Tc > : dT`
+  - `Tc > Ii : beta * V`
+  - `Ii > : aI + pz * Zc`
+  - ` > V : kv * Ii` (absolute)
+  - `V > : uV`
+  - ` > Zc : cz * Ii * Zc` (absolute) — antigen-driven CTL proliferation (bilinear, so it must be an absolute flow)
+  - `Zc > : bz`
+- Notes: Four compartments, and the only nonlinearity beyond standard mass action is the bilinear CTL proliferation term `cz * Ii * Zc`, which in the generator's grammar is an **absolute** inflow to `Zc` (the rate is not per-capita in a single source compartment). The published result worth reproducing: when the immune response controls infection, equilibrium infected-cell abundance is `bz / cz` — determined by CTL responsiveness, not by the virus's replication rate — so differences in viral load between patients reflect differences in immune responsiveness. Nowak & Bangham also present a variant with CTL proliferation proportional to `Ii` alone (`cz * Ii`, a "CTL memory" formulation) which gives qualitatively different control; both are worth offering. Parameter values in the original are illustrative in the source itself — the paper is a theory paper, not a fitting paper — so **no values here should be presented as estimates**.
+
+---
+
+## Sources and parameter provenance
+
+Items confirmed from sources retrieved in this session:
+
+- Zinsstag et al. 2009 PNAS 106(35):14996–15001: dog-to-dog transmission rate βd ≈ 0.0807 km²/(dogs·week); dog-to-human βdh ≈ 0.0002 km²/(dogs·week); effective reproductive ratio Re ≈ 1.01 at onset of observation, consistent with stable endemic dynamics; sensitivity greatest to rabies-related mortality rate, dog-to-dog transmission rate, and probability of clinical outcome; a single parenteral mass-vaccination campaign at ≥70% coverage reported sufficient to interrupt transmission to humans for ≥6 years — [PNAS record / PMC2728111](https://pmc.ncbi.nlm.nih.gov/articles/PMC2728111)
+- Mitchell et al. 2008 Proc R Soc B 275:329–334, DOI 10.1098/rspb.2007.1356: deterministic *Bufo bufo* model parameterised from laboratory infection and transmission experiments; tracks free-living zoospores Z(t); based on Anderson & May's model G; saprobic reproduction limited by a density-dependent term of the form exp[−φZ(t)]; longer pathogen persistence in water (longer zoospore lifespan or saprobic reproduction) increases probability of local host extinction; endemic infection with severe host-population depression is possible — [PMC2593721](https://pmc.ncbi.nlm.nih.gov/articles/PMC2593721); later critique that the model omits infected adults, within-host dynamics and individual zoospore-load variation — [Louca et al. 2014 discussion](https://pages.uoregon.edu/slouca/LoucaLab/SECTION_Publications/MODULE_Publications/Files/Louca2014Assessing.pdf)
+- Baccam et al. 2006 J Virol 80(15):7590–7599: target-cell-limited models fitted, with and without an interferon response, to experimentally infected volunteers; eclipse-phase formulation T, I1, I2, V with β infection, k eclipse transition, δ infected-cell death, p production, c clearance, and R0 = βpT0/(cδ) — [PMC1563736](https://pmc.ncbi.nlm.nih.gov/articles/1563736); a secondary parameter table reports β ≈ 1.13e-6, δ = 0.1 h⁻¹, p ≈ 9.9e4, c = 0.125 h⁻¹, T0 = 4e8 cells, explicitly noting that the original δ (0.167) implies an unrealistic 6-hour cell generation time and that the original p (≈5e4) was adjusted to match R0 — [Smith et al. parameter table](https://www.math.utah.edu/~adler/myreprints/smith2009atp.pdf); p and c are not independently identifiable from viral-load data, only their ratio
+- Hou et al. 2013 *Mathematical Biosciences* 242(1):51–58, DOI 10.1016/j.mbs.2012.11.012: sheep–human model with sheep population, human population and *Brucella* in the environment; concludes brucellosis cannot be eradicated even with 100% disinfection and vaccination of adult sheep, and that vaccinating plus disinfecting both young and adult sheep is more effective — [record](https://read.qxmd.com/read/23313258/modeling-the-transmission-dynamics-of-sheep-brucellosis-in-inner-mongolia-autonomous-region-china); a related 2017 brucellosis parameter table gives a human natural death rate of 0.006/year and an acute-onset period of 0.25 year — [AIMS Environ Sci 2017](https://www.aimspress.com/article/10.3934/environsci.2017.3.484/pdf)
+- Iwami, Liu & Takeuchi 2007 is in *Mathematical Biosciences* ("Avian–human influenza epidemic model", DOI 10.1016/j.mbs.2006.08.001), **not** J Theor Biol; the J Theor Biol paper is Takeuchi, Iwami, Korobeinikov & Liu 2008 on prevention policy (elimination vs quarantine), with a 2009 follow-up finding each policy can be ineffective or counterproductive; the 2007 model establishes that two types of avian-influenza outbreak may occur — [Liu/Ruan/Zhang review of the lineage](https://www.math.miami.edu/~ruan/MyPapers/LiuRuanZhang-TheoryBiosci2015.pdf)
+- Chowell et al. 2014 on MERS-CoV is in *Epidemics* 9:40–51, titled "Synthesizing data and models for the spread of MERS-CoV, 2013: key role of index cases and hospital transmission"; it matches 2013 case progression to a dynamic transmission model with community and hospital compartments, separating zoonotic (index) from secondary cases; prior reproduction-number estimates ranged 0.4–1.5. The BMC Medicine Chowell paper is 2015, on MERS/SARS in healthcare settings, and has no camel layer — [PMC4161258](https://pmc.ncbi.nlm.nih.gov/articles/PMC4161258)
+- Miller, Hobbs & Tavener 2006 *Ecological Applications* 16(6):2208–2214, "Dynamics of prion disease transmission in mule deer": a simple Kermack–McKendrick-type model with minimal population detail, parameterised from cumulative mortality data in two small captive herds; model selection supported indirect (environmental) transmission; extended by Sharp & Pastor (logistic susceptible growth) and Almberg et al. 2011 PLoS ONE on environmental prion persistence — [USGS record](https://www.usgs.gov/publications/modeling-routes-chronic-wasting-disease-transmission-environmental-prion-persistence); [PMC3094393](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3094393/)
+
+## Gaps
+
+- **Chowell et al. 2004 (Ebola) parameter table unconfirmed.** The PubMed record fetch was blocked by a content classifier on the summarising model, so β, q, τ, the incubation/infectious periods and the reported R0 values (1.83 Congo 1995, 1.34 Uganda 2000) are from the secondary literature and remain `[unverified]`. The intervention-switch structure itself is not in doubt.
+- **Rivers et al. 2014 parameter table unconfirmed**, and the model duplicates the already-implemented Legrand 2007 skeleton. Recommend either dropping it or shipping it explicitly as "Legrand structure, 2014 West Africa parameterisation, plus a vaccination lever".
+- **No single canonical ODE paper found for a three-layer bat→pig→human Nipah chain.** Pulliam et al. 2012 covers bats and piggeries with an episodic-introduction framing; the human nosocomial layer is assembled from descriptive Bangladesh epidemiology. All Nipah rate values are illustrative.
+- **No camel–human MERS ODE model with a published camel SIR layer was located.** Chowell et al. 2014 treats the reservoir as an exogenous introduction process. The camel compartments given here are an addition, not a published structure.
+- **Bhunu & Mushayabasa 2011 (mpox) parameter table not retrieved**; the paper is in a low-visibility journal (IAENG Int J Appl Math) and should be obtained before its numbers are attributed. No modern (2022-outbreak) deterministic ODE model with a published parameter table was located within the search budget — the influential 2022 analyses (e.g. Endo et al., *Science*) are sexual-contact-network models and are **out of scope for this format**.
+- **Kaplan, Craft & Wein 2002 is not a plain ODE model.** It is a discrete-time compartmental model with explicit tracing/vaccination queues and staffing constraints. The specification above is an acknowledged simplification; its parameter values are illustrative and should not be cited to the paper. Its qualitative conclusion (that under finite vaccination throughput, population-wide vaccination can avert more deaths than traced vaccination alone) is reproducible from the simplified form, but the quantitative result is not.
+- **Cox et al. 2005 (cattle–badger) parameter table not retrieved**; all values illustrative. The "perturbation effect" multiplier is a structural device, not a parameter from that paper.
+- **ASF, Q fever and anthrax parameter tables not retrieved.** Q fever (Courcoul et al.-type cattle-herd models with an environmental compartment) and anthrax (Saad-Roy, van den Driessche & Yakubu 2017, *Bull Math Biol*, DOI 10.1007/s11538-016-0238-1 — herbivore model with a carcass/spore environmental class) were **excluded from the 16** for budget reasons, not because they fail the format; both are near-identical in structure to the ASF and CWD entries (host SEIR plus an environmental reservoir fed by dead hosts) and are the cheapest additions if more models are wanted.
+- **Keeling et al. 2001 (FMD, *Science* 294:813, DOI 10.1126/science.1065973) was deliberately excluded.** The published model is a stochastic, spatially explicit, farm-level simulation with distance-dependent transmission kernels and queued culling — it is not expressible as a small deterministic ODE system without discarding the features that produced its results. A generic farm-level SIR with a culling rate could be written, but it would not be that model and should not be cited as such.
+- **Perelson 1996, Neumann 1998 and Baccam 2006 numeric values are all `[unverified]`.** These are the three entries where shipping a wrong number is most likely, because their parameter estimates are widely quoted (and, for Baccam, inconsistently rescaled). All three full texts are freely available and should be read directly before release.

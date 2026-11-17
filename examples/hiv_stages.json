@@ -1,0 +1,222 @@
+{
+  "version": 1,
+  "id": "hiv_stages",
+  "category": "Natural history",
+  "name": "HIV with disease stages",
+  "description": "Acute (I1), chronic (I2) and AIDS (A) stages with stage-specific infectiousness; AIDS deaths leave the population.",
+  "reference": "Anderson & May (1991), Infectious Diseases of Humans, ch. 11",
+  "referenceUrl": "",
+  "time": {
+    "start": "0",
+    "stop": "50",
+    "step": "0.05",
+    "unit": "years"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "Susceptible",
+      "init": "99900",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "I1",
+      "description": "Acute HIV",
+      "init": "100",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "I2",
+      "description": "Chronic HIV",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "A",
+      "description": "AIDS",
+      "init": "0",
+      "inN": true,
+      "color": "#E57373",
+      "x": 720,
+      "y": 140
+    },
+    {
+      "id": "c5",
+      "name": "D",
+      "description": "AIDS deaths",
+      "init": "0",
+      "inN": false,
+      "color": "#111111",
+      "x": 720,
+      "y": 300
+    }
+  ],
+  "parameters": [
+    {
+      "name": "cp",
+      "symbol": "c",
+      "value": "2",
+      "description": "partner change rate per year"
+    },
+    {
+      "name": "b1",
+      "symbol": "β_1",
+      "value": "0.1",
+      "description": "transmission probability per partnership, acute"
+    },
+    {
+      "name": "b2",
+      "symbol": "β_2",
+      "value": "0.02",
+      "description": "transmission probability per partnership, chronic"
+    },
+    {
+      "name": "b3",
+      "symbol": "β_3",
+      "value": "0.05",
+      "description": "transmission probability per partnership, AIDS"
+    },
+    {
+      "name": "k1",
+      "symbol": "κ_1",
+      "value": "4",
+      "description": "rate of leaving acute stage per year (3 months)"
+    },
+    {
+      "name": "k2",
+      "symbol": "κ_2",
+      "value": "1 / 9",
+      "description": "rate of progression to AIDS per year"
+    },
+    {
+      "name": "alpha",
+      "symbol": "",
+      "value": "0.5",
+      "description": "AIDS death rate per year"
+    },
+    {
+      "name": "mu",
+      "symbol": "",
+      "value": "1 / 35",
+      "description": "rate of entering/leaving the sexually active population"
+    }
+  ],
+  "variables": [
+    {
+      "name": "lam",
+      "symbol": "",
+      "expr": "cp * (b1 * I1 + b2 * I2 + b3 * A) / N",
+      "description": "force of infection",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "mu * N",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lam",
+      "output": "incidence",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "k1",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "k2",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "alpha",
+      "output": "aids_deaths",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    },
+    {
+      "id": "f7",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 270
+    },
+    {
+      "id": "f8",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 270
+    },
+    {
+      "id": "f9",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 10
+    }
+  ]
+}

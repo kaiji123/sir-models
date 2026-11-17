@@ -1,0 +1,371 @@
+{
+  "version": 1,
+  "id": "gonorrhoea_amr_whittles",
+  "category": "Sexually transmitted & blood-borne",
+  "name": "Gonorrhoea in MSM with cefixime-sensitive and cefixime-resistant strains",
+  "description": "Gonorrhoea, antimicrobial resistance.\nParameter values: 8 of 9 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Whittles LK, White PJ, Didelot X. Estimating the fitness cost and benefit of cefixime resistance in Neisseria gonorrhoeae to inform prescription policy: a modelling study. PLoS Med 2017;14(10):e1002416",
+  "referenceUrl": "https://doi.org/10.1371/journal.pmed.1002416",
+  "time": {
+    "start": "0",
+    "stop": "10",
+    "step": "0.01",
+    "unit": "years"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "susceptible MSM",
+      "init": "600000",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 380
+    },
+    {
+      "id": "c2",
+      "name": "Us",
+      "description": "incubating, sensitive strain",
+      "init": "0",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 320,
+      "y": 300
+    },
+    {
+      "id": "c3",
+      "name": "Es",
+      "description": "symptomatic, sensitive",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 520,
+      "y": 220
+    },
+    {
+      "id": "c4",
+      "name": "As",
+      "description": "asymptomatic, sensitive",
+      "init": "618",
+      "inN": true,
+      "color": "#E57373",
+      "x": 520,
+      "y": 380
+    },
+    {
+      "id": "c5",
+      "name": "Tsc",
+      "description": "treated with cefixime, sensitive",
+      "init": "0",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 720,
+      "y": 140
+    },
+    {
+      "id": "c6",
+      "name": "Tso",
+      "description": "treated with another antibiotic, sensitive",
+      "init": "0",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 720,
+      "y": 300
+    },
+    {
+      "id": "c7",
+      "name": "Ur",
+      "description": "incubating, resistant strain",
+      "init": "0",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 320,
+      "y": 460
+    },
+    {
+      "id": "c8",
+      "name": "Er",
+      "description": "symptomatic, resistant",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 520,
+      "y": 540
+    },
+    {
+      "id": "c9",
+      "name": "Ar",
+      "description": "asymptomatic, resistant",
+      "init": "49",
+      "inN": true,
+      "color": "#E57373",
+      "x": 920,
+      "y": 380
+    },
+    {
+      "id": "c10",
+      "name": "Trc",
+      "description": "treated with cefixime, resistant",
+      "init": "0",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 720,
+      "y": 460
+    },
+    {
+      "id": "c11",
+      "name": "Tro",
+      "description": "treated with another antibiotic, resistant",
+      "init": "0",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 720,
+      "y": 620
+    }
+  ],
+  "parameters": [
+    {
+      "name": "theta",
+      "symbol": "",
+      "value": "5.2",
+      "description": "transmission rate (/yr) [verified]"
+    },
+    {
+      "name": "psi",
+      "symbol": "",
+      "value": "0.63",
+      "description": "proportion of infections becoming symptomatic [verified]"
+    },
+    {
+      "name": "sig_inc",
+      "symbol": "",
+      "value": "77",
+      "description": "rate of leaving incubation (about 4.7 days) (/yr) [verified]"
+    },
+    {
+      "name": "nu",
+      "symbol": "",
+      "value": "1.8",
+      "description": "natural recovery from asymptomatic infection, sensitive strain (/yr) [verified]"
+    },
+    {
+      "name": "alpha_r",
+      "symbol": "",
+      "value": "1.8",
+      "description": "relative natural recovery rate of the resistant strain (fitness cost) [verified]"
+    },
+    {
+      "name": "mu_t",
+      "symbol": "",
+      "value": "136",
+      "description": "treatment-seeking rate when symptomatic (/yr) [verified]"
+    },
+    {
+      "name": "rho",
+      "symbol": "",
+      "value": "53",
+      "description": "recovery rate after treatment (/yr) [verified]"
+    },
+    {
+      "name": "phi_f",
+      "symbol": "",
+      "value": "0.83",
+      "description": "cefixime treatment failure for resistant infection [verified]"
+    },
+    {
+      "name": "pi_cef",
+      "symbol": "",
+      "value": "0.3",
+      "description": "proportion treated with cefixime [illustrative]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "Inf_s",
+      "symbol": "",
+      "expr": "Us+Es+As+Tsc+Tso",
+      "description": "infected with sensitive strain",
+      "output": false
+    },
+    {
+      "name": "Inf_r",
+      "symbol": "",
+      "expr": "Ur+Er+Ar+Trc+Tro",
+      "description": "infected with resistant strain",
+      "output": false
+    },
+    {
+      "name": "foi_s",
+      "symbol": "",
+      "expr": "theta*Inf_s/N",
+      "description": "force of infection, sensitive",
+      "output": false
+    },
+    {
+      "name": "foi_r",
+      "symbol": "",
+      "expr": "theta*Inf_r/N",
+      "description": "force of infection, resistant",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "foi_s",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "foi_r",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "psi*sig_inc",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c2",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "(1-psi)*sig_inc",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c7",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "psi*sig_inc",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c7",
+      "to": "c9",
+      "kind": "per_capita",
+      "rate": "(1-psi)*sig_inc",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": "c4",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "nu",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f8",
+      "from": "c9",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "alpha_r*nu",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f9",
+      "from": "c3",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "pi_cef*mu_t",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f10",
+      "from": "c3",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "(1-pi_cef)*mu_t",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f11",
+      "from": "c8",
+      "to": "c10",
+      "kind": "per_capita",
+      "rate": "pi_cef*mu_t",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f12",
+      "from": "c8",
+      "to": "c11",
+      "kind": "per_capita",
+      "rate": "(1-pi_cef)*mu_t",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f13",
+      "from": "c5",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "rho",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f14",
+      "from": "c6",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "rho",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f15",
+      "from": "c11",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "rho",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f16",
+      "from": "c10",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "(1-phi_f)*rho",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f17",
+      "from": "c10",
+      "to": "c9",
+      "kind": "per_capita",
+      "rate": "phi_f*rho",
+      "output": "",
+      "curve": 0
+    }
+  ]
+}

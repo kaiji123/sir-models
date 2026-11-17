@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "id": "si",
+  "category": "Basic",
+  "name": "SI",
+  "description": "Infection with no recovery (e.g. untreated chronic infection) in a closed population.",
+  "reference": "Keeling & Rohani (2008), Modeling Infectious Diseases in Humans and Animals, ch. 2",
+  "referenceUrl": "",
+  "time": {
+    "start": "0",
+    "stop": "100",
+    "step": "1",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "Susceptible",
+      "init": "999",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "I",
+      "description": "Infected",
+      "init": "1",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    }
+  ],
+  "parameters": [
+    {
+      "name": "beta",
+      "symbol": "",
+      "value": "0.2",
+      "description": "transmission rate per day"
+    }
+  ],
+  "variables": [
+    {
+      "name": "lam",
+      "symbol": "",
+      "expr": "beta * I / N",
+      "description": "force of infection",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lam",
+      "output": "incidence",
+      "curve": 0
+    }
+  ]
+}

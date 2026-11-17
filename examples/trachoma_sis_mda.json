@@ -1,0 +1,130 @@
+{
+  "version": 1,
+  "id": "trachoma_sis_mda",
+  "category": "Water, enteric & NTDs",
+  "name": "Trachoma SIS with periodic mass azithromycin (Lietman 1999)",
+  "description": "Ocular Chlamydia trachomatis.\nParameter values: 0 of 7 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Lietman T, Porco T, Dawson C, Blower S. Global elimination of trachoma: how frequently should we administer mass chemotherapy? Nat Med 1999;5(5):572–576",
+  "referenceUrl": "https://doi.org/10.1038/8451",
+  "time": {
+    "start": "0",
+    "stop": "10",
+    "step": "0.01",
+    "unit": "weeks"
+  },
+  "population": {
+    "name": "N"
+  },
+  "solver": {
+    "hmax": "0.01"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "uninfected",
+      "init": "500",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "I",
+      "description": "infected with ocular chlamydia",
+      "init": "500",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    }
+  ],
+  "parameters": [
+    {
+      "name": "dur_tr",
+      "symbol": "",
+      "value": "26",
+      "description": "mean duration of infection in children [I] (week)"
+    },
+    {
+      "name": "R0_tr",
+      "symbol": "",
+      "value": "2",
+      "description": "gives about 50% endemic prevalence (1 − 1/R0) [I]"
+    },
+    {
+      "name": "cover_m",
+      "symbol": "",
+      "value": "0.8",
+      "description": "MDA coverage [I]"
+    },
+    {
+      "name": "eff_m",
+      "symbol": "",
+      "value": "0.95",
+      "description": "azithromycin efficacy [M]"
+    },
+    {
+      "name": "int_m",
+      "symbol": "",
+      "value": "52",
+      "description": "treatment interval: 52 annual, 26 biannual [V that these intervals were compared] (week)"
+    },
+    {
+      "name": "t_start",
+      "symbol": "",
+      "value": "52",
+      "description": "first MDA round [I] (week)"
+    },
+    {
+      "name": "win_m",
+      "symbol": "",
+      "value": "1",
+      "description": "length of the treatment pulse [I] (week)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "b_tr",
+      "symbol": "",
+      "expr": "R0_tr/dur_tr",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "mda_on",
+      "symbol": "",
+      "expr": "ifelse(t >= t_start & (t - t_start - int_m*floor((t - t_start)/int_m)) < win_m, 1, 0)",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "mda_rate",
+      "symbol": "",
+      "expr": "mda_on*(-log(1 - cover_m*eff_m)/win_m)",
+      "description": "a pulse giving the cover×eff kill in each round",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "b_tr*I/N",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c2",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "1/dur_tr + mda_rate",
+      "output": "",
+      "curve": 60
+    }
+  ]
+}

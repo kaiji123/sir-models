@@ -1,0 +1,176 @@
+{
+  "version": 1,
+  "id": "sir_saturated_treatment",
+  "category": "Classic extensions",
+  "name": "SIR with saturated (capacity-limited) treatment",
+  "description": "generic, limited treatment capacity.\nMass-action (density-dependent) incidence as in the source papers.\nParameter values: 0 of 7 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Wang W. & Ruan S. (2004) \"Bifurcations in an epidemic model with constant removal rate of the infectives\", J. Math. Anal. Appl. 291:775–793",
+  "referenceUrl": "https://doi.org/10.1016/j.jmaa.2003.11.043",
+  "time": {
+    "start": "0",
+    "stop": "3650",
+    "step": "5",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "susceptible",
+      "init": "9990",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "I",
+      "description": "infectious",
+      "init": "10",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "R",
+      "description": "removed",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 520,
+      "y": 140
+    }
+  ],
+  "parameters": [
+    {
+      "name": "Lambda",
+      "symbol": "",
+      "value": "0.391",
+      "description": "recruitment, equal to mu10000 (persons/day) [illustrative]"
+    },
+    {
+      "name": "mu",
+      "symbol": "",
+      "value": "1/(70*365)",
+      "description": "natural death (1/day) [illustrative]"
+    },
+    {
+      "name": "beta",
+      "symbol": "",
+      "value": "3e-5",
+      "description": "mass-action transmission coefficient [illustrative]"
+    },
+    {
+      "name": "gamma",
+      "symbol": "",
+      "value": "0.1",
+      "description": "natural recovery (1/day) [illustrative]"
+    },
+    {
+      "name": "d_dis",
+      "symbol": "",
+      "value": "0.001",
+      "description": "disease death (1/day) [illustrative]"
+    },
+    {
+      "name": "r_max",
+      "symbol": "",
+      "value": "0.1",
+      "description": "maximal per-capita treatment rate at low prevalence (1/day) [illustrative]"
+    },
+    {
+      "name": "alpha_t",
+      "symbol": "",
+      "value": "0.01",
+      "description": "saturation constant (capacity effect) (1/person) [illustrative]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "treat_pc",
+      "symbol": "",
+      "expr": "r_max/(1 + alpha_t*I)",
+      "description": "per-capita treatment rate, so the total treatment is r_maxI/(1+alpha_tI)",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "Lambda",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "beta*I",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "gamma",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "treat_pc",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    },
+    {
+      "id": "f6",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu + d_dis",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 270
+    },
+    {
+      "id": "f7",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 270
+    }
+  ]
+}

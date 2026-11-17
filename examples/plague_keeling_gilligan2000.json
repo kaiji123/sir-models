@@ -1,0 +1,443 @@
+{
+  "version": 1,
+  "id": "plague_keeling_gilligan2000",
+  "category": "Vector-borne",
+  "name": "Bubonic plague: rats (SIR with inherited resistance), flea index, free infectious fleas, human SIR (Keeling & Gilligan 2000) [STRUCTURE-FROM-RECALL]",
+  "description": "Bubonic plague (Yersinia pestis), Rattus rattus – Xenopsylla cheopis – humans; historical Europe.\nParameter values: 0 of 15 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Keeling MJ, Gilligan CA (2000). Metapopulation dynamics of bubonic plague. Nature 407:903–906. https://doi.org/10.1038/35038073 ; and Keeling MJ, Gilligan CA (2000) Bubonic plague: a metapopulation model of a zoonosis. Proc R Soc B 267:2219–2230,…",
+  "referenceUrl": "https://doi.org/10.1038/35038073",
+  "time": {
+    "start": "0",
+    "stop": "50",
+    "step": "0.05",
+    "unit": "years"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Srat",
+      "description": "susceptible rats",
+      "init": "2499",
+      "inN": false,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Irat",
+      "description": "infected rats",
+      "init": "1",
+      "inN": false,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Rrat",
+      "description": "resistant rats",
+      "init": "0",
+      "inN": false,
+      "color": "#4E8A3E",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "Nf",
+      "description": "mean fleas per rat (flea index; not a head count)",
+      "init": "6.57",
+      "inN": false,
+      "color": "#DDDDDD",
+      "x": 120,
+      "y": 356
+    },
+    {
+      "id": "c5",
+      "name": "Ff",
+      "description": "free infectious fleas (searching)",
+      "init": "0",
+      "inN": false,
+      "color": "#5D4037",
+      "x": 120,
+      "y": 572
+    },
+    {
+      "id": "c6",
+      "name": "Shum",
+      "description": "susceptible humans",
+      "init": "10000",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 788
+    },
+    {
+      "id": "c7",
+      "name": "Ihum",
+      "description": "infected humans",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 788
+    },
+    {
+      "id": "c8",
+      "name": "Rhum",
+      "description": "recovered humans",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 520,
+      "y": 788
+    }
+  ],
+  "parameters": [
+    {
+      "name": "r_R",
+      "symbol": "",
+      "value": "5",
+      "description": "rat birth rate (1/yr)"
+    },
+    {
+      "name": "p_inh",
+      "symbol": "",
+      "value": "0.975",
+      "description": "probability offspring of resistant rats inherit resistance"
+    },
+    {
+      "name": "K_R",
+      "symbol": "",
+      "value": "2500",
+      "description": "rat carrying capacity (rats)"
+    },
+    {
+      "name": "d_R",
+      "symbol": "",
+      "value": "0.2",
+      "description": "rat natural death (1/yr)"
+    },
+    {
+      "name": "bet_R",
+      "symbol": "",
+      "value": "4.7",
+      "description": "rat infection rate per free flea (1/yr)"
+    },
+    {
+      "name": "a_s",
+      "symbol": "",
+      "value": "0.004",
+      "description": "flea searching efficiency (1/rat)"
+    },
+    {
+      "name": "m_R",
+      "symbol": "",
+      "value": "20",
+      "description": "rat infectious-period rate (≈18 d) (1/yr)"
+    },
+    {
+      "name": "g_R",
+      "symbol": "",
+      "value": "0.02",
+      "description": "probability an infected rat survives and becomes resistant"
+    },
+    {
+      "name": "r_F",
+      "symbol": "",
+      "value": "20",
+      "description": "flea growth rate on rats (1/yr)"
+    },
+    {
+      "name": "K_F",
+      "symbol": "",
+      "value": "6.57",
+      "description": "flea carrying capacity per rat (fleas/rat)"
+    },
+    {
+      "name": "d_F",
+      "symbol": "",
+      "value": "10",
+      "description": "death rate of free fleas (1/yr)"
+    },
+    {
+      "name": "bet_H",
+      "symbol": "",
+      "value": "0.01",
+      "description": "value taken from the notes text [recalled]"
+    },
+    {
+      "name": "mu_hum",
+      "symbol": "",
+      "value": "0.02",
+      "description": "value taken from the notes text [recalled]"
+    },
+    {
+      "name": "m_H",
+      "symbol": "",
+      "value": "26",
+      "description": "value taken from the notes text [recalled]"
+    },
+    {
+      "name": "g_H",
+      "symbol": "",
+      "value": "0.4",
+      "description": "value taken from the notes text [recalled]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "Nrat",
+      "symbol": "",
+      "expr": "Srat + Irat + Rrat",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "Nhum",
+      "symbol": "",
+      "expr": "Shum + Ihum + Rhum",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "lam_rat",
+      "symbol": "",
+      "expr": "bet_R*Ff*(1 - exp(-a_s*Nrat))/Nrat",
+      "description": "rat force of infection: fleas that find rats infect them",
+      "output": false
+    },
+    {
+      "name": "fleas_to_humans",
+      "symbol": "",
+      "expr": "Ff*exp(-a_s*Nrat)",
+      "description": "free fleas that fail to find a rat and land on humans (K&G's human force of infection)",
+      "output": false
+    },
+    {
+      "name": "lam_hum",
+      "symbol": "",
+      "expr": "bet_H*fleas_to_humans/Nhum",
+      "description": "human force of infection",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "r_R*Srat",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "r_R*(1 - p_inh)*Rrat",
+      "output": "",
+      "curve": 0,
+      "ox": 170,
+      "oy": 10
+    },
+    {
+      "id": "f3",
+      "from": null,
+      "to": "c3",
+      "kind": "absolute",
+      "rate": "r_R*p_inh*Rrat",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 10
+    },
+    {
+      "id": "f4",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "d_R + r_R*Nrat/K_R",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    },
+    {
+      "id": "f5",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "d_R + r_R*Nrat/K_R",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 270
+    },
+    {
+      "id": "f6",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lam_rat",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "m_R*g_R",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "m_R*(1 - g_R)",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 270
+    },
+    {
+      "id": "f9",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "d_R",
+      "output": "",
+      "curve": 0,
+      "ox": 370,
+      "oy": 270
+    },
+    {
+      "id": "f10",
+      "from": null,
+      "to": "c4",
+      "kind": "absolute",
+      "rate": "r_F*Nf",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 226
+    },
+    {
+      "id": "f11",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "r_F*Nf/K_F",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 486
+    },
+    {
+      "id": "f12",
+      "from": null,
+      "to": "c5",
+      "kind": "absolute",
+      "rate": "(d_R + m_R*(1 - g_R))*Irat*Nf",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 442
+    },
+    {
+      "id": "f13",
+      "from": "c5",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "d_F",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 702
+    },
+    {
+      "id": "f14",
+      "from": null,
+      "to": "c6",
+      "kind": "absolute",
+      "rate": "mu_hum*Nhum",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 658
+    },
+    {
+      "id": "f15",
+      "from": "c6",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "lam_hum",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f16",
+      "from": "c7",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "m_H*g_H",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f17",
+      "from": "c7",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "m_H*(1 - g_H)",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 918
+    },
+    {
+      "id": "f18",
+      "from": "c6",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_hum",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 918
+    },
+    {
+      "id": "f19",
+      "from": "c7",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_hum",
+      "output": "",
+      "curve": 0,
+      "ox": 370,
+      "oy": 918
+    },
+    {
+      "id": "f20",
+      "from": "c8",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_hum",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 918
+    }
+  ]
+}

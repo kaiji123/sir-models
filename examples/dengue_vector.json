@@ -1,0 +1,255 @@
+{
+  "version": 1,
+  "id": "dengue_vector",
+  "category": "Transmission routes",
+  "name": "Dengue host SEIR – vector SEI",
+  "description": "Human SEIR coupled to mosquito SEI with an extrinsic incubation period.",
+  "reference": "Manore et al. (2014), J. Theor. Biol. 356:174-191 (structure)",
+  "referenceUrl": "",
+  "time": {
+    "start": "0",
+    "stop": "365",
+    "step": "0.5",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Sh",
+      "description": "Susceptible humans",
+      "init": "99990",
+      "inN": false,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Eh",
+      "description": "Exposed humans",
+      "init": "0",
+      "inN": false,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Ih",
+      "description": "Infectious humans",
+      "init": "10",
+      "inN": false,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "Rh",
+      "description": "Recovered humans",
+      "init": "0",
+      "inN": false,
+      "color": "#4E8A3E",
+      "x": 720,
+      "y": 140
+    },
+    {
+      "id": "c5",
+      "name": "Sv",
+      "description": "Susceptible mosquitoes",
+      "init": "200000",
+      "inN": false,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 380
+    },
+    {
+      "id": "c6",
+      "name": "Ev",
+      "description": "Exposed mosquitoes",
+      "init": "0",
+      "inN": false,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 380
+    },
+    {
+      "id": "c7",
+      "name": "Iv",
+      "description": "Infectious mosquitoes",
+      "init": "0",
+      "inN": false,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 380
+    }
+  ],
+  "parameters": [
+    {
+      "name": "a",
+      "symbol": "",
+      "value": "0.5",
+      "description": "bites per mosquito per day"
+    },
+    {
+      "name": "bh",
+      "symbol": "b_h",
+      "value": "0.4",
+      "description": "mosquito-to-human transmission probability"
+    },
+    {
+      "name": "bv",
+      "symbol": "b_v",
+      "value": "0.4",
+      "description": "human-to-mosquito transmission probability"
+    },
+    {
+      "name": "sigmaH",
+      "symbol": "σ_h",
+      "value": "1 / 5.5",
+      "description": "1/(intrinsic incubation period)"
+    },
+    {
+      "name": "gammaH",
+      "symbol": "γ_h",
+      "value": "1 / 5",
+      "description": "human recovery rate"
+    },
+    {
+      "name": "sigmaV",
+      "symbol": "σ_v",
+      "value": "1 / 10",
+      "description": "1/(extrinsic incubation period)"
+    },
+    {
+      "name": "muV",
+      "symbol": "μ_v",
+      "value": "1 / 14",
+      "description": "mosquito death rate"
+    }
+  ],
+  "variables": [
+    {
+      "name": "Nh",
+      "symbol": "",
+      "expr": "Sh + Eh + Ih + Rh",
+      "description": "human population",
+      "output": false
+    },
+    {
+      "name": "Nv",
+      "symbol": "",
+      "expr": "Sv + Ev + Iv",
+      "description": "mosquito population",
+      "output": false
+    },
+    {
+      "name": "lam_h",
+      "symbol": "λ_h",
+      "expr": "a * bh * Iv / Nh",
+      "description": "force of infection on humans",
+      "output": false
+    },
+    {
+      "name": "lam_v",
+      "symbol": "λ_v",
+      "expr": "a * bv * Ih / Nh",
+      "description": "force of infection on mosquitoes",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lam_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "sigmaH",
+      "output": "human_cases",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "gammaH",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": null,
+      "to": "c5",
+      "kind": "absolute",
+      "rate": "muV * Nv",
+      "output": "",
+      "curve": 0,
+      "ox": -30,
+      "oy": 380
+    },
+    {
+      "id": "f5",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "lam_v",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c6",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "sigmaV",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": "c5",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "muV",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 510
+    },
+    {
+      "id": "f8",
+      "from": "c6",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "muV",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 510
+    },
+    {
+      "id": "f9",
+      "from": "c7",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "muV",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 510
+    }
+  ]
+}

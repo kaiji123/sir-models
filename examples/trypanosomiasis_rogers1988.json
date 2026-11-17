@@ -1,0 +1,565 @@
+{
+  "version": 1,
+  "id": "trypanosomiasis_rogers1988",
+  "category": "Vector-borne",
+  "name": "African trypanosomiasis: humans + cattle reservoir + tsetse with two-stage incubation (after Rogers 1988) [ILLUSTRATIVE-COMPOSITE]",
+  "description": "Rhodesian sleeping sickness / animal trypanosomiasis (T. brucei rhodesiense, Glossina spp.), East Africa.\nParameter values: 0 of 17 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Rogers DJ (1988). A general model for the African trypanosomiases. Parasitology 97(1):193–212. https://doi.org/10.1017/S0031182000066853 . It is a multi-host, single-vector Ross–Macdonald generalisation with host-specific feeding fractions and…",
+  "referenceUrl": "https://doi.org/10.1017/S0031182000066853",
+  "time": {
+    "start": "0",
+    "stop": "7300",
+    "step": "10",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Sh",
+      "description": "susceptible humans",
+      "init": "995",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Eh",
+      "description": "incubating humans",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Ih",
+      "description": "infectious humans",
+      "init": "5",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "Rh",
+      "description": "treated/recovered (temporary)",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 720,
+      "y": 140
+    },
+    {
+      "id": "c5",
+      "name": "Sc",
+      "description": "susceptible cattle",
+      "init": "490",
+      "inN": false,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 356
+    },
+    {
+      "id": "c6",
+      "name": "Ec",
+      "description": "incubating cattle",
+      "init": "0",
+      "inN": false,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 356
+    },
+    {
+      "id": "c7",
+      "name": "Ic",
+      "description": "infectious cattle",
+      "init": "10",
+      "inN": false,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 356
+    },
+    {
+      "id": "c8",
+      "name": "Rc",
+      "description": "recovered cattle",
+      "init": "0",
+      "inN": false,
+      "color": "#4E8A3E",
+      "x": 720,
+      "y": 356
+    },
+    {
+      "id": "c9",
+      "name": "Sf",
+      "description": "susceptible tsetse",
+      "init": "5000",
+      "inN": false,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 572
+    },
+    {
+      "id": "c10",
+      "name": "Ef1",
+      "description": "tsetse in EIP stage 1",
+      "init": "0",
+      "inN": false,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 572
+    },
+    {
+      "id": "c11",
+      "name": "Ef2",
+      "description": "tsetse in EIP stage 2",
+      "init": "0",
+      "inN": false,
+      "color": "#E8C468",
+      "x": 520,
+      "y": 572
+    },
+    {
+      "id": "c12",
+      "name": "If",
+      "description": "infectious tsetse",
+      "init": "0",
+      "inN": false,
+      "color": "#B71C1C",
+      "x": 720,
+      "y": 572
+    }
+  ],
+  "parameters": [
+    {
+      "name": "a_f",
+      "symbol": "",
+      "value": "0.25",
+      "description": "feeding rate (every 4 d) (1/day)"
+    },
+    {
+      "name": "f_hum",
+      "symbol": "",
+      "value": "0.1",
+      "description": "fraction of meals on humans; the rest on cattle"
+    },
+    {
+      "name": "b_fh",
+      "symbol": "",
+      "value": "0.6",
+      "description": "fly → human per-bite probability"
+    },
+    {
+      "name": "b_fc",
+      "symbol": "",
+      "value": "0.6",
+      "description": "fly → cattle per-bite probability"
+    },
+    {
+      "name": "p_hf",
+      "symbol": "",
+      "value": "0.05",
+      "description": "human → fly per-meal probability (low because mainly teneral flies are susceptible)"
+    },
+    {
+      "name": "p_cf",
+      "symbol": "",
+      "value": "0.05",
+      "description": "cattle → fly per-meal probability"
+    },
+    {
+      "name": "mu_f",
+      "symbol": "",
+      "value": "0.03",
+      "description": "tsetse mortality (1/day)"
+    },
+    {
+      "name": "eip",
+      "symbol": "",
+      "value": "25",
+      "description": "EIP of T. brucei (two Erlang stages at rate 2/eip each) (days)"
+    },
+    {
+      "name": "nu_h",
+      "symbol": "",
+      "value": "0.0714",
+      "description": "1/14 d human incubation (1/day)"
+    },
+    {
+      "name": "gam_h",
+      "symbol": "",
+      "value": "0.0083",
+      "description": "1/120 d to treatment/recovery (1/day)"
+    },
+    {
+      "name": "d_h",
+      "symbol": "",
+      "value": "0.0017",
+      "description": "disease death (1/day)"
+    },
+    {
+      "name": "rho_h",
+      "symbol": "",
+      "value": "0.0167",
+      "description": "loss of protection after treatment (1/day)"
+    },
+    {
+      "name": "mu_h",
+      "symbol": "",
+      "value": "4.57e-5",
+      "description": "human birth/death (1/day)"
+    },
+    {
+      "name": "nu_c",
+      "symbol": "",
+      "value": "0.1",
+      "description": "cattle incubation (1/day)"
+    },
+    {
+      "name": "gam_c",
+      "symbol": "",
+      "value": "0.01",
+      "description": "cattle recovery (100 d infectious) (1/day)"
+    },
+    {
+      "name": "rho_c",
+      "symbol": "",
+      "value": "0.02",
+      "description": "cattle waning (1/day)"
+    },
+    {
+      "name": "mu_c",
+      "symbol": "",
+      "value": "3.65e-4",
+      "description": "cattle birth/death (7.5 yr) (1/day)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "Nh",
+      "symbol": "",
+      "expr": "Sh + Eh + Ih + Rh",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "Nc",
+      "symbol": "",
+      "expr": "Sc + Ec + Ic + Rc",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "Nf",
+      "symbol": "",
+      "expr": "Sf + Ef1 + Ef2 + If",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "lam_h",
+      "symbol": "",
+      "expr": "a_f*f_hum*b_fh*If/Nh",
+      "description": "human force of infection",
+      "output": false
+    },
+    {
+      "name": "lam_c",
+      "symbol": "",
+      "expr": "a_f*(1 - f_hum)*b_fc*If/Nc",
+      "description": "cattle force of infection",
+      "output": false
+    },
+    {
+      "name": "lam_f",
+      "symbol": "",
+      "expr": "a_f*(f_hum*p_hf*Ih/Nh + (1 - f_hum)*p_cf*Ic/Nc)",
+      "description": "tsetse force of infection",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "mu_h*Nh",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lam_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "nu_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "gam_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "d_h",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 270
+    },
+    {
+      "id": "f6",
+      "from": "c4",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "rho_h",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f7",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_h",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    },
+    {
+      "id": "f8",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_h",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 270
+    },
+    {
+      "id": "f9",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_h",
+      "output": "",
+      "curve": 0,
+      "ox": 570,
+      "oy": 270
+    },
+    {
+      "id": "f10",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_h",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 270
+    },
+    {
+      "id": "f11",
+      "from": null,
+      "to": "c5",
+      "kind": "absolute",
+      "rate": "mu_c*Nc",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 226
+    },
+    {
+      "id": "f12",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "lam_c",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f13",
+      "from": "c6",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "nu_c",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f14",
+      "from": "c7",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "gam_c",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f15",
+      "from": "c8",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "rho_c",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f16",
+      "from": "c5",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_c",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 486
+    },
+    {
+      "id": "f17",
+      "from": "c6",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_c",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 486
+    },
+    {
+      "id": "f18",
+      "from": "c7",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_c",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 486
+    },
+    {
+      "id": "f19",
+      "from": "c8",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_c",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 486
+    },
+    {
+      "id": "f20",
+      "from": null,
+      "to": "c9",
+      "kind": "absolute",
+      "rate": "mu_f*Nf",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 442
+    },
+    {
+      "id": "f21",
+      "from": "c9",
+      "to": "c10",
+      "kind": "per_capita",
+      "rate": "lam_f",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f22",
+      "from": "c10",
+      "to": "c11",
+      "kind": "per_capita",
+      "rate": "2/eip",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f23",
+      "from": "c11",
+      "to": "c12",
+      "kind": "per_capita",
+      "rate": "2/eip",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f24",
+      "from": "c9",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_f",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 702
+    },
+    {
+      "id": "f25",
+      "from": "c10",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_f",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 702
+    },
+    {
+      "id": "f26",
+      "from": "c11",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_f",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 702
+    },
+    {
+      "id": "f27",
+      "from": "c12",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_f",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 702
+    }
+  ]
+}

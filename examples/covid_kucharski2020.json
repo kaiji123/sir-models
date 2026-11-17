@@ -1,0 +1,230 @@
+{
+  "version": 1,
+  "id": "covid_kucharski2020",
+  "category": "Respiratory",
+  "name": "Early Wuhan SARS-CoV-2 SEIR with Erlang stages and reporting delay (deterministic version of Kucharski et al. 2020)",
+  "description": "COVID-19.\nParameter values: 0 of 7 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Kucharski AJ, Russell TW, Diamond C, Liu Y, Edmunds J, Funk S, Eggo RM; CMMID COVID-19 working group. \"Early dynamics of transmission and control of COVID-19: a mathematical modelling study.\" Lancet Infect Dis 2020;20:553–558.…",
+  "referenceUrl": "https://doi.org/10.1016/S1473-3099(20",
+  "time": {
+    "start": "0",
+    "stop": "120",
+    "step": "0.2",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "solver": {
+    "hmax": "0.2"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "susceptible",
+      "init": "11e6",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "E1",
+      "description": "incubating, Erlang-2",
+      "init": "20",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "E2",
+      "description": "incubating, Erlang-2",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "I1",
+      "description": "infectious, Erlang-2",
+      "init": "10",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 720,
+      "y": 140
+    },
+    {
+      "id": "c5",
+      "name": "I2",
+      "description": "infectious, Erlang-2",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 920,
+      "y": 140
+    },
+    {
+      "id": "c6",
+      "name": "Rm",
+      "description": "removed",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 1120,
+      "y": 140
+    },
+    {
+      "id": "c7",
+      "name": "Qr",
+      "description": "symptomatic cases awaiting confirmation",
+      "init": "0",
+      "inN": false,
+      "color": "#00838F",
+      "x": 120,
+      "y": 356
+    },
+    {
+      "id": "c8",
+      "name": "Cr",
+      "description": "cumulative confirmed cases",
+      "init": "0",
+      "inN": false,
+      "color": "#8E0E0E",
+      "x": 320,
+      "y": 356
+    }
+  ],
+  "parameters": [
+    {
+      "name": "inc_per",
+      "symbol": "",
+      "value": "5.2",
+      "description": "mean incubation (days)"
+    },
+    {
+      "name": "inf_per",
+      "symbol": "",
+      "value": "2.9",
+      "description": "mean infectious period (days)"
+    },
+    {
+      "name": "rep_delay",
+      "symbol": "",
+      "value": "6.1",
+      "description": "mean onset-to-confirmation delay (days)"
+    },
+    {
+      "name": "R_pre",
+      "symbol": "",
+      "value": "2.35",
+      "description": "R(t) one week before and one week after the 23 Jan 2020 travel restrictions"
+    },
+    {
+      "name": "R_post",
+      "symbol": "",
+      "value": "1.05",
+      "description": "R(t) one week before and one week after the 23 Jan 2020 travel restrictions"
+    },
+    {
+      "name": "t_switch",
+      "symbol": "",
+      "value": "23",
+      "description": "date of the change (day) [illustrative]"
+    },
+    {
+      "name": "p_rep",
+      "symbol": "",
+      "value": "1",
+      "description": "fraction of cases eventually confirmed [illustrative]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "Rt",
+      "symbol": "",
+      "expr": "ifelse(t >= t_switch, R_post, R_pre)",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "foi",
+      "symbol": "",
+      "expr": "Rt/inf_per*(I1 + I2)/N",
+      "description": "",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "foi",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "2/inc_per",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "2/inc_per",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "2/inf_per",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "2/inf_per",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": null,
+      "to": "c7",
+      "kind": "absolute",
+      "rate": "p_rep*(2/inc_per)*E2",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 226
+    },
+    {
+      "id": "f7",
+      "from": "c7",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "1/rep_delay",
+      "output": "",
+      "curve": 0
+    }
+  ]
+}

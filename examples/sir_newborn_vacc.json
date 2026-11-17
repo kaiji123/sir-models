@@ -1,0 +1,188 @@
+{
+  "version": 1,
+  "id": "sir_newborn_vacc",
+  "category": "Interventions",
+  "name": "SIR with newborn vaccination",
+  "description": "A proportion p of newborns is vaccinated (enters V). Elimination requires p > 1 - 1/R0.",
+  "reference": "Keeling & Rohani (2008), Modeling Infectious Diseases in Humans and Animals, §8.1; Anderson & May (1991), Infectious Diseases of Humans, ch. 5",
+  "referenceUrl": "",
+  "time": {
+    "start": "0",
+    "stop": "80",
+    "step": "0.02",
+    "unit": "years"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "Susceptible",
+      "init": "10000",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "I",
+      "description": "Infectious",
+      "init": "10",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "R",
+      "description": "Recovered",
+      "init": "89990",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "V",
+      "description": "Vaccinated",
+      "init": "0",
+      "inN": true,
+      "color": "#2457C5",
+      "x": 120,
+      "y": 300
+    }
+  ],
+  "parameters": [
+    {
+      "name": "R0",
+      "symbol": "",
+      "value": "15",
+      "description": "basic reproduction number"
+    },
+    {
+      "name": "gamma",
+      "symbol": "",
+      "value": "365 / 7",
+      "description": "recovery rate per year"
+    },
+    {
+      "name": "mu",
+      "symbol": "",
+      "value": "1 / 70",
+      "description": "birth = death rate per year"
+    },
+    {
+      "name": "p",
+      "symbol": "",
+      "value": "0.8",
+      "description": "proportion of newborns vaccinated"
+    }
+  ],
+  "variables": [
+    {
+      "name": "beta",
+      "symbol": "",
+      "expr": "R0 * (gamma + mu)",
+      "description": "transmission rate implied by R0",
+      "output": false
+    },
+    {
+      "name": "lam",
+      "symbol": "",
+      "expr": "beta * I / N",
+      "description": "force of infection",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "(1 - p) * mu * N",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": null,
+      "to": "c4",
+      "kind": "absolute",
+      "rate": "p * mu * N",
+      "output": "",
+      "curve": 0,
+      "ox": -30,
+      "oy": 300
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lam",
+      "output": "incidence",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "gamma",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 60,
+      "oy": 250
+    },
+    {
+      "id": "f6",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 270
+    },
+    {
+      "id": "f7",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 270
+    },
+    {
+      "id": "f8",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 430
+    }
+  ]
+}

@@ -1,0 +1,287 @@
+{
+  "version": 1,
+  "id": "seachr",
+  "category": "Natural history",
+  "name": "SEACHR with re-exposure",
+  "description": "Asymptomatic (A) and clinical (C) infection, hospitalisation (H), death (D),\nwaning immunity and re-exposure of recovereds (ER). Parameter values are illustrative;\nthe force of infection is an assumption (the diagram does not define it).",
+  "reference": "Custom diagram",
+  "referenceUrl": "",
+  "time": {
+    "start": "0",
+    "stop": "365",
+    "step": "1",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "Susceptible",
+      "init": "100000 - E",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 300
+    },
+    {
+      "id": "c2",
+      "name": "E",
+      "description": "Exposed",
+      "init": "10",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 310,
+      "y": 300
+    },
+    {
+      "id": "c3",
+      "name": "A",
+      "description": "Asymptomatic",
+      "init": "0",
+      "inN": true,
+      "color": "#C62828",
+      "x": 520,
+      "y": 204
+    },
+    {
+      "id": "c4",
+      "name": "C",
+      "description": "Clinical",
+      "init": "0",
+      "inN": true,
+      "color": "#8E0E0E",
+      "x": 520,
+      "y": 396
+    },
+    {
+      "id": "c5",
+      "name": "R",
+      "description": "Recovered",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 760,
+      "y": 300
+    },
+    {
+      "id": "c6",
+      "name": "ER",
+      "description": "Exposed recovered",
+      "init": "0",
+      "inN": true,
+      "color": "#D9A441",
+      "x": 760,
+      "y": 108
+    },
+    {
+      "id": "c7",
+      "name": "H",
+      "description": "Hospitalised",
+      "init": "0",
+      "inN": true,
+      "color": "#6A2C9C",
+      "x": 520,
+      "y": 596
+    },
+    {
+      "id": "c8",
+      "name": "D",
+      "description": "Dead",
+      "init": "0",
+      "inN": false,
+      "color": "#111111",
+      "x": 760,
+      "y": 596
+    }
+  ],
+  "parameters": [
+    {
+      "name": "beta",
+      "symbol": "",
+      "value": "0.35",
+      "description": "transmission rate per day"
+    },
+    {
+      "name": "rA",
+      "symbol": "r_A",
+      "value": "0.5",
+      "description": "relative infectiousness of asymptomatics"
+    },
+    {
+      "name": "nu",
+      "symbol": "",
+      "value": "1 / 9",
+      "description": "1/(latent period)"
+    },
+    {
+      "name": "gamma",
+      "symbol": "",
+      "value": "0.7",
+      "description": "proportion of infections that are clinical"
+    },
+    {
+      "name": "tauA",
+      "symbol": "",
+      "value": "1 / 7",
+      "description": "recovery rate of asymptomatics"
+    },
+    {
+      "name": "tauC",
+      "symbol": "",
+      "value": "1 / 5",
+      "description": "rate of leaving the clinical stage"
+    },
+    {
+      "name": "theta",
+      "symbol": "",
+      "value": "0.3",
+      "description": "proportion of clinical cases hospitalised"
+    },
+    {
+      "name": "tauH",
+      "symbol": "",
+      "value": "1 / 10",
+      "description": "rate of leaving hospital"
+    },
+    {
+      "name": "omega",
+      "symbol": "",
+      "value": "0.4",
+      "description": "case fatality among hospitalised"
+    },
+    {
+      "name": "sigma",
+      "symbol": "",
+      "value": "0.2",
+      "description": "relative susceptibility of recovereds"
+    },
+    {
+      "name": "alpha",
+      "symbol": "",
+      "value": "1 / 365",
+      "description": "rate of waning immunity"
+    }
+  ],
+  "variables": [
+    {
+      "name": "lam",
+      "symbol": "",
+      "expr": "beta * (rA * A + C) / N",
+      "description": "force of infection (assumed)",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lam",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "nu * (1 - gamma)",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "nu * gamma",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c3",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "tauA",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "tauC * (1 - theta)",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c4",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "tauC * theta",
+      "output": "admissions",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": "c7",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "tauH * (1 - omega)",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c7",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "tauH * omega",
+      "output": "deaths",
+      "curve": 0
+    },
+    {
+      "id": "f9",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "sigma * lam",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f10",
+      "from": "c6",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "nu * (1 - gamma / 2)",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f11",
+      "from": "c6",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "nu * gamma / 2",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f12",
+      "from": "c5",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "alpha",
+      "output": "",
+      "curve": -190
+    }
+  ]
+}

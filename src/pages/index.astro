@@ -1,0 +1,101 @@
+---
+import '../styles/app.css';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Draw a compartmental (SIR-type) model diagram and get deterministic R / deSolve code." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Diagram to R</title>
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="brand"><span class="brand-mark">S→I→R</span> Diagram to R</div>
+        <div class="toolgroup" role="toolbar" aria-label="Drawing tools">
+          <button class="tool" data-tool="select" title="Select and move (V)">Select</button>
+          <button class="tool" data-tool="compartment" title="Click the canvas to add a compartment (C)">+ Compartment</button>
+          <button class="tool" data-tool="flow" title="Click a source, then a target; click empty canvas for outside the system (F)">+ Flow</button>
+        </div>
+        <div class="toolgroup">
+          <button id="btn-undo" title="Undo (Ctrl+Z)">Undo</button>
+          <button id="btn-redo" title="Redo (Ctrl+Shift+Z)">Redo</button>
+          <button id="btn-fit" title="Fit diagram to view">Fit</button>
+        </div>
+        <div class="toolgroup right">
+          <button id="btn-library" class="primary" title="Search the model library (/)">Model library…</button>
+          <button id="btn-new">New</button>
+          <button id="btn-open">Open…</button>
+          <input id="file-open" type="file" accept=".json,application/json" hidden />
+          <button id="btn-save">Save JSON</button>
+          <button id="btn-link" title="Copy a link that contains this model">Copy link</button>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <section class="canvas-wrap">
+          <svg id="canvas" aria-label="Model diagram">
+            <defs>
+              <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" class="arrowhead" />
+              </marker>
+              <marker id="arrow-sel" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" class="arrowhead sel" />
+              </marker>
+              <marker id="arrow-err" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" class="arrowhead err" />
+              </marker>
+              <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                <circle cx="1" cy="1" r="1" class="grid-dot" />
+              </pattern>
+            </defs>
+            <rect id="grid-bg" x="-5000" y="-5000" width="10000" height="10000" fill="url(#grid)" />
+            <g id="world"></g>
+          </svg>
+          <div id="hint" class="hint"></div>
+          <div id="status" class="status"></div>
+        </section>
+
+        <aside class="side">
+          <nav class="tabs" role="tablist">
+            <button class="tab" data-tab="inspector" role="tab">Selection</button>
+            <button class="tab" data-tab="parameters" role="tab">Parameters</button>
+            <button class="tab" data-tab="variables" role="tab">Variables</button>
+            <button class="tab" data-tab="model" role="tab">Model</button>
+            <button class="tab" data-tab="code" role="tab">R code <span id="code-badge" class="badge"></span></button>
+          </nav>
+          <div class="panel" data-panel="inspector" id="panel-inspector"></div>
+          <div class="panel" data-panel="parameters" id="panel-parameters"></div>
+          <div class="panel" data-panel="variables" id="panel-variables"></div>
+          <div class="panel" data-panel="model" id="panel-model"></div>
+          <div class="panel code-panel" data-panel="code">
+            <div class="code-actions">
+              <button id="btn-copy">Copy</button>
+              <button id="btn-download">Download .R</button>
+              <span class="muted small">Same diagram → identical code, every time.</span>
+            </div>
+            <div id="code-errors"></div>
+            <pre id="code" class="code"></pre>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <dialog id="lib-dialog" class="lib-dialog" aria-label="Model library">
+      <div class="lib-dialog-head">
+        <input id="lib-q" type="search" placeholder="Search models, e.g. malaria, vaccination, has:E, cat:vector" autocomplete="off" spellcheck="false" />
+        <button id="lib-close" aria-label="Close">✕</button>
+      </div>
+      <div id="lib-cats" class="lib-cats"></div>
+      <div id="lib-count" class="muted small lib-count"></div>
+      <ul id="lib-results" class="lib-results" role="listbox"></ul>
+      <div class="lib-dialog-foot muted small">↑↓ to move · Enter to open · <a href="library/">full library page</a></div>
+    </dialog>
+
+    <script>
+      import '../lib/editor.js';
+    </script>
+  </body>
+</html>

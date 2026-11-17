@@ -1,0 +1,146 @@
+{
+  "version": 1,
+  "id": "sidr_diagnosis",
+  "category": "Classic extensions",
+  "name": "acute infection with diagnosis, isolation-at-home and treatment (no carriers)",
+  "description": "generic acute bacterial or viral infection with case finding (e.g. diphtheria, scabies, early COVID testing).\nR0 is about 1.53 with these values, against 4 without diagnosis.\nParameter values: 0 of 5 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Illustrative structure in the spirit of the treatment and control chapters of Vynnycky E. & White R.G. (2010) An Introduction to Infectious Disease Modelling, Oxford University Press, ISBN 978-0-19-856576-5, and Martcheva M. (2015) An Introduction to…",
+  "referenceUrl": "https://doi.org/10.1007/978-1-4899-7612-3",
+  "time": {
+    "start": "0",
+    "stop": "200",
+    "step": "0.2",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "susceptible",
+      "init": "9990",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Iu",
+      "description": "infectious, undiagnosed",
+      "init": "10",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Id",
+      "description": "diagnosed and treated, reduced contacts",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "R",
+      "description": "recovered",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 720,
+      "y": 140
+    }
+  ],
+  "parameters": [
+    {
+      "name": "beta",
+      "symbol": "",
+      "value": "0.4",
+      "description": "transmission (1/day) [illustrative]"
+    },
+    {
+      "name": "delta_d",
+      "symbol": "",
+      "value": "0.2",
+      "description": "diagnosis rate (mean 5 days to diagnosis) (1/day) [illustrative]"
+    },
+    {
+      "name": "kappa_d",
+      "symbol": "",
+      "value": "0.2",
+      "description": "relative infectiousness after diagnosis (isolation plus treatment) [illustrative]"
+    },
+    {
+      "name": "gamma_u",
+      "symbol": "",
+      "value": "1/10",
+      "description": "recovery, undiagnosed (1/day) [illustrative]"
+    },
+    {
+      "name": "gamma_d",
+      "symbol": "",
+      "value": "1/3",
+      "description": "recovery, diagnosed and treated (1/day) [illustrative]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "lambda",
+      "symbol": "",
+      "expr": "beta*(Iu + kappa_d*Id)/N",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "R0",
+      "symbol": "",
+      "expr": "beta/(gamma_u + delta_d) + beta*delta_d*kappa_d/((gamma_u + delta_d)*gamma_d)",
+      "description": "",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lambda",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "delta_d",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "gamma_u",
+      "output": "",
+      "curve": 50
+    },
+    {
+      "id": "f4",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "gamma_d",
+      "output": "",
+      "curve": 0
+    }
+  ]
+}

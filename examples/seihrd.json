@@ -1,0 +1,183 @@
+{
+  "version": 1,
+  "id": "seihrd",
+  "category": "Natural history",
+  "name": "SEIHRD (hospitalisation)",
+  "description": "A proportion of cases is hospitalised; deaths occur in hospital.",
+  "reference": "Vynnycky & White (2010), An Introduction to Infectious Disease Modelling, ch. 4 (structure)",
+  "referenceUrl": "",
+  "time": {
+    "start": "0",
+    "stop": "300",
+    "step": "1",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "Susceptible",
+      "init": "99990",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "E",
+      "description": "Exposed",
+      "init": "10",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "I",
+      "description": "Infectious",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "R",
+      "description": "Recovered",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 720,
+      "y": 140
+    },
+    {
+      "id": "c5",
+      "name": "H",
+      "description": "Hospitalised",
+      "init": "0",
+      "inN": true,
+      "color": "#6A2C9C",
+      "x": 520,
+      "y": 300
+    },
+    {
+      "id": "c6",
+      "name": "D",
+      "description": "Dead",
+      "init": "0",
+      "inN": false,
+      "color": "#111111",
+      "x": 720,
+      "y": 300
+    }
+  ],
+  "parameters": [
+    {
+      "name": "beta",
+      "symbol": "",
+      "value": "0.45",
+      "description": "transmission rate per day"
+    },
+    {
+      "name": "sigma",
+      "symbol": "",
+      "value": "1 / 5",
+      "description": "1/(latent period)"
+    },
+    {
+      "name": "gamma",
+      "symbol": "",
+      "value": "1 / 7",
+      "description": "rate of leaving the infectious state"
+    },
+    {
+      "name": "h",
+      "symbol": "",
+      "value": "0.05",
+      "description": "proportion hospitalised"
+    },
+    {
+      "name": "tauH",
+      "symbol": "",
+      "value": "1 / 10",
+      "description": "rate of leaving hospital"
+    },
+    {
+      "name": "m",
+      "symbol": "",
+      "value": "0.2",
+      "description": "in-hospital fatality"
+    }
+  ],
+  "variables": [
+    {
+      "name": "lam",
+      "symbol": "",
+      "expr": "beta * I / N",
+      "description": "force of infection (hospitalised patients do not transmit)",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lam",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "sigma",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "gamma * (1 - h)",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c3",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "gamma * h",
+      "output": "admissions",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c5",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "tauH * (1 - m)",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "tauH * m",
+      "output": "deaths",
+      "curve": 0
+    }
+  ]
+}

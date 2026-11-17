@@ -1,0 +1,640 @@
+{
+  "version": 1,
+  "id": "rvf_gaff2007",
+  "category": "Vector-borne",
+  "name": "Rift Valley fever: Aedes (with transovarial transmission and eggs), Culex and livestock (Gaff, Hartley & Leahy 2007) [STRUCTURE-FROM-RECALL]",
+  "description": "Rift Valley fever, East Africa (Kenya-type floodplain).\nParameter values: 0 of 24 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Gaff HD, Hartley DM, Leahy NP (2007). An epidemiological model of Rift Valley fever. Electron J Differ Equ 2007(115):1–12. Open access: https://ejde.math.txstate.edu/Volumes/2007/115/abstr.html . The abstract confirms two mosquito populations (Aedes, which…",
+  "referenceUrl": "https://ejde.math.txstate.edu/Volumes/2007/115/abstr.html",
+  "time": {
+    "start": "0",
+    "stop": "730",
+    "step": "1",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "solver": {
+    "hmax": "1"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Pa",
+      "description": "uninfected Aedes eggs",
+      "init": "1e6",
+      "inN": false,
+      "color": "#F0A35E",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Qa",
+      "description": "infected Aedes eggs (transovarial)",
+      "init": "0",
+      "inN": false,
+      "color": "#00838F",
+      "x": 120,
+      "y": 300
+    },
+    {
+      "id": "c3",
+      "name": "Sa",
+      "description": "susceptible Aedes",
+      "init": "1e5",
+      "inN": false,
+      "color": "#FFFFFF",
+      "x": 320,
+      "y": 220
+    },
+    {
+      "id": "c4",
+      "name": "Ea",
+      "description": "exposed Aedes",
+      "init": "0",
+      "inN": false,
+      "color": "#E8C468",
+      "x": 520,
+      "y": 220
+    },
+    {
+      "id": "c5",
+      "name": "Ia",
+      "description": "infectious Aedes",
+      "init": "10",
+      "inN": false,
+      "color": "#B71C1C",
+      "x": 720,
+      "y": 220
+    },
+    {
+      "id": "c6",
+      "name": "Pc",
+      "description": "Culex eggs",
+      "init": "1e5",
+      "inN": false,
+      "color": "#F0A35E",
+      "x": 120,
+      "y": 516
+    },
+    {
+      "id": "c7",
+      "name": "Sc",
+      "description": "susceptible Culex",
+      "init": "1e5",
+      "inN": false,
+      "color": "#FFFFFF",
+      "x": 320,
+      "y": 516
+    },
+    {
+      "id": "c8",
+      "name": "Ec",
+      "description": "exposed Culex",
+      "init": "0",
+      "inN": false,
+      "color": "#E8C468",
+      "x": 520,
+      "y": 516
+    },
+    {
+      "id": "c9",
+      "name": "Ic",
+      "description": "infectious Culex",
+      "init": "0",
+      "inN": false,
+      "color": "#B71C1C",
+      "x": 720,
+      "y": 516
+    },
+    {
+      "id": "c10",
+      "name": "Sl",
+      "description": "susceptible livestock",
+      "init": "1000",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 732
+    },
+    {
+      "id": "c11",
+      "name": "El",
+      "description": "exposed livestock",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 732
+    },
+    {
+      "id": "c12",
+      "name": "Il",
+      "description": "infectious livestock",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 732
+    },
+    {
+      "id": "c13",
+      "name": "Rl",
+      "description": "recovered livestock",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 720,
+      "y": 732
+    }
+  ],
+  "parameters": [
+    {
+      "name": "b_a",
+      "symbol": "",
+      "value": "0.2",
+      "description": " (eggs/female/day)"
+    },
+    {
+      "name": "q_tov",
+      "symbol": "",
+      "value": "0.05",
+      "description": "transovarial fraction of eggs from infectious Aedes"
+    },
+    {
+      "name": "th_a",
+      "symbol": "",
+      "value": "0.05",
+      "description": "egg hatching rate (multiplied by the flood indicator) (1/day)"
+    },
+    {
+      "name": "mu_ea",
+      "symbol": "",
+      "value": "0.001",
+      "description": "Aedes egg mortality; desiccation-resistant eggs (1/day)"
+    },
+    {
+      "name": "K_a",
+      "symbol": "",
+      "value": "2e5",
+      "description": "Aedes adult capacity (mosquitoes)"
+    },
+    {
+      "name": "mu_a",
+      "symbol": "",
+      "value": "0.05",
+      "description": "Aedes adult mortality (1/day)"
+    },
+    {
+      "name": "eps_a",
+      "symbol": "",
+      "value": "0.143",
+      "description": "1/7 d EIP in Aedes (1/day)"
+    },
+    {
+      "name": "a_a",
+      "symbol": "",
+      "value": "0.3",
+      "description": "Aedes biting rate (1/day)"
+    },
+    {
+      "name": "b_c",
+      "symbol": "",
+      "value": "0.2",
+      "description": " (eggs/female/day)"
+    },
+    {
+      "name": "th_c",
+      "symbol": "",
+      "value": "0.1",
+      "description": "Culex hatching rate (1/day)"
+    },
+    {
+      "name": "mu_ec",
+      "symbol": "",
+      "value": "0.1",
+      "description": "Culex egg mortality (1/day)"
+    },
+    {
+      "name": "K_c",
+      "symbol": "",
+      "value": "2e5",
+      "description": "Culex adult capacity (mosquitoes)"
+    },
+    {
+      "name": "mu_c",
+      "symbol": "",
+      "value": "0.05",
+      "description": "Culex adult mortality (1/day)"
+    },
+    {
+      "name": "eps_c",
+      "symbol": "",
+      "value": "0.143",
+      "description": "1/7 d EIP in Culex (1/day)"
+    },
+    {
+      "name": "a_c",
+      "symbol": "",
+      "value": "0.3",
+      "description": "Culex biting rate (1/day)"
+    },
+    {
+      "name": "p_al",
+      "symbol": "",
+      "value": "0.3",
+      "description": "Aedes → livestock per-bite probability"
+    },
+    {
+      "name": "p_cl",
+      "symbol": "",
+      "value": "0.3",
+      "description": "Culex → livestock per-bite probability"
+    },
+    {
+      "name": "p_la",
+      "symbol": "",
+      "value": "0.3",
+      "description": "livestock → Aedes per-bite probability"
+    },
+    {
+      "name": "p_lc",
+      "symbol": "",
+      "value": "0.3",
+      "description": "livestock → Culex per-bite probability"
+    },
+    {
+      "name": "eps_l",
+      "symbol": "",
+      "value": "0.25",
+      "description": "1/4 d incubation in livestock (1/day)"
+    },
+    {
+      "name": "gam_l",
+      "symbol": "",
+      "value": "0.25",
+      "description": "1/4 d infectious period (1/day)"
+    },
+    {
+      "name": "d_l",
+      "symbol": "",
+      "value": "0.025",
+      "description": "RVF-induced livestock death (1/day)"
+    },
+    {
+      "name": "mu_l",
+      "symbol": "",
+      "value": "5.5e-4",
+      "description": "livestock death (5-yr life); births = mu_l·Nl (1/day)"
+    },
+    {
+      "name": "flood_len",
+      "symbol": "",
+      "value": "60",
+      "description": "wet-season window each year (days)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "Nas",
+      "symbol": "",
+      "expr": "Sa + Ea + Ia",
+      "description": "adult Aedes",
+      "output": false
+    },
+    {
+      "name": "Ncs",
+      "symbol": "",
+      "expr": "Sc + Ec + Ic",
+      "description": "adult Culex",
+      "output": false
+    },
+    {
+      "name": "Nl",
+      "symbol": "",
+      "expr": "Sl + El + Il + Rl",
+      "description": "livestock",
+      "output": false
+    },
+    {
+      "name": "flood",
+      "symbol": "",
+      "expr": "ifelse(t - 365*floor(t/365) < flood_len, 1, 0)",
+      "description": "annual flooding window",
+      "output": false
+    },
+    {
+      "name": "lam_l",
+      "symbol": "",
+      "expr": "(a_a*p_al*Ia + a_c*p_cl*Ic)/Nl",
+      "description": "livestock force of infection",
+      "output": false
+    },
+    {
+      "name": "lam_a",
+      "symbol": "",
+      "expr": "a_a*p_la*Il/Nl",
+      "description": "Aedes force of infection",
+      "output": false
+    },
+    {
+      "name": "lam_c",
+      "symbol": "",
+      "expr": "a_c*p_lc*Il/Nl",
+      "description": "Culex force of infection",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "b_a*(Sa + Ea) + b_a*(1 - q_tov)*Ia",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": null,
+      "to": "c2",
+      "kind": "absolute",
+      "rate": "b_a*q_tov*Ia",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 170
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "th_a*flood*pmax(0, 1 - Nas/K_a)",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c2",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "th_a*flood*pmax(0, 1 - Nas/K_a)",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_ea",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    },
+    {
+      "id": "f6",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_ea",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 430
+    },
+    {
+      "id": "f7",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "lam_a",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "eps_a",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f9",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_a",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 350
+    },
+    {
+      "id": "f10",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_a",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 350
+    },
+    {
+      "id": "f11",
+      "from": "c5",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_a",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 350
+    },
+    {
+      "id": "f12",
+      "from": null,
+      "to": "c6",
+      "kind": "absolute",
+      "rate": "b_c*Ncs",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 386
+    },
+    {
+      "id": "f13",
+      "from": "c6",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "th_c*flood*pmax(0, 1 - Ncs/K_c)",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f14",
+      "from": "c6",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_ec",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 646
+    },
+    {
+      "id": "f15",
+      "from": "c7",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "lam_c",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f16",
+      "from": "c8",
+      "to": "c9",
+      "kind": "per_capita",
+      "rate": "eps_c",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f17",
+      "from": "c7",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_c",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 646
+    },
+    {
+      "id": "f18",
+      "from": "c8",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_c",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 646
+    },
+    {
+      "id": "f19",
+      "from": "c9",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_c",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 646
+    },
+    {
+      "id": "f20",
+      "from": null,
+      "to": "c10",
+      "kind": "absolute",
+      "rate": "mu_l*Nl",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 602
+    },
+    {
+      "id": "f21",
+      "from": "c10",
+      "to": "c11",
+      "kind": "per_capita",
+      "rate": "lam_l",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f22",
+      "from": "c11",
+      "to": "c12",
+      "kind": "per_capita",
+      "rate": "eps_l",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f23",
+      "from": "c12",
+      "to": "c13",
+      "kind": "per_capita",
+      "rate": "gam_l",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f24",
+      "from": "c12",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "d_l",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 862
+    },
+    {
+      "id": "f25",
+      "from": "c10",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_l",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 862
+    },
+    {
+      "id": "f26",
+      "from": "c11",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_l",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 862
+    },
+    {
+      "id": "f27",
+      "from": "c12",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_l",
+      "output": "",
+      "curve": 0,
+      "ox": 570,
+      "oy": 862
+    },
+    {
+      "id": "f28",
+      "from": "c13",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_l",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 862
+    }
+  ]
+}

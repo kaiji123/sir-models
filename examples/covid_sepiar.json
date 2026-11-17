@@ -1,0 +1,196 @@
+{
+  "version": 1,
+  "id": "covid_sepiar",
+  "category": "Natural history",
+  "name": "COVID-19 style SEPIR",
+  "description": "Latent (E), pre-symptomatic infectious (P), then symptomatic (Is) or asymptomatic (Ia) infection.",
+  "reference": "Davies et al. (2020), Nature Medicine 26:1205-1211 (structure)",
+  "referenceUrl": "",
+  "time": {
+    "start": "0",
+    "stop": "300",
+    "step": "0.5",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "Susceptible",
+      "init": "999990",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 220
+    },
+    {
+      "id": "c2",
+      "name": "E",
+      "description": "Latent",
+      "init": "10",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 220
+    },
+    {
+      "id": "c3",
+      "name": "P",
+      "description": "Pre-symptomatic",
+      "init": "0",
+      "inN": true,
+      "color": "#F0A35E",
+      "x": 520,
+      "y": 220
+    },
+    {
+      "id": "c4",
+      "name": "Is",
+      "description": "Symptomatic",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 720,
+      "y": 140
+    },
+    {
+      "id": "c5",
+      "name": "Ia",
+      "description": "Asymptomatic",
+      "init": "0",
+      "inN": true,
+      "color": "#E57373",
+      "x": 720,
+      "y": 300
+    },
+    {
+      "id": "c6",
+      "name": "R",
+      "description": "Recovered",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 920,
+      "y": 220
+    }
+  ],
+  "parameters": [
+    {
+      "name": "R0",
+      "symbol": "",
+      "value": "2.5",
+      "description": "basic reproduction number"
+    },
+    {
+      "name": "sigma",
+      "symbol": "",
+      "value": "1 / 3",
+      "description": "1/(latent period)"
+    },
+    {
+      "name": "delta",
+      "symbol": "",
+      "value": "1 / 2",
+      "description": "1/(pre-symptomatic period)"
+    },
+    {
+      "name": "gamma",
+      "symbol": "",
+      "value": "1 / 5",
+      "description": "1/(infectious period after the pre-symptomatic stage)"
+    },
+    {
+      "name": "ps",
+      "symbol": "p_s",
+      "value": "0.6",
+      "description": "proportion symptomatic"
+    },
+    {
+      "name": "rP",
+      "symbol": "r_P",
+      "value": "1",
+      "description": "relative infectiousness, pre-symptomatic"
+    },
+    {
+      "name": "rA",
+      "symbol": "r_A",
+      "value": "0.5",
+      "description": "relative infectiousness, asymptomatic"
+    }
+  ],
+  "variables": [
+    {
+      "name": "beta",
+      "symbol": "",
+      "expr": "R0 / (rP / delta + (ps + (1 - ps) * rA) / gamma)",
+      "description": "transmission rate implied by R0",
+      "output": false
+    },
+    {
+      "name": "lam",
+      "symbol": "",
+      "expr": "beta * (rP * P + Is + rA * Ia) / N",
+      "description": "force of infection",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lam",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "sigma",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "delta * ps",
+      "output": "onsets",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c3",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "delta * (1 - ps)",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c4",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "gamma",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "gamma",
+      "output": "",
+      "curve": 0
+    }
+  ]
+}

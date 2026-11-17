@@ -1,0 +1,133 @@
+{
+  "version": 1,
+  "id": "seirs",
+  "category": "Basic",
+  "name": "SEIRS",
+  "description": "SEIR with waning immunity, giving recurrent epidemics.",
+  "reference": "Keeling & Rohani (2008), Modeling Infectious Diseases in Humans and Animals, §2.5",
+  "referenceUrl": "",
+  "time": {
+    "start": "0",
+    "stop": "1500",
+    "step": "1",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "Susceptible",
+      "init": "9999",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "E",
+      "description": "Exposed",
+      "init": "1",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "I",
+      "description": "Infectious",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "R",
+      "description": "Recovered",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 720,
+      "y": 140
+    }
+  ],
+  "parameters": [
+    {
+      "name": "beta",
+      "symbol": "",
+      "value": "0.5",
+      "description": "transmission rate per day"
+    },
+    {
+      "name": "sigma",
+      "symbol": "",
+      "value": "1 / 5",
+      "description": "1/(latent period)"
+    },
+    {
+      "name": "gamma",
+      "symbol": "",
+      "value": "1 / 7",
+      "description": "1/(infectious period)"
+    },
+    {
+      "name": "omega",
+      "symbol": "",
+      "value": "1 / 365",
+      "description": "1/(duration of immunity)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "lam",
+      "symbol": "",
+      "expr": "beta * I / N",
+      "description": "force of infection",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lam",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "sigma",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "gamma",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c4",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "omega",
+      "output": "",
+      "curve": 110
+    }
+  ]
+}

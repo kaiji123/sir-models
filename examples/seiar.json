@@ -1,0 +1,158 @@
+{
+  "version": 1,
+  "id": "seiar",
+  "category": "Natural history",
+  "name": "SEIAR (asymptomatic infection)",
+  "description": "A proportion of infections is asymptomatic (A) and less infectious.",
+  "reference": "Arino et al. (2008), J. R. Soc. Interface 5(Suppl 2)",
+  "referenceUrl": "",
+  "time": {
+    "start": "0",
+    "stop": "200",
+    "step": "1",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "Susceptible",
+      "init": "99990",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 220
+    },
+    {
+      "id": "c2",
+      "name": "E",
+      "description": "Exposed",
+      "init": "10",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 220
+    },
+    {
+      "id": "c3",
+      "name": "I",
+      "description": "Symptomatic",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "A",
+      "description": "Asymptomatic",
+      "init": "0",
+      "inN": true,
+      "color": "#E57373",
+      "x": 520,
+      "y": 300
+    },
+    {
+      "id": "c5",
+      "name": "R",
+      "description": "Recovered",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 720,
+      "y": 220
+    }
+  ],
+  "parameters": [
+    {
+      "name": "beta",
+      "symbol": "",
+      "value": "0.5",
+      "description": "transmission rate per day"
+    },
+    {
+      "name": "rA",
+      "symbol": "r_A",
+      "value": "0.5",
+      "description": "relative infectiousness of asymptomatics"
+    },
+    {
+      "name": "sigma",
+      "symbol": "",
+      "value": "1 / 4",
+      "description": "1/(latent period)"
+    },
+    {
+      "name": "ps",
+      "symbol": "p_s",
+      "value": "0.6",
+      "description": "proportion of infections that are symptomatic"
+    },
+    {
+      "name": "gamma",
+      "symbol": "",
+      "value": "1 / 6",
+      "description": "recovery rate"
+    }
+  ],
+  "variables": [
+    {
+      "name": "lam",
+      "symbol": "",
+      "expr": "beta * (I + rA * A) / N",
+      "description": "force of infection",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lam",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "sigma * ps",
+      "output": "cases",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "sigma * (1 - ps)",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c3",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "gamma",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "gamma",
+      "output": "",
+      "curve": 0
+    }
+  ]
+}

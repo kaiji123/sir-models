@@ -1,0 +1,114 @@
+---
+import '../../styles/app.css';
+import { LIBRARY, CATEGORIES } from '../../lib/library.js';
+import { generate } from '../../lib/generator.js';
+
+// Code is generated at build time with the same generator the editor uses.
+const entries = LIBRARY.map((m) => ({ m, code: generate(m).code }));
+const textColor = (hex) => {
+  const n = parseInt(hex.slice(1), 16);
+  const lum = (0.2126 * ((n >> 16) & 255) + 0.7152 * ((n >> 8) & 255) + 0.0722 * (n & 255)) / 255;
+  return lum > 0.6 ? '#111' : '#fff';
+};
+const counts = Object.fromEntries(CATEGORIES.map((c) => [c, LIBRARY.filter((m) => m.category === c).length]));
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const isUrl = (u) => /^https?:\/\//.test(u || '');
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="A searchable library of compartmental epidemic models (SIR, SEIR, vector-borne, vaccination...) with ready-to-run R code and references." />
+    <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+    <title>Model Library</title>
+  </head>
+  <body>
+    <main class="lib">
+      <header>
+        <h1>Model library</h1>
+        <span class="muted">{LIBRARY.length} compartmental models with generated R / deSolve code</span>
+        <a class="button" href={base}>← Back to editor</a>
+      </header>
+      <p class="muted small">Parameter values are typical published or textbook values for illustration. Check them against the cited source and your own setting before use.</p>
+
+      <div class="lib-search">
+        <input id="q" type="search" placeholder="Search: malaria, vaccination, Keeling, has:E, cat:vector, -hiv" autocomplete="off" spellcheck="false" autofocus />
+        <span id="count" class="muted small"></span>
+      </div>
+      <div class="lib-cats" id="cats" style="padding:0 0 8px">
+        <button class="chip-btn on" data-cat="">All {LIBRARY.length}</button>
+        {CATEGORIES.map((c) => <button class="chip-btn" data-cat={c}>{c} {counts[c]}</button>)}
+      </div>
+      <p class="muted small">Tip: <code>has:I</code> finds models with a compartment named I, <code>-word</code> excludes, <code>"exact phrase"</code> matches a phrase.</p>
+
+      <div class="lib-grid" id="grid">
+        {entries.map(({ m, code }) => (
+          <article class="lib-card" id={m.id} data-id={m.id}>
+            <div class="lib-hit-top"><h3>{m.name}</h3><span class="muted small">{m.category}</span></div>
+            <div class="chips">
+              {m.compartments.map((c) => (
+                <span class="chip" style={`background:${c.color};color:${textColor(c.color)}`} title={c.description}>{c.name}</span>
+              ))}
+            </div>
+            <p>{m.description}</p>
+            {m.reference && (
+              <p class="ref">
+                {isUrl(m.referenceUrl)
+                  ? <a href={m.referenceUrl} target="_blank" rel="noopener noreferrer">{m.reference} ↗</a>
+                  : m.reference}
+              </p>
+            )}
+            <details>
+              <summary>Show R code</summary>
+              <pre class="code">{code}</pre>
+            </details>
+            <div class="actions">
+              <a class="button" href={`${base}#example=${m.id}`}>Open in editor</a>
+              <a class="button" href={`${base}examples/${m.id}.R`} download>Download .R</a>
+            </div>
+          </article>
+        ))}
+      </div>
+      <p id="empty" class="muted" hidden>No models match. Try fewer words or another category.</p>
+    </main>
+
+    <script>
+      import { LIBRARY } from '../../lib/library.js';
+      import { indexModel, search } from '../../lib/search.js';
+
+      const docs = LIBRARY.map(indexModel);
+      const grid = document.getElementById('grid');
+      const cards = new Map([...grid.querySelectorAll('[data-id]')].map((el) => [el.dataset.id, el]));
+      const q = document.getElementById('q');
+      let cat = '';
+
+      function run() {
+        const hits = search(docs, q.value, { category: cat || null });
+        cards.forEach((el) => { el.hidden = true; });
+        hits.forEach(({ model }) => { const el = cards.get(model.id); el.hidden = false; grid.appendChild(el); });
+        document.getElementById('count').textContent = `${hits.length} of ${LIBRARY.length} models`;
+        document.getElementById('empty').hidden = hits.length > 0;
+        const params = new URLSearchParams();
+        if (q.value) params.set('q', q.value);
+        if (cat) params.set('cat', cat);
+        history.replaceState(null, '', location.pathname + (params.toString() ? '?' + params : '') + location.hash);
+      }
+
+      const init = new URLSearchParams(location.search);
+      q.value = init.get('q') || '';
+      cat = init.get('cat') || '';
+      document.querySelectorAll('#cats [data-cat]').forEach((b) => b.classList.toggle('on', b.dataset.cat === cat));
+
+      q.addEventListener('input', run);
+      document.getElementById('cats').addEventListener('click', (e) => {
+        const b = e.target.closest('[data-cat]');
+        if (!b) return;
+        cat = b.dataset.cat;
+        document.querySelectorAll('#cats [data-cat]').forEach((x) => x.classList.toggle('on', x === b));
+        run();
+      });
+      run();
+    </script>
+  </body>
+</html>

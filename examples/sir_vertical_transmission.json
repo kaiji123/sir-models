@@ -1,0 +1,166 @@
+{
+  "version": 1,
+  "id": "sir_vertical_transmission",
+  "category": "Classic extensions",
+  "name": "SIR with vertical (mother-to-child) transmission",
+  "description": "hepatitis B, rubella (congenital), HTLV, Chagas.\nVertical transmission adds q_v·b_birth to the infected's \"reproductive output\", so R0 = (beta + q_vb_birth)/(gamma + mu).\nParameter values: 0 of 5 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Busenberg S. & Cooke K. (1993) Vertically Transmitted Diseases: Models and Dynamics, Biomathematics 23, Springer",
+  "referenceUrl": "https://doi.org/10.1007/978-3-642-75301-5",
+  "time": {
+    "start": "0",
+    "stop": "200",
+    "step": "0.2",
+    "unit": "years"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "susceptible",
+      "init": "9900",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "I",
+      "description": "infectious",
+      "init": "100",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "R",
+      "description": "recovered/immune",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 520,
+      "y": 140
+    }
+  ],
+  "parameters": [
+    {
+      "name": "b_birth",
+      "symbol": "",
+      "value": "1 / 20",
+      "description": "per-capita birth rate (1/yr) [illustrative, adjusted for numerical stability]"
+    },
+    {
+      "name": "mu",
+      "symbol": "",
+      "value": "1 / 20",
+      "description": "natural death (1/yr) [illustrative, adjusted for numerical stability]"
+    },
+    {
+      "name": "q_v",
+      "symbol": "",
+      "value": "0.3",
+      "description": "probability a child of an infected mother is born infected [illustrative]"
+    },
+    {
+      "name": "beta",
+      "symbol": "",
+      "value": "1.5",
+      "description": "horizontal transmission (1/yr) [illustrative, adjusted for numerical stability]"
+    },
+    {
+      "name": "gamma",
+      "symbol": "",
+      "value": "0.5",
+      "description": "recovery (1/yr) [illustrative, adjusted for numerical stability]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "lambda",
+      "symbol": "",
+      "expr": "beta*I/N",
+      "description": "",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "b_birth*(S + R + (1 - q_v)*I)",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": null,
+      "to": "c2",
+      "kind": "absolute",
+      "rate": "b_birth*q_v*I",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 10
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lambda",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "gamma",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    },
+    {
+      "id": "f6",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 270
+    },
+    {
+      "id": "f7",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 270
+    }
+  ]
+}

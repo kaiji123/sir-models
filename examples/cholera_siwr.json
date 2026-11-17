@@ -1,0 +1,137 @@
+{
+  "version": 1,
+  "id": "cholera_siwr",
+  "category": "Transmission routes",
+  "name": "Cholera SIWR (water reservoir)",
+  "description": "Direct transmission plus indirect transmission through a contaminated water compartment W\n(W is a normalised pathogen concentration, so it is excluded from N).",
+  "reference": "Tien & Earn (2010), Bull. Math. Biol. 72:1506-1533",
+  "referenceUrl": "",
+  "time": {
+    "start": "0",
+    "stop": "200",
+    "step": "0.5",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "Susceptible",
+      "init": "9990",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "I",
+      "description": "Infectious",
+      "init": "10",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "R",
+      "description": "Recovered",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "W",
+      "description": "Water (pathogen)",
+      "init": "0",
+      "inN": false,
+      "color": "#4FC3F7",
+      "x": 320,
+      "y": 300
+    }
+  ],
+  "parameters": [
+    {
+      "name": "betaI",
+      "symbol": "β_I",
+      "value": "0.1",
+      "description": "direct transmission rate per day"
+    },
+    {
+      "name": "betaW",
+      "symbol": "β_W",
+      "value": "0.4",
+      "description": "water-borne transmission rate per day"
+    },
+    {
+      "name": "gamma",
+      "symbol": "",
+      "value": "1 / 5",
+      "description": "recovery rate"
+    },
+    {
+      "name": "xi",
+      "symbol": "ξ",
+      "value": "1 / 30",
+      "description": "shedding / decay rate of pathogen in water"
+    }
+  ],
+  "variables": [
+    {
+      "name": "lam",
+      "symbol": "",
+      "expr": "betaI * I / N + betaW * W",
+      "description": "force of infection",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lam",
+      "output": "incidence",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "gamma",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": null,
+      "to": "c4",
+      "kind": "absolute",
+      "rate": "xi * I / N",
+      "output": "",
+      "curve": 0,
+      "ox": 160,
+      "oy": 300
+    },
+    {
+      "id": "f4",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "xi",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 430
+    }
+  ]
+}

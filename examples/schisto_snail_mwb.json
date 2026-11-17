@@ -1,0 +1,243 @@
+{
+  "version": 1,
+  "id": "schisto_snail_mwb",
+  "category": "Water, enteric & NTDs",
+  "name": "Schistosomiasis: human mean worm burden with SEI snails (Macdonald / Anderson–May hybrid)",
+  "description": "Schistosomiasis (S. haematobium / S. mansoni).\nParameter values: 0 of 12 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Structure follows the Macdonald (1965) / Anderson & May (1985, 1991) mean-worm-burden + snail-infection framework, as implemented in, for example, Sokolow SH et al. PNAS 2015;112(31):9650–9655",
+  "referenceUrl": "https://doi.org/10.1073/pnas.1502651112",
+  "time": {
+    "start": "0",
+    "stop": "30",
+    "step": "0.05",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Wm",
+      "description": "mean adult worm burden per human (worms/person)",
+      "init": "50",
+      "inN": false,
+      "color": "#A5D6A7",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Sn",
+      "description": "susceptible snails",
+      "init": "7000",
+      "inN": false,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 356
+    },
+    {
+      "id": "c3",
+      "name": "En",
+      "description": "exposed (prepatent) snails",
+      "init": "300",
+      "inN": false,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 356
+    },
+    {
+      "id": "c4",
+      "name": "In",
+      "description": "infected (cercariae-shedding) snails",
+      "init": "400",
+      "inN": false,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 356
+    }
+  ],
+  "parameters": [
+    {
+      "name": "H",
+      "symbol": "",
+      "value": "1000",
+      "description": "human population, held constant [I] (persons)"
+    },
+    {
+      "name": "r_s",
+      "symbol": "",
+      "value": "0.1",
+      "description": "snail intrinsic birth rate [M/I] (day^-1)"
+    },
+    {
+      "name": "K_s",
+      "symbol": "",
+      "value": "10000",
+      "description": "snail carrying capacity [I] (snails)"
+    },
+    {
+      "name": "mu_n",
+      "symbol": "",
+      "value": "1/60",
+      "description": "snail death rate [M] (day^-1)"
+    },
+    {
+      "name": "sig_n",
+      "symbol": "",
+      "value": "1/40",
+      "description": "snail prepatent period (about 4–6 weeks) [M] (day^-1)"
+    },
+    {
+      "name": "mu_i",
+      "symbol": "",
+      "value": "1/10",
+      "description": "infected snail death rate [M] (day^-1)"
+    },
+    {
+      "name": "beta_sn",
+      "symbol": "",
+      "value": "7.5e-7",
+      "description": "miracidial infection of snails. [I] chosen to give about 5% snail prevalence at Wm = 50. (day^-1 per mated pair)"
+    },
+    {
+      "name": "lam_h",
+      "symbol": "",
+      "value": "1e-4",
+      "description": "cercarial establishment [I] (worms day^-1 per infected snail per person)"
+    },
+    {
+      "name": "mu_wm",
+      "symbol": "",
+      "value": "1/(3.3*365)",
+      "description": "adult worm death (about 3–4 year life span) [M] (day^-1)"
+    },
+    {
+      "name": "mu_h",
+      "symbol": "",
+      "value": "1/(60*365)",
+      "description": "human death rate [I] (day^-1)"
+    },
+    {
+      "name": "k_agg",
+      "symbol": "",
+      "value": "0.2",
+      "description": "negative binomial aggregation [M/I]"
+    },
+    {
+      "name": "tau_t",
+      "symbol": "",
+      "value": "0",
+      "description": "continuous praziquantel treatment (MDA) rate. Pulsed MDA alternative: ifelse((t - 365floor(t/365)) < 7, -log(1 - 0.750.86)/7, 0) [I; 86% worm kill is an M value"
+    }
+  ],
+  "variables": [
+    {
+      "name": "phi_m",
+      "symbol": "",
+      "expr": "Wm/(Wm + 2*k_agg + 1)",
+      "description": "crude mating-probability approximation. The exact Macdonald mating function is an integral; this is [I].",
+      "output": false
+    },
+    {
+      "name": "Nsn",
+      "symbol": "",
+      "expr": "Sn + En + In",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "miracidia",
+      "symbol": "",
+      "expr": "0.5*Wm*H*phi_m",
+      "description": "mated pairs, a proxy for egg output",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c2",
+      "kind": "absolute",
+      "rate": "r_s*(1 - Nsn/K_s)*(Sn + En)",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 226
+    },
+    {
+      "id": "f2",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "beta_sn*miracidia",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "sig_n",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_n",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 486
+    },
+    {
+      "id": "f5",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_n",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 486
+    },
+    {
+      "id": "f6",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_i",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 486
+    },
+    {
+      "id": "f7",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "lam_h*In",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f8",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_wm + mu_h + tau_t",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    }
+  ]
+}

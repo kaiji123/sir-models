@@ -1,0 +1,452 @@
+{
+  "version": 1,
+  "id": "hpv_vaccination_simplified",
+  "category": "Sexually transmitted & blood-borne",
+  "name": "HPV (single high-risk type) SIRS-type model, two sexes, with vaccination",
+  "description": "HPV 16/18, vaccination.\nParameter values: 0 of 13 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Simplified from Elbasha EH, Dasbach EJ, Insinga RP. Model for assessing human papillomavirus vaccination strategies. Emerg Infect Dis 2007;13(1):28–41",
+  "referenceUrl": "https://doi.org/10.3201/eid1301.060438",
+  "time": {
+    "start": "0",
+    "stop": "100",
+    "step": "0.1",
+    "unit": "years"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Sf",
+      "description": "susceptible women",
+      "init": "0.9",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "If",
+      "description": "infected women",
+      "init": "0.05",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Rf",
+      "description": "naturally immune women",
+      "init": "0.05",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 720,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "Vf",
+      "description": "vaccinated women",
+      "init": "0",
+      "inN": true,
+      "color": "#2457C5",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c5",
+      "name": "Sm",
+      "description": "susceptible men",
+      "init": "0.9",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 320,
+      "y": 356
+    },
+    {
+      "id": "c6",
+      "name": "Im",
+      "description": "infected men",
+      "init": "0.05",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 356
+    },
+    {
+      "id": "c7",
+      "name": "Rm",
+      "description": "immune men",
+      "init": "0.05",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 720,
+      "y": 356
+    },
+    {
+      "id": "c8",
+      "name": "Vm",
+      "description": "vaccinated men",
+      "init": "0",
+      "inN": true,
+      "color": "#2457C5",
+      "x": 120,
+      "y": 356
+    }
+  ],
+  "parameters": [
+    {
+      "name": "cp",
+      "symbol": "",
+      "value": "2",
+      "description": "partner change rate (partners/yr) [illustrative]"
+    },
+    {
+      "name": "beta_mf",
+      "symbol": "",
+      "value": "0.8",
+      "description": "male-to-female transmission (Elbasha used high values) (per partnership) [illustrative]"
+    },
+    {
+      "name": "beta_fm",
+      "symbol": "",
+      "value": "0.7",
+      "description": "female-to-male transmission (per partnership) [illustrative]"
+    },
+    {
+      "name": "clr_f",
+      "symbol": "",
+      "value": "1",
+      "description": "clearance in women (about 1 yr) (/yr) [illustrative]"
+    },
+    {
+      "name": "clr_m",
+      "symbol": "",
+      "value": "1.5",
+      "description": "clearance in men (/yr) [illustrative]"
+    },
+    {
+      "name": "p_imm_f",
+      "symbol": "",
+      "value": "0.5",
+      "description": "fraction of women gaining natural immunity on clearance [illustrative]"
+    },
+    {
+      "name": "p_imm_m",
+      "symbol": "",
+      "value": "0.2",
+      "description": "fraction of men gaining natural immunity on clearance [illustrative]"
+    },
+    {
+      "name": "w_nat",
+      "symbol": "",
+      "value": "0.1",
+      "description": "waning of natural immunity (/yr) [illustrative]"
+    },
+    {
+      "name": "w_vac",
+      "symbol": "",
+      "value": "0",
+      "description": "waning of vaccine protection (assumed lifelong) (/yr) [illustrative]"
+    },
+    {
+      "name": "vc_f",
+      "symbol": "",
+      "value": "0.7",
+      "description": "vaccine coverage of girls at entry [illustrative]"
+    },
+    {
+      "name": "vc_m",
+      "symbol": "",
+      "value": "0",
+      "description": "vaccine coverage of boys at entry [illustrative]"
+    },
+    {
+      "name": "ve",
+      "symbol": "",
+      "value": "0.9",
+      "description": "vaccine efficacy (degree protection) [illustrative]"
+    },
+    {
+      "name": "mu",
+      "symbol": "",
+      "value": "1/30",
+      "description": "exit from the sexually active population (/yr) [illustrative]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "Nf",
+      "symbol": "",
+      "expr": "Sf+If+Rf+Vf",
+      "description": "women total",
+      "output": false
+    },
+    {
+      "name": "Nm",
+      "symbol": "",
+      "expr": "Sm+Im+Rm+Vm",
+      "description": "men total",
+      "output": false
+    },
+    {
+      "name": "foi_f",
+      "symbol": "",
+      "expr": "cp*beta_mf*Im/Nm",
+      "description": "force of infection on women",
+      "output": false
+    },
+    {
+      "name": "foi_m",
+      "symbol": "",
+      "expr": "cp*beta_fm*If/Nf",
+      "description": "force of infection on men",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "mu*Nf*(1-vc_f)",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": null,
+      "to": "c4",
+      "kind": "absolute",
+      "rate": "mu*Nf*vc_f",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f3",
+      "from": null,
+      "to": "c5",
+      "kind": "absolute",
+      "rate": "mu*Nm*(1-vc_m)",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 226
+    },
+    {
+      "id": "f4",
+      "from": null,
+      "to": "c8",
+      "kind": "absolute",
+      "rate": "mu*Nm*vc_m",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 226
+    },
+    {
+      "id": "f5",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "foi_f",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c4",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "(1-ve)*foi_f",
+      "output": "",
+      "curve": 50
+    },
+    {
+      "id": "f7",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "p_imm_f*clr_f",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c2",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "(1-p_imm_f)*clr_f",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f9",
+      "from": "c3",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "w_nat",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f10",
+      "from": "c4",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "w_vac",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f11",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "foi_m",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f12",
+      "from": "c8",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "(1-ve)*foi_m",
+      "output": "",
+      "curve": 50
+    },
+    {
+      "id": "f13",
+      "from": "c6",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "p_imm_m*clr_m",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f14",
+      "from": "c6",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "(1-p_imm_m)*clr_m",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f15",
+      "from": "c7",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "w_nat",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f16",
+      "from": "c8",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "w_vac",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f17",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 270
+    },
+    {
+      "id": "f18",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 270
+    },
+    {
+      "id": "f19",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 270
+    },
+    {
+      "id": "f20",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    },
+    {
+      "id": "f21",
+      "from": "c5",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 486
+    },
+    {
+      "id": "f22",
+      "from": "c6",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 486
+    },
+    {
+      "id": "f23",
+      "from": "c7",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 486
+    },
+    {
+      "id": "f24",
+      "from": "c8",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 486
+    }
+  ]
+}

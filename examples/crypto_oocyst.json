@@ -1,0 +1,201 @@
+{
+  "version": 1,
+  "id": "crypto_oocyst",
+  "category": "Water, enteric & NTDs",
+  "name": "Cryptosporidiosis with environmental oocysts and exponential dose–response",
+  "description": "Cryptosporidium (also adaptable to Giardia cysts).\nParameter values: 0 of 9 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Author-constructed SIRS + environment structure [I]. The dose–response is Haas CN et al., exponential model with r ≈ 0.004 per oocyst (IOWA strain): J Am Water Works Assoc 1996;88(9):131–136 [M]. Giardia exponential r ≈ 0.0199 (Rose, Haas & Regli 1991, Am…",
+  "referenceUrl": "",
+  "time": {
+    "start": "0",
+    "stop": "3",
+    "step": "0.005",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "susceptible",
+      "init": "9990",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "I",
+      "description": "infected/shedding",
+      "init": "10",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "R",
+      "description": "immune (partial, waning)",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "Oc",
+      "description": "oocysts per litre in the community water source",
+      "init": "0",
+      "inN": false,
+      "color": "#DDDDDD",
+      "x": 120,
+      "y": 356
+    }
+  ],
+  "parameters": [
+    {
+      "name": "exp_c",
+      "symbol": "",
+      "value": "1",
+      "description": "water-consumption events per day [I] (day^-1)"
+    },
+    {
+      "name": "vol_d",
+      "symbol": "",
+      "value": "1",
+      "description": "volume ingested per event [I] (L)"
+    },
+    {
+      "name": "r_dose",
+      "symbol": "",
+      "value": "0.004",
+      "description": "exponential dose–response parameter [M] (per oocyst)"
+    },
+    {
+      "name": "gam_c",
+      "symbol": "",
+      "value": "1/14",
+      "description": "recovery and end of shedding [M/I] (day^-1)"
+    },
+    {
+      "name": "sh_vol",
+      "symbol": "",
+      "value": "2e-4",
+      "description": "shedding divided by water volume. [I] chosen to give R0 ≈ 2. (oocysts L^-1 day^-1 per infected)"
+    },
+    {
+      "name": "mu_o",
+      "symbol": "",
+      "value": "0.05",
+      "description": "oocyst inactivation and flushing [I] (day^-1)"
+    },
+    {
+      "name": "omega_c",
+      "symbol": "",
+      "value": "1/365",
+      "description": "waning immunity [I] (day^-1)"
+    },
+    {
+      "name": "mu_h",
+      "symbol": "",
+      "value": "1/(70*365)",
+      "description": "birth/death [I] (day^-1)"
+    },
+    {
+      "name": "rem_t",
+      "symbol": "",
+      "value": "0",
+      "description": "fractional log-removal by treatment, for example 0.99 [I]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "dose",
+      "symbol": "",
+      "expr": "vol_d*Oc*(1 - rem_t)",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "lam",
+      "symbol": "",
+      "expr": "exp_c*(1 - exp(-r_dose*dose))",
+      "description": "daily infection probability as a hazard",
+      "output": false
+    },
+    {
+      "name": "R0_cr",
+      "symbol": "",
+      "expr": "exp_c*r_dose*vol_d*sh_vol*N/(mu_o*(gam_c + mu_h))",
+      "description": "linearised R0 (about 2)",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "mu_h*N",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lam",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "gam_c",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c3",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "omega_c",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f5",
+      "from": null,
+      "to": "c4",
+      "kind": "absolute",
+      "rate": "sh_vol*I",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 226
+    },
+    {
+      "id": "f6",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_o",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 486
+    }
+  ]
+}

@@ -1,0 +1,415 @@
+{
+  "version": 1,
+  "id": "hiv_core_noncore_mixing",
+  "category": "Sexually transmitted & blood-borne",
+  "name": "HIV in core and non-core risk groups with preferential mixing and ART",
+  "description": "HIV, heterogeneous sexual activity.\nParameter values: 0 of 10 checked against the source; the rest are recalled or illustrative.",
+  "reference": "The core-group concept and the mixing structure come from Hethcote HW, Yorke JA. Gonorrhea Transmission Dynamics and Control. Lecture Notes in Biomathematics 56, Springer, 1984",
+  "referenceUrl": "https://doi.org/10.1007/978-3-662-07544-9",
+  "time": {
+    "start": "0",
+    "stop": "60",
+    "step": "0.1",
+    "unit": "years"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S_h",
+      "description": "susceptible, high activity (core)",
+      "init": "0.049",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 220
+    },
+    {
+      "id": "c2",
+      "name": "I_h",
+      "description": "infected untreated, high activity",
+      "init": "0.001",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 220
+    },
+    {
+      "id": "c3",
+      "name": "Y_h",
+      "description": "AIDS, high activity",
+      "init": "0",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "A_h",
+      "description": "on ART, high activity",
+      "init": "0",
+      "inN": true,
+      "color": "#E57373",
+      "x": 520,
+      "y": 300
+    },
+    {
+      "id": "c5",
+      "name": "S_l",
+      "description": "susceptible, low activity",
+      "init": "0.95",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 596
+    },
+    {
+      "id": "c6",
+      "name": "I_l",
+      "description": "infected untreated, low activity",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 596
+    },
+    {
+      "id": "c7",
+      "name": "Y_l",
+      "description": "AIDS, low activity",
+      "init": "0",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 520,
+      "y": 516
+    },
+    {
+      "id": "c8",
+      "name": "A_l",
+      "description": "on ART, low activity",
+      "init": "0",
+      "inN": true,
+      "color": "#E57373",
+      "x": 520,
+      "y": 676
+    }
+  ],
+  "parameters": [
+    {
+      "name": "cp_h",
+      "symbol": "",
+      "value": "10",
+      "description": "partner change rate, core (partners/yr) [illustrative]"
+    },
+    {
+      "name": "cp_l",
+      "symbol": "",
+      "value": "1",
+      "description": "partner change rate, non-core (partners/yr) [illustrative]"
+    },
+    {
+      "name": "beta_p",
+      "symbol": "",
+      "value": "0.05",
+      "description": "transmission probability per partnership (per partnership) [illustrative]"
+    },
+    {
+      "name": "eps_mix",
+      "symbol": "",
+      "value": "0.5",
+      "description": "assortativity: 0 = proportionate mixing, 1 = fully assortative [illustrative]"
+    },
+    {
+      "name": "nu_i",
+      "symbol": "",
+      "value": "0.1",
+      "description": "progression from chronic infection to AIDS (/yr) [illustrative]"
+    },
+    {
+      "name": "delta_y",
+      "symbol": "",
+      "value": "1",
+      "description": "AIDS mortality (/yr) [illustrative]"
+    },
+    {
+      "name": "tau",
+      "symbol": "",
+      "value": "0.2",
+      "description": "ART initiation (/yr) [illustrative]"
+    },
+    {
+      "name": "eps_art",
+      "symbol": "",
+      "value": "0.04",
+      "description": "relative infectiousness on ART (96% reduction; HPTN 052, Cohen et al. NEJM 2011, DOI 10.1056/NEJMoa1105243) [recalled]"
+    },
+    {
+      "name": "mu",
+      "symbol": "",
+      "value": "0.03",
+      "description": "exit from the sexually active population (/yr) [illustrative]"
+    },
+    {
+      "name": "f_h",
+      "symbol": "",
+      "value": "0.05",
+      "description": "fraction of recruits entering the core [illustrative]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "N_h",
+      "symbol": "",
+      "expr": "S_h+I_h+Y_h+A_h",
+      "description": "core group total",
+      "output": false
+    },
+    {
+      "name": "N_l",
+      "symbol": "",
+      "expr": "S_l+I_l+Y_l+A_l",
+      "description": "non-core group total",
+      "output": false
+    },
+    {
+      "name": "Ninf_h",
+      "symbol": "",
+      "expr": "I_h + eps_art*A_h",
+      "description": "effective infectious count, core",
+      "output": false
+    },
+    {
+      "name": "Ninf_l",
+      "symbol": "",
+      "expr": "I_l + eps_art*A_l",
+      "description": "effective infectious count, non-core",
+      "output": false
+    },
+    {
+      "name": "act_h",
+      "symbol": "",
+      "expr": "cp_h*(N_h - Y_h)",
+      "description": "partnerships offered by the core (AIDS cases assumed inactive)",
+      "output": false
+    },
+    {
+      "name": "act_l",
+      "symbol": "",
+      "expr": "cp_l*(N_l - Y_l)",
+      "description": "partnerships offered by the non-core",
+      "output": false
+    },
+    {
+      "name": "prop_inf",
+      "symbol": "",
+      "expr": "(cp_h*Ninf_h + cp_l*Ninf_l)/(act_h + act_l)",
+      "description": "infectious fraction among partnerships under proportionate mixing",
+      "output": false
+    },
+    {
+      "name": "foi_h",
+      "symbol": "",
+      "expr": "cp_h*beta_p*(eps_mix*Ninf_h/(N_h - Y_h) + (1-eps_mix)*prop_inf)",
+      "description": "force of infection, core",
+      "output": false
+    },
+    {
+      "name": "foi_l",
+      "symbol": "",
+      "expr": "cp_l*beta_p*(eps_mix*Ninf_l/(N_l - Y_l) + (1-eps_mix)*prop_inf)",
+      "description": "force of infection, non-core",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "f_h*(mu*N + delta_y*(Y_h+Y_l))",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 90
+    },
+    {
+      "id": "f2",
+      "from": null,
+      "to": "c5",
+      "kind": "absolute",
+      "rate": "(1-f_h)*(mu*N + delta_y*(Y_h+Y_l))",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 466
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "foi_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "foi_l",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "nu_i",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c6",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "nu_i",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": "c2",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "tau",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c6",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "tau",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f9",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "delta_y",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 270
+    },
+    {
+      "id": "f10",
+      "from": "c7",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "delta_y",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 646
+    },
+    {
+      "id": "f11",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 350
+    },
+    {
+      "id": "f12",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 350
+    },
+    {
+      "id": "f13",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 570,
+      "oy": 270
+    },
+    {
+      "id": "f14",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 430
+    },
+    {
+      "id": "f15",
+      "from": "c5",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 726
+    },
+    {
+      "id": "f16",
+      "from": "c6",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 726
+    },
+    {
+      "id": "f17",
+      "from": "c7",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 570,
+      "oy": 646
+    },
+    {
+      "id": "f18",
+      "from": "c8",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 806
+    }
+  ]
+}

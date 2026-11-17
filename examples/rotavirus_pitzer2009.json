@@ -1,0 +1,375 @@
+{
+  "version": 1,
+  "id": "rotavirus_pitzer2009",
+  "category": "Water, enteric & NTDs",
+  "name": "Rotavirus with maternal immunity and repeated infections of decreasing severity",
+  "description": "Rotavirus gastroenteritis.\nParameter values: 0 of 15 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Pitzer VE, Viboud C, Simonsen L, Steiner C, Panozzo CA, Alonso WJ, Miller MA, Glass RI, Glasser JW, Parashar UD, Grenfell BT. Demographic variability, vaccination, and the spatiotemporal dynamics of rotavirus epidemics. Science 2009;325(5938):290–294",
+  "referenceUrl": "https://doi.org/10.1126/science.1172330",
+  "time": {
+    "start": "0",
+    "stop": "30",
+    "step": "0.05",
+    "unit": "weeks"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "M",
+      "description": "maternal immunity",
+      "init": "0.01*N0",
+      "inN": true,
+      "color": "#F3C6D3",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "S0",
+      "description": "naive susceptible",
+      "init": "0.05*N0",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "I1",
+      "description": "first infection",
+      "init": "10",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "R1",
+      "description": "temporary immunity after the 1st infection",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 720,
+      "y": 140
+    },
+    {
+      "id": "c5",
+      "name": "S1",
+      "description": "susceptible after the 1st infection",
+      "init": "0.1*N0",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 920,
+      "y": 140
+    },
+    {
+      "id": "c6",
+      "name": "I2",
+      "description": "second infection",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 1120,
+      "y": 140
+    },
+    {
+      "id": "c7",
+      "name": "R2",
+      "description": "temporary immunity after the 2nd infection",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 1320,
+      "y": 140
+    },
+    {
+      "id": "c8",
+      "name": "S2",
+      "description": "susceptible after the 2nd infection",
+      "init": "0.2*N0",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 1520,
+      "y": 140
+    },
+    {
+      "id": "c9",
+      "name": "I3",
+      "description": "third or later infection",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 1720,
+      "y": 140
+    },
+    {
+      "id": "c10",
+      "name": "R3",
+      "description": "temporary immunity after the 3rd or later infection",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 1920,
+      "y": 140
+    },
+    {
+      "id": "c11",
+      "name": "S3",
+      "description": "susceptible after 3+ infections",
+      "init": "0.64*N0",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 2120,
+      "y": 140
+    }
+  ],
+  "parameters": [
+    {
+      "name": "mu_h",
+      "symbol": "",
+      "value": "0.0003",
+      "description": "birth/death. The paper used state-specific US birth rates (about 14–15 per 1000 per year) [I] (week^-1)"
+    },
+    {
+      "name": "omega_m",
+      "symbol": "",
+      "value": "1/13",
+      "description": "loss of maternal immunity (13 weeks) [V via PMC9746532; M that Pitzer 2009 used it] (week^-1)"
+    },
+    {
+      "name": "gam_1",
+      "symbol": "",
+      "value": "1",
+      "description": "recovery from the first infection (1 week) [M] (week^-1)"
+    },
+    {
+      "name": "gam_2",
+      "symbol": "",
+      "value": "2",
+      "description": "recovery from later infections (half as long) [M] (week^-1)"
+    },
+    {
+      "name": "rho_inf",
+      "symbol": "",
+      "value": "0.5",
+      "description": "relative infectiousness of 2nd+ infections [M]"
+    },
+    {
+      "name": "sus_1",
+      "symbol": "",
+      "value": "0.62",
+      "description": "relative susceptibility after 1 infection [V, Velázquez via PMC9746532]"
+    },
+    {
+      "name": "sus_2",
+      "symbol": "",
+      "value": "0.37",
+      "description": "relative susceptibility after 2+ infections [V, Velázquez via PMC9746532]. Pitzer may have used 0.35 [M]."
+    },
+    {
+      "name": "omega_r",
+      "symbol": "",
+      "value": "1/52",
+      "description": "waning of temporary immunity (1 year) [M] (week^-1)"
+    },
+    {
+      "name": "R0_rv",
+      "symbol": "",
+      "value": "15",
+      "description": "R0; fitted values were roughly 10–25 [M]"
+    },
+    {
+      "name": "amp_s",
+      "symbol": "",
+      "value": "0.15",
+      "description": "seasonal amplitude [M/I]"
+    },
+    {
+      "name": "phi_s",
+      "symbol": "",
+      "value": "0",
+      "description": "seasonal phase [I] (week)"
+    },
+    {
+      "name": "ps1",
+      "symbol": "",
+      "value": "0.47",
+      "description": "proportion symptomatic for the 1st, 2nd and 3rd+ infections. Velázquez 1996-type values; the 4th infection is about 0.2 [M]. Used for outputs only."
+    },
+    {
+      "name": "ps2",
+      "symbol": "",
+      "value": "0.25",
+      "description": "proportion symptomatic for the 1st, 2nd and 3rd+ infections. Velázquez 1996-type values; the 4th infection is about 0.2 [M]. Used for outputs only."
+    },
+    {
+      "name": "ps3",
+      "symbol": "",
+      "value": "0.32",
+      "description": "proportion symptomatic for the 1st, 2nd and 3rd+ infections. Velázquez 1996-type values; the 4th infection is about 0.2 [M]. Used for outputs only."
+    },
+    {
+      "name": "N0",
+      "symbol": "",
+      "value": "100000",
+      "description": "total initial population [illustrative default]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "b0",
+      "symbol": "",
+      "expr": "R0_rv*(gam_1 + mu_h)",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "bt",
+      "symbol": "",
+      "expr": "b0*(1 + amp_s*cos(6.2831853*(t - phi_s)/52))",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "lam",
+      "symbol": "",
+      "expr": "bt*(I1 + rho_inf*(I2 + I3))/N",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "inc_sev",
+      "symbol": "",
+      "expr": "lam*(ps1*S0 + ps2*sus_1*S1 + ps3*sus_2*S2)",
+      "description": "incidence of rotavirus gastroenteritis (RVGE)",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "mu_h*N",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "omega_m",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "lam",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "gam_1",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "omega_r",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "sus_1*lam",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": "c6",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "gam_2",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c7",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "omega_r",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f9",
+      "from": "c8",
+      "to": "c9",
+      "kind": "per_capita",
+      "rate": "sus_2*lam",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f10",
+      "from": "c9",
+      "to": "c10",
+      "kind": "per_capita",
+      "rate": "gam_2",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f11",
+      "from": "c10",
+      "to": "c11",
+      "kind": "per_capita",
+      "rate": "omega_r",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f12",
+      "from": "c11",
+      "to": "c9",
+      "kind": "per_capita",
+      "rate": "sus_2*lam",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f13",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_h",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    }
+  ]
+}

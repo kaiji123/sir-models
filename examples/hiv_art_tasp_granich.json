@@ -1,0 +1,474 @@
+{
+  "version": 1,
+  "id": "hiv_art_tasp_granich",
+  "category": "Sexually transmitted & blood-borne",
+  "name": "HIV universal test-and-treat (4 untreated + 4 ART stages)",
+  "description": "HIV, generalised heterosexual epidemic (South Africa).\nParameter values: 0 of 10 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Granich RM, Gilks CF, Dye C, De Cock KM, Williams BG. Universal voluntary HIV testing with immediate antiretroviral therapy as a strategy for elimination of HIV transmission: a mathematical model. Lancet 2009;373(9657):48–57",
+  "referenceUrl": "https://doi.org/10.1016/S0140-6736(08",
+  "time": {
+    "start": "0",
+    "stop": "50",
+    "step": "0.05",
+    "unit": "years"
+  },
+  "population": {
+    "name": "N"
+  },
+  "solver": {
+    "hmax": "0.05"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "susceptible adults aged 15+",
+      "init": "0.85",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 220
+    },
+    {
+      "id": "c2",
+      "name": "I1",
+      "description": "untreated HIV, stage 1",
+      "init": "0.04",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 220
+    },
+    {
+      "id": "c3",
+      "name": "I2",
+      "description": "untreated HIV, stage 2",
+      "init": "0.04",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "I3",
+      "description": "untreated HIV, stage 3",
+      "init": "0.04",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 720,
+      "y": 140
+    },
+    {
+      "id": "c5",
+      "name": "I4",
+      "description": "untreated HIV, stage 4 (AIDS)",
+      "init": "0.03",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 920,
+      "y": 140
+    },
+    {
+      "id": "c6",
+      "name": "A1",
+      "description": "on ART, entered from stage 1",
+      "init": "0",
+      "inN": true,
+      "color": "#E57373",
+      "x": 520,
+      "y": 300
+    },
+    {
+      "id": "c7",
+      "name": "A2",
+      "description": "on ART, entered from stage 2",
+      "init": "0",
+      "inN": true,
+      "color": "#E57373",
+      "x": 720,
+      "y": 300
+    },
+    {
+      "id": "c8",
+      "name": "A3",
+      "description": "on ART, entered from stage 3",
+      "init": "0",
+      "inN": true,
+      "color": "#E57373",
+      "x": 920,
+      "y": 300
+    },
+    {
+      "id": "c9",
+      "name": "A4",
+      "description": "on ART, entered from stage 4",
+      "init": "0",
+      "inN": true,
+      "color": "#E57373",
+      "x": 1120,
+      "y": 220
+    }
+  ],
+  "parameters": [
+    {
+      "name": "lambda0",
+      "symbol": "",
+      "value": "0.6",
+      "description": "transmission coefficient at low prevalence (/yr) [illustrative]"
+    },
+    {
+      "name": "alpha_h",
+      "symbol": "",
+      "value": "4",
+      "description": "strength of the prevalence-dependent decline in transmission [illustrative]"
+    },
+    {
+      "name": "n_h",
+      "symbol": "",
+      "value": "1",
+      "description": "shape exponent of that decline [illustrative]"
+    },
+    {
+      "name": "rho_p",
+      "symbol": "",
+      "value": "0.4",
+      "description": "progression rate between untreated stages (4 stages of 2.5 yr give about 10 yr mean survival) (/yr) [illustrative]"
+    },
+    {
+      "name": "rho_a",
+      "symbol": "",
+      "value": "0.1",
+      "description": "progression between stages while on ART (slower) (/yr) [illustrative]"
+    },
+    {
+      "name": "eps_art",
+      "symbol": "",
+      "value": "0.01",
+      "description": "relative infectiousness on ART (99% reduction) [recalled]"
+    },
+    {
+      "name": "tau",
+      "symbol": "",
+      "value": "1",
+      "description": "testing plus ART initiation rate; 1/yr = annual universal test-and-treat (/yr) [illustrative]"
+    },
+    {
+      "name": "dropout",
+      "symbol": "",
+      "value": "0.015",
+      "description": "ART discontinuation (/yr) [illustrative]"
+    },
+    {
+      "name": "mu",
+      "symbol": "",
+      "value": "0.02",
+      "description": "background adult mortality/exit (/yr) [illustrative]"
+    },
+    {
+      "name": "t_start",
+      "symbol": "",
+      "value": "10",
+      "description": "year the strategy starts (yr) [illustrative]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "P",
+      "symbol": "",
+      "expr": "(I1+I2+I3+I4+A1+A2+A3+A4)/N",
+      "description": "HIV prevalence",
+      "output": false
+    },
+    {
+      "name": "lam_eff",
+      "symbol": "",
+      "expr": "lambda0*exp(-alpha_h*P^n_h)",
+      "description": "saturating transmission rate (heterogeneity proxy)",
+      "output": false
+    },
+    {
+      "name": "foi",
+      "symbol": "",
+      "expr": "lam_eff*(I1+I2+I3+I4 + eps_art*(A1+A2+A3+A4))/N",
+      "description": "force of infection",
+      "output": false
+    },
+    {
+      "name": "tau_t",
+      "symbol": "",
+      "expr": "ifelse(t >= t_start, tau, 0)",
+      "description": "time-switched testing/ART rate",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "mu*N + rho_p*I4 + rho_a*A4",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 90
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "foi",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "rho_p",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "rho_p",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "rho_p",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c5",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "rho_p",
+      "output": "",
+      "curve": 0,
+      "ox": 920,
+      "oy": 270
+    },
+    {
+      "id": "f7",
+      "from": "c2",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "tau_t",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c3",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "tau_t",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f9",
+      "from": "c4",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "tau_t",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f10",
+      "from": "c5",
+      "to": "c9",
+      "kind": "per_capita",
+      "rate": "tau_t",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f11",
+      "from": "c6",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "rho_a",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f12",
+      "from": "c7",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "rho_a",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f13",
+      "from": "c8",
+      "to": "c9",
+      "kind": "per_capita",
+      "rate": "rho_a",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f14",
+      "from": "c9",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "rho_a",
+      "output": "",
+      "curve": 0,
+      "ox": 1120,
+      "oy": 350
+    },
+    {
+      "id": "f15",
+      "from": "c6",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "dropout",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f16",
+      "from": "c7",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "dropout",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f17",
+      "from": "c8",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "dropout",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f18",
+      "from": "c9",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "dropout",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f19",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 350
+    },
+    {
+      "id": "f20",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 350
+    },
+    {
+      "id": "f21",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 270
+    },
+    {
+      "id": "f22",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 270
+    },
+    {
+      "id": "f23",
+      "from": "c5",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 970,
+      "oy": 270
+    },
+    {
+      "id": "f24",
+      "from": "c6",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 430
+    },
+    {
+      "id": "f25",
+      "from": "c7",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 430
+    },
+    {
+      "id": "f26",
+      "from": "c8",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 920,
+      "oy": 430
+    },
+    {
+      "id": "f27",
+      "from": "c9",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 1170,
+      "oy": 350
+    }
+  ]
+}

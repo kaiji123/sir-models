@@ -1,0 +1,345 @@
+{
+  "version": 1,
+  "id": "seiqhr_sars",
+  "category": "Classic extensions",
+  "name": "SEIQHR quarantine and isolation (Gumel et al. 2004, SARS)",
+  "description": "SARS 2003 (Toronto, Hong Kong, Singapore, Beijing).\nThe headline result is that optimal isolation of symptomatic cases is more effective than sub-optimal isolation combined with quarantine (search summary of the abstract).\nParameter values: 0 of 14 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Gumel A.B. et al. (2004) \"Modelling strategies for controlling SARS outbreaks\", Proc. R. Soc. B 271:2223–2232",
+  "referenceUrl": "https://doi.org/10.1098/rspb.2004.2800",
+  "time": {
+    "start": "0",
+    "stop": "200",
+    "step": "0.2",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "susceptible",
+      "init": "4000000",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 220
+    },
+    {
+      "id": "c2",
+      "name": "E",
+      "description": "exposed/asymptomatic, mildly infectious",
+      "init": "10",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 220
+    },
+    {
+      "id": "c3",
+      "name": "Q",
+      "description": "quarantined exposed",
+      "init": "0",
+      "inN": true,
+      "color": "#00838F",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "I",
+      "description": "symptomatic infectious",
+      "init": "1",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 300
+    },
+    {
+      "id": "c5",
+      "name": "H",
+      "description": "isolated/hospitalised (Gumel's J)",
+      "init": "0",
+      "inN": true,
+      "color": "#6A2C9C",
+      "x": 720,
+      "y": 220
+    },
+    {
+      "id": "c6",
+      "name": "R",
+      "description": "recovered",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 920,
+      "y": 140
+    },
+    {
+      "id": "c7",
+      "name": "Dd",
+      "description": "cumulative SARS deaths",
+      "init": "0",
+      "inN": false,
+      "color": "#111111",
+      "x": 920,
+      "y": 300
+    }
+  ],
+  "parameters": [
+    {
+      "name": "Pi_b",
+      "symbol": "",
+      "value": "136",
+      "description": "recruitment (recalled; or set to muN0) (persons/day)"
+    },
+    {
+      "name": "mu",
+      "symbol": "",
+      "value": "1/(70*365)",
+      "description": "natural death (1/day) [illustrative]"
+    },
+    {
+      "name": "beta",
+      "symbol": "",
+      "value": "0.2",
+      "description": "transmission rate (1/day) [recalled]"
+    },
+    {
+      "name": "eps_E",
+      "symbol": "",
+      "value": "0.3",
+      "description": "relative infectiousness of E [recalled]"
+    },
+    {
+      "name": "eps_Q",
+      "symbol": "",
+      "value": "0",
+      "description": "relative infectiousness of Q [recalled]"
+    },
+    {
+      "name": "eps_H",
+      "symbol": "",
+      "value": "0.36",
+      "description": "relative infectiousness of the isolated (Toronto hospital transmission) [recalled]"
+    },
+    {
+      "name": "gamma1",
+      "symbol": "",
+      "value": "0.1",
+      "description": "quarantine rate of exposed (1/day) [recalled]"
+    },
+    {
+      "name": "gamma2",
+      "symbol": "",
+      "value": "0.5",
+      "description": "isolation rate of symptomatic (1/day) [recalled]"
+    },
+    {
+      "name": "kappa1",
+      "symbol": "",
+      "value": "0.1",
+      "description": "progression E→I (1/day) [recalled]"
+    },
+    {
+      "name": "kappa2",
+      "symbol": "",
+      "value": "0.125",
+      "description": "progression Q→H (1/day) [recalled]"
+    },
+    {
+      "name": "sigma1",
+      "symbol": "",
+      "value": "0.0337",
+      "description": "recovery of I (1/day) [recalled]"
+    },
+    {
+      "name": "sigma2",
+      "symbol": "",
+      "value": "0.0386",
+      "description": "recovery of H (1/day) [recalled]"
+    },
+    {
+      "name": "d1",
+      "symbol": "",
+      "value": "0.0068",
+      "description": "SARS death rate in I (1/day) [recalled]"
+    },
+    {
+      "name": "d2",
+      "symbol": "",
+      "value": "0.0045",
+      "description": "SARS death rate in H (1/day) [recalled]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "lambda",
+      "symbol": "",
+      "expr": "beta*(I + eps_E*E + eps_Q*Q + eps_H*H)/N",
+      "description": "",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "Pi_b",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 90
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lambda",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "gamma1",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c2",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "kappa1",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c3",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "kappa2",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "gamma2",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": "c4",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "sigma1",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "sigma2",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f9",
+      "from": "c4",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "d1",
+      "output": "",
+      "curve": 50
+    },
+    {
+      "id": "f10",
+      "from": "c5",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "d2",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f11",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 350
+    },
+    {
+      "id": "f12",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 350
+    },
+    {
+      "id": "f13",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 270
+    },
+    {
+      "id": "f14",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 430
+    },
+    {
+      "id": "f15",
+      "from": "c5",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 350
+    },
+    {
+      "id": "f16",
+      "from": "c6",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 920,
+      "oy": 270
+    }
+  ]
+}

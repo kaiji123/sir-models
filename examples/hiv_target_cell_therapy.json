@@ -1,0 +1,212 @@
+{
+  "version": 1,
+  "id": "hiv_target_cell_therapy",
+  "category": "Within-host",
+  "name": "HIV-1 target-cell-limited model with antiretroviral therapy",
+  "description": "HIV-1 within-host viral dynamics.\nThe canonical three-equation target-cell-limited system.\nParameter values: 0 of 9 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Perelson AS, Neumann AU, Markowitz M, Leonard JM, Ho DD (1996). HIV-1 dynamics in vivo: virion clearance rate, infected cell life-span, and viral generation time. Science 271(5255):1582–1586",
+  "referenceUrl": "https://doi.org/10.1126/science.271.5255.1582",
+  "time": {
+    "start": "0",
+    "stop": "60",
+    "step": "0.1",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "solver": {
+    "hmax": "0.1"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Tc",
+      "description": "uninfected target cells (CD4+ T cells, per µL)",
+      "init": "1000",
+      "inN": false,
+      "color": "#DDDDDD",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Ii",
+      "description": "productively infected cells (per µL)",
+      "init": "0",
+      "inN": false,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "V",
+      "description": "free virions (copies per mL)",
+      "init": "1e-3",
+      "inN": false,
+      "color": "#2457C5",
+      "x": 120,
+      "y": 356
+    }
+  ],
+  "parameters": [
+    {
+      "name": "lam",
+      "symbol": "",
+      "value": "10",
+      "description": "target-cell production rate [illustrative] (cells µL⁻¹ day⁻¹)"
+    },
+    {
+      "name": "dT",
+      "symbol": "",
+      "value": "0.01",
+      "description": "natural death rate of uninfected target cells [illustrative] (per day)"
+    },
+    {
+      "name": "beta",
+      "symbol": "",
+      "value": "2.4e-5",
+      "description": "infection rate constant [illustrative] (mL copies⁻¹ day⁻¹)"
+    },
+    {
+      "name": "delta",
+      "symbol": "",
+      "value": "0.5",
+      "description": "death rate of productively infected cells; the authors' estimate implies an infected-cell half-life of ≈1.6 days [unverified; 0.5/day is the value conventionall"
+    },
+    {
+      "name": "p",
+      "symbol": "",
+      "value": "1000",
+      "description": "virion production rate per infected cell [illustrative] (virions cell⁻¹ day⁻¹)"
+    },
+    {
+      "name": "cV",
+      "symbol": "",
+      "value": "3.07",
+      "description": "virion clearance rate from plasma (c is reserved, hence cV) [unverified; 3.07/day is the value conventionally cited from this paper] (per day)"
+    },
+    {
+      "name": "eps_rt",
+      "symbol": "",
+      "value": "0",
+      "description": "efficacy of a reverse-transcriptase inhibitor (blocks new infection) [illustrative] (dimensionless, 0–1)"
+    },
+    {
+      "name": "eps_pi",
+      "symbol": "",
+      "value": "0",
+      "description": "efficacy of a protease inhibitor (blocks production of infectious virions) [illustrative] (dimensionless, 0–1)"
+    },
+    {
+      "name": "tau_rx",
+      "symbol": "",
+      "value": "30",
+      "description": "time therapy starts [illustrative] (days)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "on_rx",
+      "symbol": "",
+      "expr": "ifelse(t < tau_rx, 0, 1)",
+      "description": "therapy switch",
+      "output": false
+    },
+    {
+      "name": "er",
+      "symbol": "",
+      "expr": "eps_rt * on_rx",
+      "description": "effective RT-inhibitor efficacy at time t",
+      "output": false
+    },
+    {
+      "name": "ep",
+      "symbol": "",
+      "expr": "eps_pi * on_rx",
+      "description": "effective PI efficacy at time t",
+      "output": false
+    },
+    {
+      "name": "R0v",
+      "symbol": "",
+      "expr": "beta * p * (lam / dT) / (cV * delta)",
+      "description": "basic reproductive ratio of the virus within host",
+      "output": false
+    },
+    {
+      "name": "Tc_star",
+      "symbol": "",
+      "expr": "cV * delta / (beta * p)",
+      "description": "infected steady-state target-cell level",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "lam",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "dT",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "beta * (1 - er) * V",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "delta",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 270
+    },
+    {
+      "id": "f5",
+      "from": null,
+      "to": "c3",
+      "kind": "absolute",
+      "rate": "p * (1 - ep) * Ii",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 226
+    },
+    {
+      "id": "f6",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "cV",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 486
+    }
+  ]
+}

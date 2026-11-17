@@ -1,0 +1,345 @@
+{
+  "version": 1,
+  "id": "pneumo_vt_nvt_lipsitch",
+  "category": "Respiratory",
+  "name": "Pneumococcal carriage: vaccine-type (VT) and non-vaccine-type (NVT) serotypes with competition (Lipsitch 1997)",
+  "description": "Streptococcus pneumoniae carriage.\nParameter values: 0 of 8 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Lipsitch M. \"Vaccination against colonizing bacteria with multiple serotypes.\" PNAS 1997;94:6571–6576. https://doi.org/10.1073/pnas.94.12.6571 (PMC: https://pmc.ncbi.nlm.nih.gov/articles/PMC21091)",
+  "referenceUrl": "https://doi.org/10.1073/pnas.94.12.6571",
+  "time": {
+    "start": "0",
+    "stop": "3650",
+    "step": "5",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "X",
+      "description": "unvaccinated, uncolonised",
+      "init": "0.6*N0",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Y1",
+      "description": "unvaccinated, carrying VT",
+      "init": "0.15*N0",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Y2",
+      "description": "unvaccinated, carrying NVT",
+      "init": "0.15*N0",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 720,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "Y12",
+      "description": "unvaccinated, carrying both",
+      "init": "0.1*N0",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c5",
+      "name": "Xv",
+      "description": "the same four states in vaccinated people",
+      "init": "0",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 120,
+      "y": 356
+    },
+    {
+      "id": "c6",
+      "name": "Y1v",
+      "description": "the same four states in vaccinated people",
+      "init": "0",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 320,
+      "y": 356
+    },
+    {
+      "id": "c7",
+      "name": "Y2v",
+      "description": "the same four states in vaccinated people",
+      "init": "0",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 720,
+      "y": 356
+    },
+    {
+      "id": "c8",
+      "name": "Y12v",
+      "description": "the same four states in vaccinated people",
+      "init": "0",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 520,
+      "y": 356
+    }
+  ],
+  "parameters": [
+    {
+      "name": "b_vt",
+      "symbol": "",
+      "value": "0.06",
+      "description": "acquisition rate per carrier contact [illustrative]"
+    },
+    {
+      "name": "b_nvt",
+      "symbol": "",
+      "value": "0.055",
+      "description": "acquisition rate per carrier contact (1/day) [illustrative]"
+    },
+    {
+      "name": "clr",
+      "symbol": "",
+      "value": "1/42",
+      "description": "clearance of each serotype (carriage of about 6 weeks) (1/day) [illustrative]"
+    },
+    {
+      "name": "comp",
+      "symbol": "",
+      "value": "0.3",
+      "description": "relative rate at which a carrier acquires the second serotype (1 = no competition) [illustrative]"
+    },
+    {
+      "name": "ve",
+      "symbol": "",
+      "value": "0.9",
+      "description": "vaccine reduction in VT acquisition [illustrative]"
+    },
+    {
+      "name": "p_vac",
+      "symbol": "",
+      "value": "0.9",
+      "description": "fraction of births vaccinated [illustrative]"
+    },
+    {
+      "name": "mu",
+      "symbol": "",
+      "value": "1/(5*365)",
+      "description": "turnover of the at-risk population (children under 5) (1/day) [illustrative]"
+    },
+    {
+      "name": "N0",
+      "symbol": "",
+      "value": "1e5",
+      "description": "value taken from the notes text [recalled]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "foi1",
+      "symbol": "",
+      "expr": "b_vt*(Y1 + Y12 + Y1v + Y12v)/N",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "foi2",
+      "symbol": "",
+      "expr": "b_nvt*(Y2 + Y12 + Y2v + Y12v)/N",
+      "description": "",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "(1-p_vac)*mu*N",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": null,
+      "to": "c5",
+      "kind": "absolute",
+      "rate": "p_vac*mu*N",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 226
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "foi1",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c1",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "foi2",
+      "output": "",
+      "curve": 50
+    },
+    {
+      "id": "f5",
+      "from": "c2",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "comp*foi2",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "comp*foi1",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f7",
+      "from": "c2",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "clr",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f8",
+      "from": "c3",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "clr",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f9",
+      "from": "c4",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "clr",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f10",
+      "from": "c4",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "clr",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f11",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "(1-ve)*foi1",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f12",
+      "from": "c5",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "foi2",
+      "output": "",
+      "curve": 50
+    },
+    {
+      "id": "f13",
+      "from": "c6",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "comp*foi2",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f14",
+      "from": "c7",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "comp*(1-ve)*foi1",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f15",
+      "from": "c6",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "clr",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f16",
+      "from": "c7",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "clr",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f17",
+      "from": "c8",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "clr",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f18",
+      "from": "c8",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "clr",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f19",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    }
+  ]
+}

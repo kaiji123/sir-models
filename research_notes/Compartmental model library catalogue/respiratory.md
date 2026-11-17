@@ -1,0 +1,807 @@
+# Respiratory and childhood infections: implementation-ready ODE model catalogue
+
+Scope: 16 deterministic compartment/flow specifications for respiratory and childhood infections, written for an R/deSolve code generator. They avoid the models already in the library (generic SEIR, Davies SEPIR, SEIHRD, Lavine SIRWS, Blower TB, seasonal SEIR, MSIR).
+
+**Verification levels.** Each model has one of three tags:
+- **[VERIFIED-TEXT]**: equations and/or parameter values were read from the primary source during this session.
+- **[STRUCTURE-FROM-SOURCE, VALUES PARTLY ILLUSTRATIVE]**: the structure follows the cited paper, as given in abstracts, secondary descriptions or my own recall, and only some values were checked.
+- **[ILLUSTRATIVE]**: a standard textbook structure. The values are plausible but were not taken from the cited paper.
+
+**Naming rules.** The names below avoid R reserved words and the R functions that are easy to mask: `I()`, `D()`, `C()`, `q()`, `c()`, `t()`, `beta()`, `gamma()`, `sigma()`, `kappa()`, `df`, `dt`, `sd`, `var`, `mode`. So infectious classes are called `Ip`, `Iu` and so on, never bare `I`. Death compartments are `Dead`, never `D`.
+
+**Expressions.** `two_pi` (6.283185) is used in place of `pi`. Logical AND is written as a product of comparisons, because `&` is not in the allowed operator list.
+
+---
+
+## Q1: For each model: compartments, every flow with its rate expression, force of infection, and typical parameter values with units
+
+### Takeaway
+All 16 models fit the "FROM > TO : rate" format with 14 compartments or fewer. Four have parameter values read directly from the primary paper in this session:
+- Arino 2008 influenza with antivirals
+- SIDARTHE
+- Chowell SARS
+- the Weber RSV rates for latency, recovery and immunity, which come via secondary sources
+
+The rest use the published structure with parameter values that are partly or wholly illustrative. Each model says which.
+
+---
+
+### flu_arino2008_antiviral — Pandemic influenza SLIAR model with antiviral treatment and pre-epidemic vaccination/prophylaxis (Arino et al. 2008)
+- Disease/area: Pandemic influenza | Category: Respiratory
+- Source: Arino J, Brauer F, van den Driessche P, Watmough J, Wu J. "A model for influenza with vaccination and antiviral treatment." *J Theor Biol* 2008;253:118–130. https://doi.org/10.1016/j.jtbi.2008.02.026 (PDF: https://julien-arino.github.io/assets/pdf/papers/2008_ArinoBrauerPvdDWatmoughWu-JTB253.pdf).
+  - The structure extends Arino et al. 2006, "Simple models for containment of a pandemic" (*J R Soc Interface* 3:453–457).
+  - Parameter values are from Longini IM et al. 2004, "Containing pandemic influenza with antiviral agents," *Am J Epidemiol* 159:623–633, as adapted in Arino 2008 Table 1. **[VERIFIED-TEXT]**
+- Time unit: days; simulate 200 days
+- Compartments:
+  - `S` — untreated susceptible — (1-g_vac)*1988 = 1988 when g_vac = 0
+  - `ST` — treated (prophylaxed or vaccinated) susceptible — g_vac*1988 = 0
+  - `L` — latent — 0
+  - `LT` — treated latent — 0
+  - `Ip` — symptomatic infective — 12
+  - `IpT` — treated symptomatic infective — 0
+  - `A` — asymptomatic infective — 0
+  - `AT` — treated asymptomatic infective — 0
+  - `R` — recovered — 0
+  - `Dead` — influenza deaths (cumulative) — 0 — not in N
+- Parameters:
+  - `k_lat` = 0.526 (1/day) — exit rate from L, i.e. 1/1.9 d — Arino Tab.1 / Longini 2004
+  - `k_latT` = 0.526 (1/day) — exit rate from LT — Arino Tab.1
+  - `alpha_r` = 0.244 (1/day) — exit rate from Ip, i.e. 1/4.1 d — Arino Tab.1
+  - `eta_r` = 0.244 (1/day) — exit rate from A — Arino Tab.1
+  - `alpha_T` = 0.323 (1/day) — exit rate from IpT — Arino Tab.1
+  - `eta_T` = 0.323 (1/day) — exit rate from AT — Arino Tab.1
+  - `p_sym` = 0.667 (–) — fraction of latents who become symptomatic — Arino Tab.1
+  - `tau_av` = 0.4 (–) — factor by which antivirals reduce the fraction who develop symptoms — Arino Tab.1
+  - `f_rec` = 0.98 (–) — fraction of Ip who recover (1 - CFR) — Arino §3 text
+  - `fT_rec` = 1.0 (–) — fraction of IpT who recover — Arino Tab.1
+  - `eps_L` = 0 (–) — relative infectivity of latents; Longini assumes 0 — Arino §2 text
+  - `delta_a` = 0.5 (–) — relative infectivity of asymptomatics — Arino §3 text
+  - `phi_L` = `phi_I` = `phi_A` = 1.61 (1/day) — treatment rate, = -ln(1-0.8), i.e. 80% treated within 1 day — Arino §7.1 text
+  - `theta_L` = `theta_I` = `theta_A` = 0.0179 (1/day) — relapse rate from treated back to untreated — Arino Tab.1 (see Note)
+  - `sig_S` = 0.7 (–) — relative susceptibility of ST — Arino Tab.1/Tab.2 caption
+  - `sig_L` = `sig_I` = `sig_A` = 0.2 (–) — relative infectivity of treated classes — Arino Tab.1 (see Note)
+  - `q_w` = 0.4 (–) — fraction of symptomatics who withdraw from mixing — Arino §3 text
+  - `b0` = 0.581 (1/day) — transmission coefficient under standard incidence with q_w = 0.4 — Arino §3 text, giving R0 = 1.35
+  - `g_vac` = 0 (–) — fraction of S0 treated or vaccinated before the epidemic; the paper explores 0–0.7 — Arino Tab.2–3
+- Derived variables:
+  - `N_M` = N - q_w*Ip - q_w*IpT — mixing population
+  - `Lam` = eps_L*L + eps_L*sig_L*LT + (1-q_w)*Ip + (1-q_w)*sig_I*IpT + delta_a*A + delta_a*sig_A*AT — total infectivity
+  - `foi` = b0*Lam/N_M — force of infection on untreated susceptibles
+- Flows:
+  - `S > L : foi`
+  - `ST > LT : sig_S*foi`
+  - `L > Ip : p_sym*k_lat`
+  - `L > A : (1-p_sym)*k_lat`
+  - `L > LT : phi_L`
+  - `LT > L : theta_L`
+  - `LT > IpT : p_sym*tau_av*k_latT`
+  - `LT > AT : (1-p_sym*tau_av)*k_latT`
+  - `Ip > R : f_rec*alpha_r`
+  - `Ip > Dead : (1-f_rec)*alpha_r`
+  - `Ip > IpT : phi_I`
+  - `IpT > Ip : theta_I`
+  - `IpT > R : fT_rec*alpha_T`
+  - `IpT > Dead : (1-fT_rec)*alpha_T`
+  - `A > R : eta_r`
+  - `A > AT : phi_A`
+  - `AT > A : theta_A`
+  - `AT > R : eta_T`
+- Notes:
+  - Setting phi = theta = 0 and g_vac = 0 gives the untreated SLIAR model, which is Arino 2008 eq. (2).
+  - For the untreated baseline the paper also gives a mass-action alternative: q_w = 0, b0 = 0.402, with S0 = 1988 and I0 = 12 in N0 = 2000. That setup gives about 660 cases, against 668 in Longini.
+  - **Table caveat:** pdftotext extraction misaligned Table 1's labels. I assigned theta = 0.0179, sig_S = 0.7 and sig_L = sig_I = sig_A = 0.2 from row order and from the Table 2/3 captions ("σS = 0.7", "σS = 0.3"). The values 1.61, f = 0.98 and b0 = 0.581 with q = 0.4 are confirmed by the running text.
+  - Tables 2–4 set treatment phi = 0 and study pre-epidemic prophylaxis only.
+
+### flu_two_strain_cross — Two-strain influenza with partial cross-immunity (status-based, reduced susceptibility)
+- Disease/area: Influenza (co-circulating strains/subtypes) | Category: Respiratory
+- Source: the structure follows two papers. **[STRUCTURE-FROM-SOURCE, VALUES ILLUSTRATIVE]**
+  - Castillo-Chavez C, Hethcote HW, Andreasen V, Levin SA, Liu WM. "Epidemiological models with age structure, proportionate mixing, and cross-immunity." *J Math Biol* 1989;27:233–258. https://doi.org/10.1007/BF00275810
+  - Andreasen V, Lin J, Levin SA. "The dynamics of cocirculating influenza strains conferring partial cross-immunity." *J Math Biol* 1997;35:825–842. https://doi.org/10.1007/s002850050079
+  - I did not fetch either paper this session. The equations are the standard two-strain reduced-susceptibility form. The values are illustrative.
+- Time unit: days; simulate 7300 days (20 years) with demography
+- Compartments:
+  - `S` — naive — 0.999*1e6
+  - `I1` — infected with strain 1, naive host — 500
+  - `I2` — infected with strain 2, naive host — 500
+  - `R1` — immune to strain 1 only — 0
+  - `R2` — immune to strain 2 only — 0
+  - `J1` — infected with strain 1, previously immune to strain 2 — 0
+  - `J2` — infected with strain 2, previously immune to strain 1 — 0
+  - `R12` — immune to both — 0
+- Parameters:
+  - `b1` = 0.5 (1/day) — transmission rate of strain 1 — illustrative; R0 ≈ 2 with a 4-day infectious period
+  - `b2` = 0.45 (1/day) — transmission rate of strain 2 — illustrative
+  - `g_rec` = 0.25 (1/day) — recovery rate — illustrative (4 days)
+  - `cx` = 0.3 (–) — relative susceptibility to the other strain after one infection (0 = full cross-immunity) — illustrative
+  - `mu` = 3.9e-5 (1/day) — birth = death rate, i.e. 1/(70 y) — illustrative
+  - `omega` = 1/730 (1/day) — loss of strain-specific immunity, a crude stand-in for antigenic drift — illustrative
+- Derived variables:
+  - `foi1` = b1*(I1 + J1)/N
+  - `foi2` = b2*(I2 + J2)/N
+- Flows:
+  - ` > S : mu*N (absolute)`
+  - `S > I1 : foi1`
+  - `S > I2 : foi2`
+  - `I1 > R1 : g_rec`
+  - `I2 > R2 : g_rec`
+  - `R1 > J2 : cx*foi2`
+  - `R2 > J1 : cx*foi1`
+  - `J1 > R12 : g_rec`
+  - `J2 > R12 : g_rec`
+  - `R1 > S : omega`
+  - `R2 > S : omega`
+  - `R12 > R1 : omega/2` and `R12 > R2 : omega/2` (illustrative waning, one strain at a time)
+  - `S > : mu`, `I1 > : mu`, `I2 > : mu`, `R1 > : mu`, `R2 > : mu`, `J1 > : mu`, `J2 > : mu`, `R12 > : mu`
+- Notes: this is the "reduced susceptibility" cross-immunity form. The alternative "reduced transmission" form (Gog & Grenfell 2002) would scale the infectivity of J1 and J2 instead. Without waning or births, both strains burn out after one epidemic.
+
+### flu_seasonal_vax — Seasonal influenza SIRS with sinusoidal forcing and an annual vaccination campaign
+- Disease/area: Seasonal influenza | Category: Respiratory
+- Source: **[ILLUSTRATIVE]** textbook SIRS-V structure (Keeling & Rohani 2008, *Modeling Infectious Diseases in Humans and Animals*, Princeton UP, ch. 5). The reproduction-number anchor is Biggerstaff M, Cauchemez S, Reed C, Gambhir M, Finelli L. "Estimates of the reproduction number for seasonal, pandemic, and zoonotic influenza: a systematic review." *BMC Infect Dis* 2014;14:480. https://doi.org/10.1186/1471-2334-14-480 (median seasonal R ≈ 1.28). That figure is from my recall and was not fetched.
+- Time unit: days; simulate 3650 days
+- Compartments:
+  - `S` — susceptible — 0.6*1e6
+  - `Ip` — infectious — 100
+  - `R` — infection-derived immunity — 0.4*1e6
+  - `V` — vaccine-protected — 0
+- Parameters:
+  - `R0_base` = 1.3 (–) — mean reproduction number — Biggerstaff 2014 (recall)
+  - `g_rec` = 0.25 (1/day) — recovery rate (4 days) — illustrative
+  - `amp` = 0.2 (–) — seasonal amplitude — illustrative
+  - `t_peak` = 15 (day of year) — day of peak transmission — illustrative
+  - `two_pi` = 6.283185 (–) — constant
+  - `omega_R` = 1/730 (1/day) — waning of infection immunity, including drift — illustrative
+  - `omega_V` = 1/240 (1/day) — waning of vaccine protection — illustrative
+  - `cov` = 0.45 (–) — target coverage per campaign — illustrative
+  - `ve` = 0.5 (–) — vaccine efficacy (all-or-nothing) — illustrative
+  - `camp_start` = 274, `camp_len` = 60 (day of year, days) — campaign from Oct 1 for 60 days — illustrative
+  - `mu` = 3.9e-5 (1/day) — birth = death rate — illustrative
+- Derived variables:
+  - `beta_t` = R0_base*g_rec*(1 + amp*cos(two_pi*(t - t_peak)/365))
+  - `tyear` = t - 365*floor(t/365)
+  - `in_camp` = (tyear >= camp_start)*(tyear < camp_start + camp_len)
+  - `vrate` = in_camp*(-log(1-cov)/camp_len)
+  - `foi` = beta_t*Ip/N
+- Flows:
+  - ` > S : mu*N (absolute)`
+  - `S > Ip : foi`
+  - `Ip > R : g_rec`
+  - `R > S : omega_R`
+  - `S > V : ve*vrate`
+  - `V > S : omega_V`
+  - `S > : mu`, `Ip > : mu`, `R > : mu`, `V > : mu`
+- Notes: vaccinating only S assumes vaccine is not wasted on R. Real campaigns vaccinate everyone; to model that, add `R > V` at vrate, or reduce effective coverage.
+
+### covid_sidarthe — SIDARTHE model of COVID-19 in Italy (Giordano et al. 2020)
+- Disease/area: COVID-19 | Category: Respiratory
+- Source: Giordano G, Blanchini F, Bruno R, Colaneri P, Di Filippo A, Di Matteo A, Colaneri M. "Modelling the COVID-19 epidemic and implementation of population-wide interventions in Italy." *Nat Med* 2020;26:855–860. https://doi.org/10.1038/s41591-020-0883-7
+  - Preprint used for the values: arXiv:2003.09861, https://arxiv.org/abs/2003.09861. **[VERIFIED-TEXT from the arXiv preprint]**
+- Time unit: days; simulate 300 days. t = 0 is "day 1" (20 Feb 2020).
+- Compartments (original letter → identifier):
+  - `S` — susceptible — 60e6 - 223
+  - `Iu` — infected, asymptomatic or mild, undetected (I) — 200
+  - `Dg` — diagnosed, asymptomatic or mild (D) — 20
+  - `A` — ailing: symptomatic, undetected (A) — 1
+  - `Rd` — recognised: symptomatic, detected (R) — 2
+  - `Th` — threatened: life-threatening, detected, in ICU (T) — 0
+  - `H` — healed — 0
+  - `Ex` — extinct (dead) — 0 — not in N
+- Parameters, day-1 values from arXiv v1 text (all 1/day):
+  - `alpha_t` = 0.570 — transmission from Iu
+  - `beta_t` = 0.011 — transmission from Dg
+  - `gamma_t` = 0.456 — transmission from A
+  - `delta_t` = 0.011 — transmission from Rd
+  - `epsilon` = 0.171 — diagnosis of Iu
+  - `theta` = 0.371 — diagnosis of A
+  - `zeta` = 0.125 — Iu develops symptoms (to A)
+  - `eta` = 0.125 — Dg develops symptoms (to Rd)
+  - `mu_t` = 0.012 — A becomes life-threatening
+  - `nu_t` = 0.027 — Rd becomes life-threatening
+  - `tau_t` = 0.003 — death from Th
+  - `lambda_h` = 0.034 — healing of Iu
+  - `rho_h` = 0.034 — healing of Dg
+  - `kappa_h` = 0.017 — healing of A
+  - `xi_h` = 0.017 — healing of Rd
+  - `sigma_h` = 0.017 — healing of Th
+  - `Npop` = 60e6 — Italian population, used for normalisation
+  - These give R0 = 2.38 (paper).
+  - Day-4 change (t ≥ 3): alpha_t = 0.422, gamma_t = 0.285, beta_t = delta_t = 0.0057, giving R0 = 1.66.
+  - Day-12 change (t ≥ 11): epsilon = 0.143.
+  - Day-22 scenarios (t ≥ 21) give R0 = 1.13 with the two transmission rates set to 0.285 and 0.171, R0 = 0.787 with 0.200 and 0.086, and R0 = 0.329 with both at 0.057. **Greek letters were lost in extraction.** Comparing with the day-4 step, these are most likely alpha_t and gamma_t. Verify before use.
+- Derived variables:
+  - `alpha_v` = ifelse(t >= 3, 0.422, 0.570)
+  - `gamma_v` = ifelse(t >= 3, 0.285, 0.456)
+  - `bd_v` = ifelse(t >= 3, 0.0057, 0.011) (used for both beta and delta)
+  - `eps_v` = ifelse(t >= 11, 0.143, 0.171)
+  - `foi` = (alpha_v*Iu + bd_v*Dg + gamma_v*A + bd_v*Rd)/Npop
+- Flows:
+  - `S > Iu : foi`
+  - `Iu > Dg : eps_v`
+  - `Iu > A : zeta`
+  - `Iu > H : lambda_h`
+  - `Dg > Rd : eta`
+  - `Dg > H : rho_h`
+  - `A > Rd : theta`
+  - `A > Th : mu_t`
+  - `A > H : kappa_h`
+  - `Rd > Th : nu_t`
+  - `Rd > H : xi_h`
+  - `Th > Ex : tau_t`
+  - `Th > H : sigma_h`
+- Notes:
+  - The paper writes the model in population fractions that sum to 1, deaths included. Dividing by the constant Npop reproduces that exactly.
+  - The published *Nature Medicine* version uses somewhat different values; I recall mu = 0.017 and tau = 0.01, but did not check. Pick one version and cite it.
+  - There are no births, deaths from other causes, or reinfection.
+
+### covid_kucharski2020 — Early Wuhan SARS-CoV-2 SEIR with Erlang stages and reporting delay (deterministic version of Kucharski et al. 2020)
+- Disease/area: COVID-19 | Category: Respiratory
+- Source: Kucharski AJ, Russell TW, Diamond C, Liu Y, Edmunds J, Funk S, Eggo RM; CMMID COVID-19 working group. "Early dynamics of transmission and control of COVID-19: a mathematical modelling study." *Lancet Infect Dis* 2020;20:553–558. https://doi.org/10.1016/S1473-3099(20)30144-4
+  - **[STRUCTURE-FROM-SOURCE, VALUES FROM RECALL — not fetched this session; verify]**
+- Time unit: days; simulate 120 days (t = 0 = 1 Jan 2020)
+- Compartments:
+  - `S` — susceptible — 11e6
+  - `E1`, `E2` — incubating, Erlang-2 — 20, 0
+  - `I1`, `I2` — infectious, Erlang-2 — 10, 0
+  - `Rm` — removed — 0
+  - `Qr` — symptomatic cases awaiting confirmation — 0 — not in N
+  - `Cr` — cumulative confirmed cases — 0 — not in N
+- Parameters:
+  - `inc_per` = 5.2 (days) — mean incubation — Li et al. *NEJM* 2020, as used by Kucharski
+  - `inf_per` = 2.9 (days) — mean infectious period — Kucharski
+  - `rep_delay` = 6.1 (days) — mean onset-to-confirmation delay — Kucharski
+  - `R_pre` = 2.35, `R_post` = 1.05 (–) — R(t) one week before and one week after the 23 Jan 2020 travel restrictions — Kucharski abstract (recall)
+  - `t_switch` = 23 (day) — date of the change — illustrative step
+  - `p_rep` = 1 (–) — fraction of cases eventually confirmed — illustrative; the paper estimated ascertainment from export data
+- Derived variables:
+  - `Rt` = ifelse(t >= t_switch, R_post, R_pre)
+  - `foi` = Rt/inf_per*(I1 + I2)/N
+- Flows:
+  - `S > E1 : foi`
+  - `E1 > E2 : 2/inc_per`
+  - `E2 > I1 : 2/inc_per`
+  - `I1 > I2 : 2/inf_per`
+  - `I2 > Rm : 2/inf_per`
+  - ` > Qr : p_rep*(2/inc_per)*E2 (absolute)` (case onsets enter the reporting pipeline)
+  - `Qr > Cr : 1/rep_delay`
+- Notes:
+  - The original model was stochastic, with β(t) following geometric Brownian motion and an observation model for exported cases. Here that is replaced by a step change.
+  - `Qr` and `Cr` are bookkeeping only and are not infectious.
+
+### covid_vax_waning — COVID-19 SEIR-H with two-level vaccine protection, waning and reinfection
+- Disease/area: COVID-19 | Category: Respiratory
+- Source: **[ILLUSTRATIVE]** generic structure of the kind used in many 2021 vaccination models. Values are chosen to be plausible, not taken from a single paper. Waning anchor: Andrews N et al. "Covid-19 vaccine effectiveness against the Omicron (B.1.1.529) variant." *N Engl J Med* 2022;386:1532–1546. https://doi.org/10.1056/NEJMoa2119451. The values are my recall of its pattern (VE against symptomatic infection fell substantially within about 3–6 months) and were not fetched.
+- Time unit: days; simulate 730 days
+- Compartments:
+  - `S` — susceptible, unvaccinated — 0.7*1e6
+  - `V` — recently vaccinated (high protection) — 0
+  - `Wv` — vaccinated, waned protection — 0
+  - `E` — exposed — 100
+  - `Ip` — infectious — 100
+  - `Hc` — hospitalised — 0
+  - `R` — recovered (hybrid or natural immunity) — 0.3*1e6
+  - `Dead` — COVID deaths — 0 — not in N
+- Parameters:
+  - `R0_eff` = 3 (–) — illustrative
+  - `sig_lat` = 1/3 (1/day) — latent period of 3 days — illustrative
+  - `g_rec` = 1/5 (1/day) — infectious period of 5 days — illustrative
+  - `p_hosp` = 0.02 (–) — hospitalised fraction, unvaccinated — illustrative
+  - `h_rec` = 1/8 (1/day) — hospital stay — illustrative
+  - `p_die` = 0.15 (–) — in-hospital fatality — illustrative
+  - `vac_rate` = 0.005 (1/day) — per-capita vaccination rate of S — illustrative
+  - `ve_V` = 0.8, `ve_W` = 0.3 (–) — leaky protection against infection — illustrative
+  - `vh_red` = 0.8 (–) — extra reduction in hospitalisation if infected after vaccination — illustrative
+  - `wane_V` = 1/120 (1/day) — waning from V to Wv — illustrative
+  - `wane_R` = 1/180 (1/day) — waning of infection immunity, R to Wv — illustrative
+  - `boost_rate` = 0.002 (1/day) — booster from Wv back to V — illustrative
+- Derived variables:
+  - `foi` = R0_eff*g_rec*Ip/N
+- Flows:
+  - `S > E : foi`
+  - `V > E : (1-ve_V)*foi`
+  - `Wv > E : (1-ve_W)*foi`
+  - `S > V : vac_rate`
+  - `V > Wv : wane_V`
+  - `Wv > V : boost_rate`
+  - `R > Wv : wane_R`
+  - `E > Ip : sig_lat`
+  - `Ip > Hc : p_hosp*g_rec`
+  - `Ip > R : (1-p_hosp)*g_rec`
+  - `Hc > R : (1-p_die)*h_rec`
+  - `Hc > Dead : p_die*h_rec`
+- Notes: `vh_red` would need a separate exposed class for vaccinated people (E_v) to act properly. To keep the model small it is listed but unused; add `Ev` and `Ipv` if it is needed. Waned infection-derived immunity goes to `Wv`, which treats it as partial protection.
+
+### rsv_weber2001_graded — RSV with seasonal forcing and repeated infections with graded immunity (Weber, Weber & Milligan 2001)
+- Disease/area: RSV | Category: Respiratory
+- Source: Weber A, Weber M, Milligan P. "Modeling epidemics caused by respiratory syncytial virus (RSV)." *Math Biosci* 2001;172(2):95–113. https://doi.org/10.1016/S0025-5564(01)00066-9.
+  - The 4-stage version is documented in MEmilio's ODE-MSEIRS4 model, which cites Weber 2001: https://memilio.readthedocs.io/en/stable/_sources/cpp/models/omseirs4.rst.txt
+  - **[STRUCTURE-FROM-SOURCE, VALUES PARTLY ILLUSTRATIVE]** This is reduced to 2 infection stages plus M (9 compartments). MEmilio's 4-stage form has 17 compartments, which exceeds the limit.
+- Time unit: years; simulate 30 years and discard the first 10 as burn-in
+- Compartments:
+  - `M` — maternally protected — 0.01*N0
+  - `S1` — susceptible, never infected — 0.05*N0
+  - `E1` — exposed, first infection — 0
+  - `I1` — infectious, first infection — 100
+  - `R1` — temporarily immune after the first infection — 0.04*N0
+  - `S2` — susceptible, previously infected (reduced susceptibility) — 0.85*N0
+  - `E2` — exposed, reinfection — 0
+  - `I2` — infectious, reinfection — 100
+  - `R2` — temporarily immune after reinfection — 0.05*N0
+  - (N0 = 1e6)
+- Parameters:
+  - `b0` = 60 (1/year) — mean transmission rate — **illustrative**; gives R0 = b0/(nu+mu) ≈ 1.6, inside Weber's SIRS range of 1.2–2.1
+  - `b1` = 0.3 (–) — seasonal amplitude — illustrative
+  - `phase` = 0 (rad) — seasonal phase — illustrative
+  - `two_pi` = 6.283185 — constant
+  - `sig_lat` = 91.25 (1/year) — 4-day latency — Weber 2001 via secondary sources
+  - `nu` = 36.5 (1/year) — 10-day infectious period — Weber 2001 via secondary sources
+  - `gam_w` = 1.825 (1/year) — loss of immunity after about 200 days — Weber 2001 via secondary sources
+  - `xi_m` = 2 (1/year) — loss of maternal protection (about 6 months) — illustrative
+  - `f2` = 0.5 (–) — relative susceptibility of S2 — illustrative; MEmilio defines f2–f4 multipliers
+  - `mu` = 0.0133 (1/year) — birth = death rate, i.e. 1/75 y — illustrative
+- Derived variables:
+  - `beta1` = b0*(1 + b1*cos(two_pi*t + phase))
+  - `foi1` = beta1*(I1 + I2)/N
+- Flows:
+  - ` > M : mu*N (absolute)`
+  - `M > S1 : xi_m`
+  - `S1 > E1 : foi1`
+  - `E1 > I1 : sig_lat`
+  - `I1 > R1 : nu`
+  - `R1 > S2 : gam_w`
+  - `S2 > E2 : f2*foi1`
+  - `E2 > I2 : sig_lat`
+  - `I2 > R2 : nu`
+  - `R2 > S2 : gam_w`
+  - `M > : mu`, `S1 > : mu`, `E1 > : mu`, `I1 > : mu`, `R1 > : mu`, `S2 > : mu`, `E2 > : mu`, `I2 > : mu`, `R2 > : mu`
+- Notes:
+  - Weber's plain SIRS is the special case without M or E, with f2 = 1 and a single stage.
+  - Weber's gradual-immunity model gave R0 of 5.4–7.1. I could not get the paper's fitted b0, b1 and phi values, which it fitted separately to Gambia, Singapore, Florida and Finland.
+  - All infectious classes contribute equally to transmission, as in MEmilio.
+
+### pertussis_hethcote_mild — Pertussis with vaccination, waning, and mild reinfections in partially immune people (Hethcote-style)
+- Disease/area: Pertussis | Category: Respiratory
+- Source: Hethcote HW. "An age-structured model for pertussis transmission." *Math Biosci* 1997;145:89–136. https://doi.org/10.1016/S0025-5564(97)00014-X
+  - **[STRUCTURE-FROM-SOURCE, AGE STRUCTURE REMOVED; VALUES ILLUSTRATIVE — not fetched]**
+  - It differs from the library's Lavine SIRWS model by separating severe primary infection from mild infection in waned people, and by tracking vaccine-derived immunity separately.
+- Time unit: years; simulate 100 years
+- Compartments:
+  - `S` — fully susceptible (never infected or vaccinated) — 0.05*N0
+  - `Ip` — typical (severe) primary infection — 50
+  - `R` — fully immune after infection — 0.5*N0
+  - `V` — vaccine-immune — 0.3*N0
+  - `W` — waned, partially immune — 0.15*N0
+  - `Im` — mild infection in a waned person — 50
+  - (N0 = 1e6)
+- Parameters:
+  - `R0_p` = 15 (–) — illustrative; the literature for pertussis spans roughly 5–17
+  - `g_rec` = 17.4 (1/year) — 21-day infectious period — illustrative
+  - `rel_m` = 0.5 (–) — relative infectiousness of mild cases — illustrative
+  - `w_nat` = 1/30 (1/year) — waning of natural immunity — illustrative
+  - `w_vac` = 1/10 (1/year) — waning of vaccine immunity — illustrative
+  - `p_vac` = 0.9 (–) — fraction of births effectively vaccinated — illustrative
+  - `mu` = 0.0133 (1/year) — birth = death rate — illustrative
+- Derived variables:
+  - `foi` = R0_p*(g_rec + mu)*(Ip + rel_m*Im)/N
+- Flows:
+  - ` > S : (1-p_vac)*mu*N (absolute)`
+  - ` > V : p_vac*mu*N (absolute)`
+  - `S > Ip : foi`
+  - `Ip > R : g_rec`
+  - `R > W : w_nat`
+  - `V > W : w_vac`
+  - `W > Im : foi`
+  - `Im > R : g_rec`
+  - `S > : mu`, `Ip > : mu`, `R > : mu`, `V > : mu`, `W > : mu`, `Im > : mu`
+- Notes: Hethcote's 1997 paper is age-structured with many age groups. Here everything is collapsed into one group. For realistic magnitudes, replace the parameters with values from Hethcote's tables.
+
+### measles_mseir_2dose — Measles MSEIR with two-dose vaccination (dose-1 failures eligible for dose 2)
+- Disease/area: Measles | Category: Respiratory/childhood
+- Source: **[ILLUSTRATIVE]** MSEIR structure from Hethcote HW, "The mathematics of infectious diseases," *SIAM Review* 2000;42:599–653, https://doi.org/10.1137/S0036144500371907. The values below are from my recall and were not fetched this session:
+  - R0 range: Guerra FM et al., "The basic reproduction number (R0) of measles: a systematic review," *Lancet Infect Dis* 2017;17:e420–e428, https://doi.org/10.1016/S1473-3099(17)30307-9. The commonly cited range is 12–18.
+  - Dose efficacies: about 93% (dose 1) and 97% (two doses), from the US CDC Pink Book.
+- Time unit: years; simulate 50 years
+- Compartments:
+  - `M` — maternally protected — 0.01*N0
+  - `S0` — susceptible, unvaccinated — 0.05*N0
+  - `Sf` — susceptible after failed or missed dose 1, eligible for dose 2 — 0.01*N0
+  - `V` — vaccine-immune — 0.6*N0
+  - `E` — exposed — 10
+  - `Ip` — infectious — 10
+  - `R` — recovered — 0.33*N0
+  - (N0 = 1e6)
+- Parameters:
+  - `R0_m` = 15 (–) — Guerra 2017 range (recall)
+  - `sig_lat` = 365/8 (1/year) — 8-day latent period — illustrative
+  - `g_rec` = 365/5 (1/year) — 5-day infectious period — illustrative
+  - `xi_m` = 2 (1/year) — loss of maternal antibody at about 6 months — illustrative
+  - `nu1` = 1.5 (1/year) — per-capita dose-1 rate in S0 — illustrative
+  - `nu2` = 0.3 (1/year) — dose-2 rate in Sf — illustrative
+  - `e1` = 0.93, `e2` = 0.97 (–) — efficacy of dose 1, and of dose 2 given to a dose-1 failure — CDC (recall)
+  - `mu` = 0.0133 (1/year) — birth = death rate — illustrative
+- Derived variables:
+  - `foi` = R0_m*(g_rec + mu)*Ip/N
+- Flows:
+  - ` > M : mu*N (absolute)`
+  - `M > S0 : xi_m`
+  - `S0 > V : e1*nu1`
+  - `S0 > Sf : (1-e1)*nu1`
+  - `Sf > V : e2*nu2`
+  - `S0 > E : foi`
+  - `Sf > E : foi`
+  - `E > Ip : sig_lat`
+  - `Ip > R : g_rec`
+  - `M > : mu`, `S0 > : mu`, `Sf > : mu`, `V > : mu`, `E > : mu`, `Ip > : mu`, `R > : mu`
+- Notes:
+  - Constant per-capita vaccination rates stand in for age-specific scheduling.
+  - The `S0 > Sf` flow also represents children who received dose 1 without it taking. Children who missed dose 1 entirely stay in S0.
+  - There is no measles death. To add one, use `Ip > : cfr*g_rec`.
+
+### tb_mdr_treatment — TB with treatment, acquired and transmitted MDR, and a fitness cost (after Dye & Williams 2000 and Cohen & Murray 2004)
+- Disease/area: Tuberculosis | Category: Respiratory
+- Sources:
+  - Dye C, Williams BG. "Criteria for the control of drug-resistant tuberculosis." *PNAS* 2000;97:8180–8185. https://doi.org/10.1073/pnas.140102797
+  - Cohen T, Murray M. "Modeling epidemics of multidrug-resistant M. tuberculosis of heterogeneous fitness." *Nat Med* 2004;10:1117–1121. https://doi.org/10.1038/nm1110 (PMC full text: https://pmc.ncbi.nlm.nih.gov/articles/PMC2652755)
+  - **[STRUCTURE-FROM-SOURCE (simplified to one MDR strain); VALUES MOSTLY ILLUSTRATIVE]**
+  - Cohen & Murray values seen in search snippets: birth/non-TB death mu = 0.02/yr; unfit MDR relative fitness 0.3; fit MDR relative fitness 0.8–1.2; mutation to the unfit phenotype 100 times as frequent as to the fit one.
+- Time unit: years; simulate 200 years
+- Compartments:
+  - `S` — uninfected — 0.7*N0
+  - `Ls` — latent, drug-sensitive — 0.29*N0
+  - `Lr` — latent, MDR — 0
+  - `Is` — active TB, drug-sensitive — 0.002*N0
+  - `Ir` — active TB, MDR — 10
+  - `Rt` — recovered/treated, latent infection cleared or controlled — 0
+  - (N0 = 1e6)
+- Parameters:
+  - `beta_s` = 10 (1/year) — effective contacts per infectious case per year — illustrative (Styblo rule of thumb, about 10 infections per case-year)
+  - `fit_r` = 0.8 (–) — relative transmissibility of MDR — Cohen & Murray "fit" lower bound
+  - `p_fast` = 0.14 (–) — fraction who progress quickly after infection — illustrative (commonly used value)
+  - `v_react` = 0.0005 (1/year) — reactivation from latency — illustrative
+  - `x_prot` = 0.65 (–) — protection of latent and recovered people against reinfection-driven fast progression — illustrative
+  - `cure_nat` = 0.2 (1/year) — self-cure — illustrative
+  - `mu_tb` = 0.2 (1/year) — TB death, untreated — illustrative
+  - `det` = 0.7 (1/year) — detection and treatment rate — illustrative
+  - `succ_s` = 0.85 (–) — treatment success for DS-TB — illustrative (DOTS target)
+  - `a_res` = 0.03 (–) — fraction of DS treatments that produce MDR — illustrative
+  - `succ_r` = 0.5 (–) — first-line treatment success for MDR — illustrative
+  - `relapse` = 0.002 (1/year) — relapse from Rt to DS active disease — illustrative
+  - `mu` = 0.02 (1/year) — birth = non-TB death rate — Cohen & Murray (snippet)
+- Derived variables:
+  - `foi_s` = beta_s*Is/N
+  - `foi_r` = beta_s*fit_r*Ir/N
+- Flows:
+  - ` > S : mu*N + mu_tb*(Is + Ir) (absolute)` (keeps N constant; optional)
+  - `S > Is : p_fast*foi_s`
+  - `S > Ls : (1-p_fast)*foi_s`
+  - `S > Ir : p_fast*foi_r`
+  - `S > Lr : (1-p_fast)*foi_r`
+  - `Ls > Is : v_react + p_fast*(1-x_prot)*foi_s`
+  - `Ls > Ir : p_fast*(1-x_prot)*foi_r`
+  - `Lr > Ir : v_react + p_fast*(1-x_prot)*foi_r`
+  - `Lr > Is : p_fast*(1-x_prot)*foi_s`
+  - `Rt > Is : relapse + p_fast*(1-x_prot)*foi_s`
+  - `Rt > Ir : p_fast*(1-x_prot)*foi_r`
+  - `Is > Rt : cure_nat + det*succ_s`
+  - `Is > Ir : det*a_res`
+  - `Ir > Rt : cure_nat + det*succ_r`
+  - `Is > : mu + mu_tb`, `Ir > : mu + mu_tb`, `S > : mu`, `Ls > : mu`, `Lr > : mu`, `Rt > : mu`
+- Notes:
+  - DS treatment failures with no resistance acquired (det*(1-succ_s-a_res)) stay in Is.
+  - Cohen & Murray used 3 strains (DS, unfit MDR, fit MDR), each with latent, infectious and treated classes. Adding a third strain gives 9–10 compartments, still within the limit.
+  - The mass-action β quoted in their table snippet (8.5e-6) is not comparable with the frequency-dependent `beta_s` here.
+
+### pneumo_vt_nvt_lipsitch — Pneumococcal carriage: vaccine-type (VT) and non-vaccine-type (NVT) serotypes with competition (Lipsitch 1997)
+- Disease/area: Streptococcus pneumoniae carriage | Category: Respiratory
+- Source: Lipsitch M. "Vaccination against colonizing bacteria with multiple serotypes." *PNAS* 1997;94:6571–6576. https://doi.org/10.1073/pnas.94.12.6571 (PMC: https://pmc.ncbi.nlm.nih.gov/articles/PMC21091)
+  - **[STRUCTURE-FROM-SOURCE (from the abstract plus my recall of the SIS-with-co-colonisation form); VALUES ILLUSTRATIVE]**
+- Time unit: days; simulate 3650 days
+- Compartments:
+  - `X` — unvaccinated, uncolonised — 0.6*N0
+  - `Y1` — unvaccinated, carrying VT — 0.15*N0
+  - `Y2` — unvaccinated, carrying NVT — 0.15*N0
+  - `Y12` — unvaccinated, carrying both — 0.1*N0
+  - `Xv`, `Y1v`, `Y2v`, `Y12v` — the same four states in vaccinated people — 0
+  - (N0 = 1e5)
+- Parameters:
+  - `b_vt` = 0.06, `b_nvt` = 0.055 (1/day) — acquisition rate per carrier contact — illustrative
+  - `clr` = 1/42 (1/day) — clearance of each serotype (carriage of about 6 weeks) — illustrative
+  - `comp` = 0.3 (–) — relative rate at which a carrier acquires the second serotype (1 = no competition) — illustrative
+  - `ve` = 0.9 (–) — vaccine reduction in VT acquisition — illustrative
+  - `p_vac` = 0.9 (–) — fraction of births vaccinated — illustrative
+  - `mu` = 1/(5*365) (1/day) — turnover of the at-risk population (children under 5) — illustrative
+- Derived variables:
+  - `foi1` = b_vt*(Y1 + Y12 + Y1v + Y12v)/N
+  - `foi2` = b_nvt*(Y2 + Y12 + Y2v + Y12v)/N
+- Flows:
+  - ` > X : (1-p_vac)*mu*N (absolute)`
+  - ` > Xv : p_vac*mu*N (absolute)`
+  - `X > Y1 : foi1`
+  - `X > Y2 : foi2`
+  - `Y1 > Y12 : comp*foi2`
+  - `Y2 > Y12 : comp*foi1`
+  - `Y1 > X : clr`
+  - `Y2 > X : clr`
+  - `Y12 > Y2 : clr`
+  - `Y12 > Y1 : clr`
+  - `Xv > Y1v : (1-ve)*foi1`
+  - `Xv > Y2v : foi2`
+  - `Y1v > Y12v : comp*foi2`
+  - `Y2v > Y12v : comp*(1-ve)*foi1`
+  - `Y1v > Xv : clr`
+  - `Y2v > Xv : clr`
+  - `Y12v > Y2v : clr`
+  - `Y12v > Y1v : clr`
+  - Deaths: `X > : mu`, `Y1 > : mu`, `Y2 > : mu`, `Y12 > : mu`, `Xv > : mu`, `Y1v > : mu`, `Y2v > : mu`, `Y12v > : mu`
+- Notes:
+  - This reproduces the serotype-replacement mechanism. Lipsitch's two-serotype result is that the rise in NVT carriage cannot exceed the fall in VT carriage.
+  - Verify against PMC21091 whether Lipsitch allows dual carriage (Y12) or makes one serotype exclude the other completely. Setting `comp` = 0 gives exclusion.
+
+### varicella_zoster_brisson — Varicella with latent VZV, exogenous boosting and zoster reactivation (after Brisson et al. 2000)
+- Disease/area: Varicella / herpes zoster | Category: Respiratory/childhood
+- Source:
+  - Brisson M, Edmunds WJ, Gay NJ, Law B, De Serres G. "Modelling the impact of immunization on the epidemiology of varicella zoster virus." *Epidemiol Infect* 2000;125:651–669 (PubMed: https://pubmed.ncbi.nlm.nih.gov/?term=Brisson+2000+varicella+zoster+Epidemiol+Infect). I did not verify the DOI.
+  - Boosting duration: Brisson M, Gay NJ, Edmunds WJ, Andrews NJ. "Exposure to varicella boosts immunity to herpes-zoster: implications for mass vaccination against chickenpox." *Vaccine* 2002;20:2500–2507. Best-fit duration of boosting about 20 years (95% CI 7–41), as summarised in search results.
+  - **[STRUCTURE-FROM-SOURCE, AGE REMOVED; VALUES MOSTLY ILLUSTRATIVE]**
+- Time unit: years; simulate 100 years
+- Compartments:
+  - `M` — maternally protected — 0.005*N0
+  - `S` — susceptible to varicella — 0.08*N0
+  - `E` — latent (pre-infectious) varicella — 0
+  - `Ip` — varicella, infectious — 100
+  - `Lb` — VZV-latent, boosted (protected from zoster) — 0.5*N0
+  - `Zs` — VZV-latent, susceptible to zoster — 0.41*N0
+  - `Zo` — active zoster — 0
+  - `Rz` — post-zoster, immune — 0
+  - `V` — varicella-vaccinated, immune; vaccine-strain latency ignored — 0
+  - (N0 = 1e6)
+- Parameters:
+  - `R0_v` = 8 (–) — illustrative (varicella R0 is often given as 7–12)
+  - `sig_lat` = 365/14 (1/year) — 14-day latent period — illustrative
+  - `g_rec` = 365/7 (1/year) — 7-day infectious period — illustrative
+  - `xi_m` = 2 (1/year) — loss of maternal protection — illustrative
+  - `w_boost` = 1/20 (1/year) — loss of boosted protection — Brisson 2002
+  - `boost_f` = 1 (–) — fraction of varicella exposures that boost latent people — illustrative
+  - `react` = 0.004 (1/year) — zoster reactivation rate in Zs — illustrative; in reality it rises steeply with age
+  - `z_rec` = 365/21 (1/year) — zoster duration — illustrative
+  - `rel_z` = 0.2 (–) — infectiousness of zoster relative to varicella — illustrative
+  - `p_vac` = 0 (–) — fraction of births vaccinated; vary between 0 and 0.9 — illustrative
+  - `mu` = 0.0133 (1/year) — birth = death rate — illustrative
+- Derived variables:
+  - `foi` = R0_v*(g_rec + mu)*(Ip + rel_z*Zo)/N
+- Flows:
+  - ` > M : (1-p_vac)*mu*N (absolute)`
+  - ` > V : p_vac*mu*N (absolute)`
+  - `M > S : xi_m`
+  - `S > E : foi`
+  - `E > Ip : sig_lat`
+  - `Ip > Lb : g_rec`
+  - `Lb > Zs : w_boost`
+  - `Zs > Lb : boost_f*foi`
+  - `Zs > Zo : react`
+  - `Zo > Rz : z_rec`
+  - Deaths: `M > : mu`, `S > : mu`, `E > : mu`, `Ip > : mu`, `Lb > : mu`, `Zs > : mu`, `Zo > : mu`, `Rz > : mu`, `V > : mu`
+- Notes:
+  - Under the exogenous-boosting hypothesis, vaccination lowers foi, so fewer people return from Zs to Lb, and zoster rises for decades. This is the model's main qualitative output.
+  - A 2019 *BMC Infect Dis* table attributes a boosting rate of 0.91·λ to "Brisson et al." without saying which paper. A boost_f of about 0.9 is a defensible choice.
+
+### rubella_crs — Rubella with two age groups, routine infant vaccination, and congenital rubella syndrome (CRS) as an output
+- Disease/area: Rubella / CRS | Category: Respiratory/childhood
+- Sources:
+  - Structure motivated by Anderson RM, May RM. "Vaccination against rubella and measles: quantitative investigations of different policies." *J Hyg (Lond)* 1983;90:259–325. https://doi.org/10.1017/S002217240002893X (DOI from recall)
+  - CRS risk: Miller E, Cradock-Watson JE, Pollock TM. "Consequences of confirmed maternal rubella at successive stages of pregnancy." *Lancet* 1982;2:781–784. https://doi.org/10.1016/S0140-6736(82)92677-0. From recall: about 80–90% of fetuses infected after maternal rash before 11–12 weeks are affected.
+  - **[ILLUSTRATIVE]**
+- Time unit: years; simulate 80 years
+- Compartments:
+  - `Sch` — susceptible child, 0–14 y — 0.1*N0
+  - `Ich` — infectious child — 50
+  - `Rch` — immune child — 0.1*N0
+  - `Sad` — susceptible adult, 15+ y — 0.05*N0
+  - `Iad` — infectious adult — 50
+  - `Rad` — immune adult — 0.6*N0
+  - `V` — vaccinated, all ages — 0.15*N0
+  - `CRS` — cumulative CRS births — 0 — not in N
+  - (N0 = 1e6)
+- Parameters:
+  - `R0_r` = 7 (–) — illustrative; commonly cited range about 6–7
+  - `g_rec` = 365/11 (1/year) — 11-day infectious period — illustrative
+  - `age_out` = 1/15 (1/year) — ageing from child to adult — structural
+  - `mu_ad` = 1/55 (1/year) — adult death rate, so life expectancy is 70 — illustrative
+  - `p_vac` = 0.8 (–) — fraction of births vaccinated — illustrative
+  - `preg_frac` = 0.015 (–) — fraction of adults who are women in the first 16 weeks of pregnancy at any time — illustrative
+  - `q_crs` = 0.6 (–) — probability of CRS given infection in that window, averaged over weeks 0–16 — illustrative, informed by Miller 1982
+  - `births` = 1e6/70 (persons/year) — constant births, roughly balancing deaths — illustrative
+- Derived variables:
+  - `foi` = R0_r*g_rec*(Ich + Iad)/N
+  - `crs_rate` = q_crs*preg_frac*foi*Sad
+- Flows:
+  - ` > Sch : (1-p_vac)*births (absolute)`
+  - ` > V : p_vac*births (absolute)`
+  - `Sch > Ich : foi`
+  - `Ich > Rch : g_rec`
+  - `Sad > Iad : foi`
+  - `Iad > Rad : g_rec`
+  - `Sch > Sad : age_out`
+  - `Ich > Iad : age_out`
+  - `Rch > Rad : age_out`
+  - `Sad > : mu_ad`, `Iad > : mu_ad`, `Rad > : mu_ad`
+  - `V > : 1/70`
+  - ` > CRS : crs_rate (absolute)`
+- Notes:
+  - This model captures the classic paradox: partial infant coverage can raise CRS, because infection shifts to older ages.
+  - Mixing is homogeneous. An age-specific mixing matrix would require two foi expressions.
+  - V uses a mean lifetime of 70 years and does not age explicitly.
+
+### mumps_waning_lewnard — Mumps SEIR with vaccine-derived immunity that wanes (Lewnard & Grad 2018)
+- Disease/area: Mumps | Category: Respiratory/childhood
+- Source: Lewnard JA, Grad YH. "Vaccine waning and mumps re-emergence in the United States." *Sci Transl Med* 2018;10(433):eaao5945. https://doi.org/10.1126/scitranslmed.aao5945
+  - **[STRUCTURE-FROM-SOURCE (age structure removed); waning value from my recall of that paper (mean about 27 years, 95% CI 16–51), not fetched; other values ILLUSTRATIVE]**
+- Time unit: years; simulate 100 years
+- Compartments:
+  - `S` — susceptible — 0.05*N0
+  - `E` — exposed — 10
+  - `Ip` — infectious — 10
+  - `R` — infection-derived immunity, lifelong — 0.3*N0
+  - `V` — vaccine-derived immunity — 0.65*N0
+  - (N0 = 1e6)
+- Parameters:
+  - `R0_mu` = 7 (–) — illustrative
+  - `sig_lat` = 365/17 (1/year) — 17-day latent period — illustrative (incubation is about 16–18 days)
+  - `g_rec` = 365/8 (1/year) — 8-day infectious period — illustrative
+  - `p_vac` = 0.92 (–) — fraction of births effectively vaccinated (coverage × efficacy) — illustrative
+  - `w_vac` = 1/27 (1/year) — waning of vaccine immunity — Lewnard & Grad (recall)
+  - `boost_v` = 0 (1/year) — rate of a booster (third) dose that returns S to V; set > 0 for scenarios — illustrative
+  - `mu` = 0.0133 (1/year) — birth = death rate — illustrative
+- Derived variables:
+  - `foi` = R0_mu*(g_rec + mu)*Ip/N
+- Flows:
+  - ` > S : (1-p_vac)*mu*N (absolute)`
+  - ` > V : p_vac*mu*N (absolute)`
+  - `S > E : foi`
+  - `E > Ip : sig_lat`
+  - `Ip > R : g_rec`
+  - `V > S : w_vac`
+  - `S > V : boost_v`
+  - `S > : mu`, `E > : mu`, `Ip > : mu`, `R > : mu`, `V > : mu`
+- Notes: the booster flow acts on all of S, so it also reaches never-vaccinated people. That is a simplification.
+
+### meningo_carriage_trotter — Meningococcal (serogroup C) carriage SCIS model with conjugate vaccine that protects against carriage (Trotter et al. 2005)
+- Disease/area: Neisseria meningitidis C (applies to Hib with relabelling) | Category: Respiratory
+- Source: Trotter CL, Gay NJ, Edmunds WJ. "Dynamic models of meningococcal carriage, disease, and the impact of serogroup C conjugate vaccination." *Am J Epidemiol* 2005;162:89–100. https://doi.org/10.1093/aje/kwi160 (record: https://researchonline.lshtm.ac.uk/6806/)
+  - **[STRUCTURE-FROM-SOURCE (the original is age-structured); R0 = 1.36 from the abstract; other VALUES ILLUSTRATIVE]**
+- Time unit: years; simulate 30 years
+- Compartments:
+  - `S` — susceptible to carriage — 0.6*N0
+  - `Ca` — carrier — 0.01*N0
+  - `Rim` — immune after carriage — 0.39*N0
+  - `V` — vaccinated, protected — 0
+  - `Cases` — cumulative invasive disease cases — 0 — not in N
+  - (N0 = 1e6)
+- Parameters:
+  - `R0_c` = 1.36 (–) — Trotter 2005 abstract
+  - `clr` = 2 (1/year) — carriage clearance (about 6 months) — illustrative
+  - `w_nat` = 0.5 (1/year) — waning of immunity after carriage — illustrative
+  - `ve_c` = 0.75 (–) — vaccine efficacy against acquiring carriage — illustrative
+  - `w_vac` = 0.1 (1/year) — waning of vaccine protection — illustrative; Trotter found results sensitive to this
+  - `vac_rate` = 0 (1/year) — catch-up vaccination of S and Rim, e.g. 2 during a campaign — illustrative
+  - `p_vac` = 0.9 (–) — fraction of births vaccinated — illustrative
+  - `ccr` = 1e-4 (–) — invasive cases per carriage acquisition (case:carrier ratio) — illustrative
+  - `mu` = 0.0133 (1/year) — birth = death rate — illustrative
+- Derived variables:
+  - `foi` = R0_c*(clr + mu)*Ca/N
+  - `acq` = foi*S + (1-ve_c)*foi*V — total acquisitions
+- Flows:
+  - ` > S : (1-p_vac)*mu*N (absolute)`
+  - ` > V : p_vac*mu*N (absolute)`
+  - `S > Ca : foi`
+  - `V > Ca : (1-ve_c)*foi`
+  - `Ca > Rim : clr`
+  - `Rim > S : w_nat`
+  - `V > S : w_vac`
+  - `S > V : vac_rate`
+  - `Rim > V : vac_rate`
+  - ` > Cases : ccr*acq (absolute)`
+  - `S > : mu`, `Ca > : mu`, `Rim > : mu`, `V > : mu`
+- Notes:
+  - Herd protection from preventing carriage is the key mechanism.
+  - Leaving carriers unvaccinated is a simplification.
+
+### sars_chowell_seijr — SARS SEIJR model with diagnosis/isolation and two susceptibility classes (Chowell et al. 2003/2004)
+- Disease/area: SARS (the template also suits MERS) | Category: Respiratory
+- Sources:
+  - Chowell G, Fenimore PW, Castillo-Garsow MA, Castillo-Chavez C. "SARS outbreaks in Ontario, Hong Kong and Singapore: the role of diagnosis and isolation as a control mechanism." *J Theor Biol* 2003;224:1–8. https://doi.org/10.1016/S0022-5193(03)00228-5
+  - Parameter values from Chowell G, Castillo-Chavez C, Fenimore PW, Kribs-Zaleta CM, Arriola L, Hyman JM. "Model parameters and outbreak control for SARS." *Emerg Infect Dis* 2004;10:1258–1263. https://wwwnc.cdc.gov/eid/article/10/7/03-0647_article
+  - **[VALUES VERIFIED-TEXT from EID 2004; EQUATIONS from the published structure, since the EID text shows the equations only as images]**
+- Time unit: days; simulate 150 days
+- Compartments:
+  - `S1` — high-risk susceptible — rho_hr*N0
+  - `S2` — lower-risk susceptible (relative susceptibility p_low) — (1-rho_hr)*N0
+  - `E` — exposed, low infectivity — 0
+  - `Ip` — symptomatic infectious, undiagnosed — 1
+  - `J` — diagnosed and isolated — 0
+  - `R` — recovered — 0
+  - `Dead` — SARS deaths — 0 — not in N
+  - (N0 = 6.7e6 for Hong Kong; illustrative)
+- Parameters:
+  - `beta_s` = 0.25 (1/day) — transmission rate — EID 2004 (Hong Kong)
+  - `q_e` = 0.1 (–) — relative infectiousness of E — EID 2004
+  - `l_iso` = 0.43 (–) — relative infectiousness of J — EID 2004: Hong Kong 0.43, Singapore 0.49, Toronto 0.10
+  - `p_low` = 1/3 (–) — relative susceptibility of S2 — EID 2004
+  - `rho_hr` = 0.77 (–) — initial fraction in S1 — EID 2004
+  - `k_inc` = 0.15707 (1/day) — E to Ip (6.4-day incubation) — EID 2004
+  - `alpha_d` = 0.2061 (1/day) — diagnosis and isolation (4.85 days); Toronto used 1/3 after controls — EID 2004
+  - `g1` = 0.035285 (1/day) — recovery from Ip — EID 2004
+  - `g2` = 0.0426 (1/day) — recovery from J — EID 2004
+  - `delta_d` = 0.0279 (1/day) — disease death rate — EID 2004
+- Derived variables:
+  - `foi` = beta_s*(Ip + q_e*E + l_iso*J)/N
+- Flows:
+  - `S1 > E : foi`
+  - `S2 > E : p_low*foi`
+  - `E > Ip : k_inc`
+  - `Ip > J : alpha_d`
+  - `Ip > R : g1`
+  - `Ip > Dead : delta_d`
+  - `J > R : g2`
+  - `J > Dead : delta_d`
+- Notes:
+  - EID 2004 reports median R0 of 1.10 for Hong Kong (l = 0.43), 1.17 for Singapore (l = 0.49) and 0.58 for Toronto (l = 0.10). That was the article's summary as I fetched it. These seem low next to the widely cited R0 ≈ 3 of earlier SARS papers, so check the definition used (it may be the reproduction number under control).
+  - Applying the same death rate to Ip and J follows the EID text ("death at rate δ"). Check Chowell 2003 for separate rates.
+  - For MERS, reuse the model with hospital-transmission terms and new values.
+
+---
+
+### Cited Findings
+- SIDARTHE has 8 compartments and bilinear dynamics. H and E are cumulative. The day-1 Italian values are α = 0.570, β = δ = 0.011, γ = 0.456, ε = 0.171, θ = 0.371, ζ = η = 0.125, μ = 0.012, ν = 0.027, τ = 0.003, λ = ρ = 0.034, κ = ξ = σ = 0.017, giving R0 = 2.38. At day 4, α = 0.422, γ = 0.285 and β = δ = 0.0057 (R0 = 1.66); at day 12, ε = 0.143. Initial conditions: I = 200/60e6, D = 20/60e6, A = 1/60e6, R = 2/60e6. — [Giordano et al., arXiv:2003.09861](https://arxiv.org/abs/2003.09861)
+- Arino 2008 has compartments S, ST, L, LT, I, IT, A, AT, R. The infectivity term is Λ = εL + εσL·LT + (1−q)I + (1−q)σI·IT + δA + δσA·AT. The mixing population is N_M = N − qI − qIT. Treatment rate φ = −ln(1−0.8) = 1.61/day. With q = 0.4 and standard incidence, b0 = 0.581 and R0 = 1.35. Without treatment the model gives about 660 cases, against Longini's 668. — [Arino et al. 2008 JTB](https://julien-arino.github.io/assets/pdf/papers/2008_ArinoBrauerPvdDWatmoughWu-JTB253.pdf)
+- In Arino 2008 Table 1: κ = κT = 0.526, α = η = 0.244, αT = ηT = 0.323, p = 0.667, τ = 0.4, δ = 0.5, f = 0.98, fT = 1; the time unit is days. — [Arino et al. 2008](https://julien-arino.github.io/assets/pdf/papers/2008_ArinoBrauerPvdDWatmoughWu-JTB253.pdf)
+- SARS values from EID 2004: β = 0.25/day, q = 0.1, l = 0.43 (Hong Kong), 0.49 (Singapore) and 0.1 (Toronto), p = 1/3, ρ = 0.77, k = 0.15707, α = 0.2061, γ1 = 0.035285, γ2 = 0.0426, δ = 0.0279. Median R0 was reported as 0.58 for Toronto, 1.10 for Hong Kong and 1.17 for Singapore. — [Chowell et al. 2004 EID](https://wwwnc.cdc.gov/eid/article/10/7/03-0647_article)
+- The SARS SEIJR model originates in Chowell et al. 2003, *J Theor Biol* 224:1–8. — [search summary pointing to the PMC record](https://pmc.ncbi.nlm.nih.gov/articles/PMC7094100)
+- Weber 2001 estimated R0 of 1.2–2.1 with the SIRS model and 5.4–7.1 with gradual immunity. It fitted data from developed and developing countries. — [ISC record of Weber et al. 2001](https://search.isc.ac/inventory/10/1588589.htm)
+- Later work traces an RSV latency of about 4 days, infectiousness of about 10 days and immunity of about 200 days to Weber 2001, and calls the 200-day value weakly supported. — [ANU thesis](https://openresearch-repository.anu.edu.au/server/api/core/bitstreams/e3e1d619-dc5a-4d65-9747-7e31ca0ab4ad/content); [PLoS Comput Biol 2011 table](https://pmc.ncbi.nlm.nih.gov/articles/PMC3040644/table/pcbi-1001079-t001)
+- MEmilio's MSEIRS4 RSV model uses compartments M, S1–4, E1–4, I1–4, R1–4. Transmission is β1(t) = b0(1 + b1·cos(2πt/365 + φ)) with βk = fk·β1, and all infectious classes contribute equally. — [MEmilio docs](https://memilio.readthedocs.io/en/stable/_sources/cpp/models/omseirs4.rst.txt)
+- Cohen & Murray 2004 modelled one drug-sensitive and two MDR strains. The unfit MDR strain has relative fitness 0.3 and the fit strain 0.8–1.2. Mutation to the unfit phenotype is 100 times as frequent as to the fit one. Other values: μ = 0.02/yr and β = 8.5e-6 (mass action). — [search summary of Nat Med 2004](https://www.nature.com/articles/nm1110.pdf); [PMC2652755](https://pmc.ncbi.nlm.nih.gov/articles/PMC2652755)
+- Trotter 2005 used an age-structured carriage model for England and Wales and estimated R0 = 1.36. Its results were sensitive to the duration of vaccine protection and to vaccine efficacy against carriage. — [LSHTM record](https://researchonline.lshtm.ac.uk/6806/)
+- Lipsitch 1997 analysed a two-serotype colonisation model in which hosts carrying one serotype are less likely to acquire another. With two serotypes, the rise in non-targeted carriage cannot exceed the fall in targeted carriage. — [PMC21091](https://pmc.ncbi.nlm.nih.gov/articles/PMC21091)
+- Brisson et al. 2002 estimated that exposure to varicella boosts immunity to zoster for about 20 years (95% CI 7–41). — [search summary of Brisson et al.](https://researchonline.lshtm.ac.uk/id/eprint/6784)
+- A 2019 table attributes to "Brisson et al." an exogenous boosting rate of 0.91·λ(a), a relative reactivation factor of 0.167 after vaccination, and a relative infectiousness of 0.5 for vaccinated cases. — [BMC Infect Dis 2019](https://bmcinfectdis.biomedcentral.com/articles/10.1186/s12879-019-3759-z/tables/1)
+
+### Inferences
+- Under these naming rules, the generator should reject bare `I`, `D`, `C`, `q`, `beta`, `gamma`, `sigma` and `kappa` as identifiers. Every model here already uses suffixed names.
+- Several models track cumulative counters (`Dead`, `Ex`, `Cr`, `CRS`, `Cases`) marked "not in N". The generator must leave these out of N, or force-of-infection denominators will drift.
+- Time-varying interventions (SIDARTHE phases, the Kucharski step, vaccination campaign windows) can all be written with `ifelse`, `floor` and products of comparisons, so no event handling is needed.
+
+### Gaps
+- Several items were not checked against the full text this session:
+  - Lipsitch 1997 equations, and whether dual carriage is allowed
+  - Hethcote 1997 parameter tables
+  - the Brisson 2000 equations and DOI
+  - the Kucharski 2020 values (from my recall)
+  - the Lewnard & Grad 27-year waning (recall)
+  - the Anderson & May 1983 and Miller 1982 DOIs and CRS risk (recall)
+  - the Biggerstaff 2014 R value (recall)
+- PMC pages returned a reCAPTCHA, and Nature and Elsevier full text was not reachable.
+- Weber 2001's fitted b0, b1 and φ values per country were not found.
+- Arino 2008 Table 1 was misaligned in text extraction. The θ (relapse) and σ values are my reading of row order, cross-checked against the Table 2 and 3 captions.
+- The Greek letters for SIDARTHE's day-22 scenario parameters were lost in extraction. α and γ are the likely pair. The *Nature Medicine* published values may differ from arXiv v1.
+- Requested but not built: diphtheria, a separate Hib model, and a separate MERS model. No primary deterministic ODE source was checked. The meningococcal and SARS templates can be relabelled for Hib and MERS.
+- I did not use Dye & Williams 2000 parameter values directly. The TB values are largely illustrative.
+
+## Q2: What is the primary source (authors, year, journal, DOI/URL) and where are parameter values from?
+
+### Takeaway
+Every model above has a full citation with a DOI or URL on its Source line. Parameter values come straight from the primary paper only for Arino 2008, SIDARTHE (arXiv v1) and Chowell EID 2004, and partly for Weber 2001 and Trotter 2005. All other values are marked illustrative or "from recall".
+
+### Cited Findings
+- Arino 2008 takes its parameter values from the Longini et al. 2004 *Am J Epidemiol* stochastic simulation and converts them to rates. For example, 80% treated within 1 day becomes φ = 1.61/day. — [Arino et al. 2008](https://julien-arino.github.io/assets/pdf/papers/2008_ArinoBrauerPvdDWatmoughWu-JTB253.pdf)
+- SIDARTHE parameters were fitted to Italian data from 20 Feb to 12 Mar 2020, as fractions of a population of about 60 million. — [Giordano et al., arXiv:2003.09861](https://arxiv.org/abs/2003.09861)
+- The Chowell EID 2004 baseline values for k, γ2, δ and α come from Donnelly et al. (2003). The Appendix values apply to Toronto (l = 0.1) and Hong Kong (l = 0.43). — [Chowell et al. 2004 EID](https://wwwnc.cdc.gov/eid/article/10/7/03-0647_article)
+- Weber 2001: *Math Biosci* 172(2):95–113, DOI 10.1016/S0025-5564(01)00066-9. — [ISC record](https://search.isc.ac/inventory/10/1588589.htm)
+- Arino 2008: *J Theor Biol* 253:118–130, DOI 10.1016/j.jtbi.2008.02.026. — [MaRDI record](https://portal.mardi4nfdi.de/wiki/Publication:1794908)
+- Trotter 2005: *Am J Epidemiol* 162(1):89–100, PMID 15961591. — [LSHTM](https://researchonline.lshtm.ac.uk/6806/)
+- Cohen & Murray 2004: *Nat Med* 10:1117–1121, DOI 10.1038/nm1110. — [dx.doi.org](https://dx.doi.org/10.1038/nm1110)
+- Lipsitch 1997: *PNAS* 94(12):6571–6576. — [PMC21091](https://pmc.ncbi.nlm.nih.gov/articles/PMC21091)
+
+### Inferences
+- For a library that claims to follow published sources, the four verified models (Arino 2008, SIDARTHE, Chowell SARS, Weber RSV rates) are ready to ship. Before release, the others need a provenance flag such as `values: illustrative` in their metadata.
+
+### Gaps
+- Before release, check these against full text: Hethcote 1997 (pertussis), Brisson 2000 (VZV), Lipsitch 1997 (pneumococcus), Lewnard & Grad 2018 (mumps), Kucharski 2020 (COVID), Dye & Williams 2000 (TB).

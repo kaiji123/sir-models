@@ -1,0 +1,354 @@
+{
+  "version": 1,
+  "id": "h5n1_poultry_human_iwami",
+  "category": "Zoonoses & emerging",
+  "name": "Avian influenza in poultry with human spillover and a mutant human-transmissible strain",
+  "description": "Highly pathogenic avian influenza H5N1, poultry → humans.\nThe paper's point is that Ii is a dead-end (no human-to-human spread) while Im is not, so two outbreak regimes are possible depending on whether R0m exceeds 1.\nParameter values: 0 of 13 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Iwami S, Takeuchi Y, Liu X (2007). Avian–human influenza epidemic model. Mathematical Biosciences 207(1):1–25",
+  "referenceUrl": "https://doi.org/10.1016/j.mbs.2006.08.001",
+  "time": {
+    "start": "0",
+    "stop": "365",
+    "step": "0.5",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N_total"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Sa",
+      "description": "susceptible birds",
+      "init": "1e5",
+      "inN": false,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Ia",
+      "description": "infected birds",
+      "init": "10",
+      "inN": false,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "S",
+      "description": "susceptible humans",
+      "init": "1e6",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 436
+    },
+    {
+      "id": "c4",
+      "name": "Ii",
+      "description": "humans infected with the avian (non-transmissible) strain",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 436
+    },
+    {
+      "id": "c5",
+      "name": "Im",
+      "description": "humans infected with the mutant human-transmissible strain",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 436
+    },
+    {
+      "id": "c6",
+      "name": "R",
+      "description": "recovered humans",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 720,
+      "y": 356
+    },
+    {
+      "id": "c7",
+      "name": "D",
+      "description": "cumulative human deaths",
+      "init": "0",
+      "inN": false,
+      "color": "#111111",
+      "x": 720,
+      "y": 516
+    }
+  ],
+  "parameters": [
+    {
+      "name": "ca",
+      "symbol": "",
+      "value": "1000",
+      "description": "recruitment of susceptible birds (poultry restocking); named ca because c is reserved [illustrative] (birds per day)"
+    },
+    {
+      "name": "mu_a",
+      "symbol": "",
+      "value": "1/500",
+      "description": "natural bird death rate [illustrative] (per day)"
+    },
+    {
+      "name": "beta_a",
+      "symbol": "",
+      "value": "2e-5",
+      "description": "bird-to-bird transmission coefficient (mass action) [illustrative] (per bird per day)"
+    },
+    {
+      "name": "delta_a",
+      "symbol": "",
+      "value": "0.4",
+      "description": "disease-induced bird death rate (HPAI kills within days) [illustrative] (per day)"
+    },
+    {
+      "name": "cull",
+      "symbol": "",
+      "value": "0",
+      "description": "additional culling rate applied to birds (policy lever from the 2008 companion paper) [illustrative] (per day)"
+    },
+    {
+      "name": "ch",
+      "symbol": "",
+      "value": "100",
+      "description": "human recruitment [illustrative] (humans per day)"
+    },
+    {
+      "name": "mu_h",
+      "symbol": "",
+      "value": "1/25550",
+      "description": "natural human death rate (70-year life expectancy) [illustrative] (per day)"
+    },
+    {
+      "name": "beta_ah",
+      "symbol": "",
+      "value": "1e-8",
+      "description": "bird-to-human transmission coefficient [illustrative] (per bird per day)"
+    },
+    {
+      "name": "beta_m",
+      "symbol": "",
+      "value": "2e-7",
+      "description": "mutant human-to-human transmission coefficient [illustrative] (per human per day)"
+    },
+    {
+      "name": "nu",
+      "symbol": "",
+      "value": "1e-4",
+      "description": "rate at which an avian-strain human case yields mutant-strain infection (mutation) [illustrative] (per day)"
+    },
+    {
+      "name": "delta_i",
+      "symbol": "",
+      "value": "0.5",
+      "description": "disease death rate, avian-strain human cases (H5N1 CFR ≈60%) [illustrative] (per day)"
+    },
+    {
+      "name": "delta_m",
+      "symbol": "",
+      "value": "0.1",
+      "description": "disease death rate, mutant-strain cases [illustrative] (per day)"
+    },
+    {
+      "name": "gamma_m",
+      "symbol": "",
+      "value": "1/7",
+      "description": "recovery rate, mutant-strain cases [illustrative] (per day)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "Na",
+      "symbol": "",
+      "expr": "Sa + Ia",
+      "description": "bird population",
+      "output": false
+    },
+    {
+      "name": "N",
+      "symbol": "",
+      "expr": "S + Ii + Im + R",
+      "description": "living human population",
+      "output": false
+    },
+    {
+      "name": "lambda_a",
+      "symbol": "",
+      "expr": "beta_a * Ia",
+      "description": "bird force of infection (density-dependent)",
+      "output": false
+    },
+    {
+      "name": "lambda_ah",
+      "symbol": "",
+      "expr": "beta_ah * Ia",
+      "description": "spillover hazard to humans",
+      "output": false
+    },
+    {
+      "name": "lambda_m",
+      "symbol": "",
+      "expr": "beta_m * Im",
+      "description": "mutant-strain force of infection",
+      "output": false
+    },
+    {
+      "name": "R0a",
+      "symbol": "",
+      "expr": "beta_a * ca / ((mu_a + delta_a + cull) * mu_a)",
+      "description": "bird-strain reproduction number",
+      "output": false
+    },
+    {
+      "name": "R0m",
+      "symbol": "",
+      "expr": "beta_m * ch / ((mu_h + delta_m + gamma_m) * mu_h)",
+      "description": "mutant-strain reproduction number",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "ca",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lambda_a",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_a + cull",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    },
+    {
+      "id": "f4",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_a + delta_a + cull",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 270
+    },
+    {
+      "id": "f5",
+      "from": null,
+      "to": "c3",
+      "kind": "absolute",
+      "rate": "ch",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 306
+    },
+    {
+      "id": "f6",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "lambda_ah",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": "c3",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "lambda_m",
+      "output": "",
+      "curve": 50
+    },
+    {
+      "id": "f8",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "nu",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f9",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_h + delta_i",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 566
+    },
+    {
+      "id": "f10",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "gamma_m",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f11",
+      "from": "c5",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "delta_m",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f12",
+      "from": "c5",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_h",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 566
+    },
+    {
+      "id": "f13",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_h",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 566
+    }
+  ]
+}

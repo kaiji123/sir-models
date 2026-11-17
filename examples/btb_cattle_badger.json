@@ -1,0 +1,285 @@
+{
+  "version": 1,
+  "id": "btb_cattle_badger",
+  "category": "Zoonoses & emerging",
+  "name": "Bovine tuberculosis in cattle and badgers with test-and-slaughter",
+  "description": "Mycobacterium bovis, cattle ↔ European badger (Meles meles).\nThe two-host coupling is the whole point: the paper examines how much of cattle infection is attributable to badgers versus within-herd spread, and how badger culling changes that.\nParameter values: 0 of 12 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Cox DR, Donnelly CA, Bourne FJ, Gettinby G, McInerney JP, Morrison WI, Woodroffe R (2005). Simple model for tuberculosis in cattle and badgers. PNAS 102(49):17588–17593",
+  "referenceUrl": "https://doi.org/10.1073/pnas.0509003102",
+  "time": {
+    "start": "0",
+    "stop": "40",
+    "step": "0.05",
+    "unit": "years"
+  },
+  "population": {
+    "name": "N_total"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Sc",
+      "description": "susceptible cattle",
+      "init": "10000",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Ec",
+      "description": "cattle infected but test-negative (occult/early infection)",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Ic",
+      "description": "cattle infected and test-positive / infectious",
+      "init": "10",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "Sb",
+      "description": "susceptible badgers",
+      "init": "1000",
+      "inN": false,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 356
+    },
+    {
+      "id": "c5",
+      "name": "Eb",
+      "description": "badgers infected, not yet excreting",
+      "init": "0",
+      "inN": false,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 356
+    },
+    {
+      "id": "c6",
+      "name": "Ib",
+      "description": "badgers excreting M. bovis",
+      "init": "20",
+      "inN": false,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 356
+    },
+    {
+      "id": "c7",
+      "name": "CRc",
+      "description": "cumulative cattle reactors removed (herd-breakdown counter)",
+      "init": "0",
+      "inN": false,
+      "color": "#8E0E0E",
+      "x": 720,
+      "y": 140
+    }
+  ],
+  "parameters": [
+    {
+      "name": "beta_cc",
+      "symbol": "",
+      "value": "0.4",
+      "description": "cattle-to-cattle transmission rate [illustrative] (per year)"
+    },
+    {
+      "name": "beta_bc",
+      "symbol": "",
+      "value": "0.02",
+      "description": "badger-to-cattle transmission coefficient [illustrative] (per badger per year)"
+    },
+    {
+      "name": "beta_bb",
+      "symbol": "",
+      "value": "0.6",
+      "description": "badger-to-badger transmission rate [illustrative] (per year)"
+    },
+    {
+      "name": "beta_cb",
+      "symbol": "",
+      "value": "0.002",
+      "description": "cattle-to-badger transmission coefficient [illustrative] (per cattle per year)"
+    },
+    {
+      "name": "sigma_c",
+      "symbol": "",
+      "value": "2.0",
+      "description": "rate cattle progress from test-negative to test-positive [illustrative] (per year)"
+    },
+    {
+      "name": "test",
+      "symbol": "",
+      "value": "1.0",
+      "description": "herd-testing frequency × test sensitivity, i.e. rate at which Ic animals are detected and slaughtered [illustrative] (per year)"
+    },
+    {
+      "name": "mu_c",
+      "symbol": "",
+      "value": "0.25",
+      "description": "cattle turnover (culling/sale, 4-year productive life) [illustrative] (per year)"
+    },
+    {
+      "name": "sigma_b",
+      "symbol": "",
+      "value": "1.5",
+      "description": "badger progression rate to excreting state [illustrative] (per year)"
+    },
+    {
+      "name": "mu_b",
+      "symbol": "",
+      "value": "0.3",
+      "description": "badger natural death rate [illustrative] (per year)"
+    },
+    {
+      "name": "alpha_b",
+      "symbol": "",
+      "value": "0.2",
+      "description": "additional disease-induced badger death rate [illustrative] (per year)"
+    },
+    {
+      "name": "cull_b",
+      "symbol": "",
+      "value": "0",
+      "description": "badger culling rate (the intervention the trial was designed to evaluate) [illustrative] (per year)"
+    },
+    {
+      "name": "perturb",
+      "symbol": "",
+      "value": "0",
+      "description": "proportional increase in beta_bc caused by culling-induced badger ranging (\"perturbation effect\"); e.g. 0.3 [illustrative] (dimensionless)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "N",
+      "symbol": "",
+      "expr": "Sc + Ec + Ic",
+      "description": "cattle herd size",
+      "output": false
+    },
+    {
+      "name": "Nb",
+      "symbol": "",
+      "expr": "Sb + Eb + Ib",
+      "description": "badger population",
+      "output": false
+    },
+    {
+      "name": "lambda_c",
+      "symbol": "",
+      "expr": "beta_cc * Ic / N + beta_bc * (1 + perturb * (cull_b > 0)) * Ib",
+      "description": "cattle force of infection",
+      "output": false
+    },
+    {
+      "name": "lambda_b",
+      "symbol": "",
+      "expr": "beta_bb * Ib / Nb + beta_cb * Ic",
+      "description": "badger force of infection",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "mu_c * N + test * Ic",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lambda_c",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "sigma_c",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c3",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "test",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_c",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    },
+    {
+      "id": "f6",
+      "from": null,
+      "to": "c4",
+      "kind": "absolute",
+      "rate": "(mu_b * Nb + alpha_b * Ib + cull_b * Nb)",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 226
+    },
+    {
+      "id": "f7",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "lambda_b",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "sigma_b",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f9",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_b + cull_b",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 486
+    }
+  ]
+}

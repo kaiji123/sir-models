@@ -1,0 +1,167 @@
+{
+  "version": 1,
+  "id": "influenza_within_host_teiv",
+  "category": "Within-host",
+  "name": "Influenza A target-cell-limited model with an eclipse phase (TEIV)",
+  "description": "Influenza A within-host dynamics in experimentally infected humans.\nFour compartments, no target-cell regeneration and no host death terms — over a 7–10 day infection, target-cell depletion alone terminates the infection, which is the model's central claim.\nParameter values: 0 of 6 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Baccam P, Beauchemin C, Macken CA, Hayden FG, Perelson AS (2006). Kinetics of influenza A virus infection in humans. Journal of Virology 80(15):7590–7599",
+  "referenceUrl": "https://doi.org/10.1128/JVI.01623-05",
+  "time": {
+    "start": "0",
+    "stop": "10",
+    "step": "0.01",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Tc",
+      "description": "uninfected target (epithelial) cells",
+      "init": "4e8",
+      "inN": false,
+      "color": "#DDDDDD",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "I1",
+      "description": "infected cells in the eclipse phase (not yet producing virus)",
+      "init": "0",
+      "inN": false,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "I2",
+      "description": "productively infected cells",
+      "init": "0",
+      "inN": false,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "V",
+      "description": "infectious virus titre (TCID50 per mL of nasal wash)",
+      "init": "7.5e-2",
+      "inN": false,
+      "color": "#2457C5",
+      "x": 120,
+      "y": 356
+    }
+  ],
+  "parameters": [
+    {
+      "name": "beta",
+      "symbol": "",
+      "value": "2.7e-5",
+      "description": "infection rate constant [unverified (mL TCID50⁻¹ day⁻¹)"
+    },
+    {
+      "name": "k",
+      "symbol": "",
+      "value": "4.0",
+      "description": "rate of transition from eclipse to productively infected [unverified] (per day)"
+    },
+    {
+      "name": "delta",
+      "symbol": "",
+      "value": "2.4",
+      "description": "death rate of productively infected cells (a secondary source reports the original estimate as 0.167 per hour ≈ 4.0 per day and notes it implies an implausibly "
+    },
+    {
+      "name": "p",
+      "symbol": "",
+      "value": "1.2e-2",
+      "description": "virion production rate per productively infected cell [unverified; secondary source reports ≈9.9e4 and ≈5e4 for differently scaled versions] (TCID50 mL⁻¹ day⁻¹ "
+    },
+    {
+      "name": "cV",
+      "symbol": "",
+      "value": "3.0",
+      "description": "viral clearance rate (secondary source: 0.125 per hour = 3.0 per day) [unverified] (per day)"
+    },
+    {
+      "name": "Tc0",
+      "symbol": "",
+      "value": "4e8",
+      "description": "initial value of Tc"
+    }
+  ],
+  "variables": [
+    {
+      "name": "R0v",
+      "symbol": "",
+      "expr": "beta * p * Tc0 / (cV * delta)",
+      "description": "within-host basic reproductive ratio, with Tc0 the initial target-cell count (this expression for R0 is confirmed in the derived literature)",
+      "output": false
+    },
+    {
+      "name": "logV",
+      "symbol": "",
+      "expr": "log(pmax(V, 1e-12))",
+      "description": "log10-scale output is what the data are fitted on (divide by log(10))",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "beta * V",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "k",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "delta",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 270
+    },
+    {
+      "id": "f4",
+      "from": null,
+      "to": "c4",
+      "kind": "absolute",
+      "rate": "p * I2",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 226
+    },
+    {
+      "id": "f5",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "cV",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 486
+    }
+  ]
+}

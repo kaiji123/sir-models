@@ -1,0 +1,333 @@
+{
+  "version": 1,
+  "id": "covid_sidarthe",
+  "category": "Respiratory",
+  "name": "SIDARTHE model of COVID-19 in Italy (Giordano et al. 2020)",
+  "description": "COVID-19.\nParameter values: 0 of 12 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Giordano G, Blanchini F, Bruno R, Colaneri P, Di Filippo A, Di Matteo A, Colaneri M. \"Modelling the COVID-19 epidemic and implementation of population-wide interventions in Italy.\" Nat Med 2020;26:855–860. https://doi.org/10.1038/s41591-020-0883-7",
+  "referenceUrl": "https://doi.org/10.1038/s41591-020-0883-7",
+  "time": {
+    "start": "0",
+    "stop": "300",
+    "step": "0.5",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "solver": {
+    "hmax": "0.5"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "susceptible",
+      "init": "60e6 - 223",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 220
+    },
+    {
+      "id": "c2",
+      "name": "Iu",
+      "description": "infected, asymptomatic or mild, undetected (I)",
+      "init": "200",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 220
+    },
+    {
+      "id": "c3",
+      "name": "Dg",
+      "description": "diagnosed, asymptomatic or mild (D)",
+      "init": "20",
+      "inN": true,
+      "color": "#111111",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "A",
+      "description": "ailing: symptomatic, undetected (A)",
+      "init": "1",
+      "inN": true,
+      "color": "#E57373",
+      "x": 520,
+      "y": 300
+    },
+    {
+      "id": "c5",
+      "name": "Rd",
+      "description": "recognised: symptomatic, detected (R)",
+      "init": "2",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 720,
+      "y": 220
+    },
+    {
+      "id": "c6",
+      "name": "Th",
+      "description": "threatened: life-threatening, detected, in ICU (T)",
+      "init": "0",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 920,
+      "y": 220
+    },
+    {
+      "id": "c7",
+      "name": "H",
+      "description": "healed",
+      "init": "0",
+      "inN": true,
+      "color": "#6A2C9C",
+      "x": 1120,
+      "y": 140
+    },
+    {
+      "id": "c8",
+      "name": "Ex",
+      "description": "extinct (dead)",
+      "init": "0",
+      "inN": false,
+      "color": "#E8C468",
+      "x": 1120,
+      "y": 300
+    }
+  ],
+  "parameters": [
+    {
+      "name": "Npop",
+      "symbol": "",
+      "value": "60e6",
+      "description": "value taken from the notes text [recalled]"
+    },
+    {
+      "name": "zeta",
+      "symbol": "",
+      "value": "0.125",
+      "description": "value taken from the notes text [recalled]"
+    },
+    {
+      "name": "lambda_h",
+      "symbol": "",
+      "value": "0.034",
+      "description": "value taken from the notes text [recalled]"
+    },
+    {
+      "name": "eta",
+      "symbol": "",
+      "value": "0.125",
+      "description": "value taken from the notes text [recalled]"
+    },
+    {
+      "name": "rho_h",
+      "symbol": "",
+      "value": "0.034",
+      "description": "value taken from the notes text [recalled]"
+    },
+    {
+      "name": "theta",
+      "symbol": "",
+      "value": "0.371",
+      "description": "value taken from the notes text [recalled]"
+    },
+    {
+      "name": "mu_t",
+      "symbol": "",
+      "value": "0.012",
+      "description": "value taken from the notes text [recalled]"
+    },
+    {
+      "name": "kappa_h",
+      "symbol": "",
+      "value": "0.017",
+      "description": "value taken from the notes text [recalled]"
+    },
+    {
+      "name": "nu_t",
+      "symbol": "",
+      "value": "0.027",
+      "description": "value taken from the notes text [recalled]"
+    },
+    {
+      "name": "xi_h",
+      "symbol": "",
+      "value": "0.017",
+      "description": "value taken from the notes text [recalled]"
+    },
+    {
+      "name": "tau_t",
+      "symbol": "",
+      "value": "0.003",
+      "description": "value taken from the notes text [recalled]"
+    },
+    {
+      "name": "sigma_h",
+      "symbol": "",
+      "value": "0.017",
+      "description": "value taken from the notes text [recalled]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "alpha_v",
+      "symbol": "",
+      "expr": "ifelse(t >= 3, 0.422, 0.570)",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "gamma_v",
+      "symbol": "",
+      "expr": "ifelse(t >= 3, 0.285, 0.456)",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "bd_v",
+      "symbol": "",
+      "expr": "ifelse(t >= 3, 0.0057, 0.011)",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "eps_v",
+      "symbol": "",
+      "expr": "ifelse(t >= 11, 0.143, 0.171)",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "foi",
+      "symbol": "",
+      "expr": "(alpha_v*Iu + bd_v*Dg + gamma_v*A + bd_v*Rd)/Npop",
+      "description": "",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "foi",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "eps_v",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "zeta",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c2",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "lambda_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c3",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "eta",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c3",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "rho_h",
+      "output": "",
+      "curve": 50
+    },
+    {
+      "id": "f7",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "theta",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c4",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "mu_t",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f9",
+      "from": "c4",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "kappa_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f10",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "nu_t",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f11",
+      "from": "c5",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "xi_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f12",
+      "from": "c6",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "tau_t",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f13",
+      "from": "c6",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "sigma_h",
+      "output": "",
+      "curve": 0
+    }
+  ]
+}

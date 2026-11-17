@@ -1,0 +1,422 @@
+{
+  "version": 1,
+  "id": "malaria_chitnis2008_seirs_sei",
+  "category": "Vector-borne",
+  "name": "Malaria SEIRS humans / SEI mosquitoes with saturating biting (Chitnis, Hyman & Cushing 2008) [VERIFIED-FULL]",
+  "description": "Plasmodium falciparum malaria, generic high- or low-transmission settings in sub-Saharan Africa.\nParameter values: 0 of 17 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Chitnis N, Hyman JM, Cushing JM (2008). Determining important parameters in the spread of malaria through the sensitivity analysis of a mathematical model. Bull Math Biol 70(5):1272–1296. https://doi.org/10.1007/s11538-008-9299-0 — the equations (1a–g) and…",
+  "referenceUrl": "https://doi.org/10.1007/s11538-008-9299-0",
+  "time": {
+    "start": "0",
+    "stop": "7300",
+    "step": "10",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Sh",
+      "description": "susceptible humans",
+      "init": "500",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Eh",
+      "description": "exposed (latent) humans",
+      "init": "10",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Ih",
+      "description": "infectious humans",
+      "init": "10",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "Rh",
+      "description": "recovered: immune, asymptomatic, slightly infectious",
+      "init": "4",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 720,
+      "y": 140
+    },
+    {
+      "id": "c5",
+      "name": "Sv",
+      "description": "susceptible mosquitoes",
+      "init": "4800",
+      "inN": false,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 356
+    },
+    {
+      "id": "c6",
+      "name": "Ev",
+      "description": "exposed mosquitoes",
+      "init": "30",
+      "inN": false,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 356
+    },
+    {
+      "id": "c7",
+      "name": "Iv",
+      "description": "infectious mosquitoes",
+      "init": "20",
+      "inN": false,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 356
+    }
+  ],
+  "parameters": [
+    {
+      "name": "Lambda_h",
+      "symbol": "",
+      "value": "0.033",
+      "description": "immigration of humans (humans/day)"
+    },
+    {
+      "name": "psi_h",
+      "symbol": "",
+      "value": "1.1e-4",
+      "description": "per-capita human birth rate (1/day)"
+    },
+    {
+      "name": "psi_v",
+      "symbol": "",
+      "value": "0.13",
+      "description": "per-capita mosquito birth rate (1/day)"
+    },
+    {
+      "name": "sig_v",
+      "symbol": "",
+      "value": "0.50",
+      "description": "bites one mosquito would want per day (1/day)"
+    },
+    {
+      "name": "sig_h",
+      "symbol": "",
+      "value": "19",
+      "description": "maximum bites one human can receive per day (1/day)"
+    },
+    {
+      "name": "bet_hv",
+      "symbol": "",
+      "value": "0.022",
+      "description": "P(infection) per bite, infectious mosquito → susceptible human"
+    },
+    {
+      "name": "bet_vh",
+      "symbol": "",
+      "value": "0.48",
+      "description": "P(infection) per bite, infectious human → mosquito"
+    },
+    {
+      "name": "bet_vh_r",
+      "symbol": "",
+      "value": "0.048",
+      "description": "P(infection) per bite, recovered human → mosquito"
+    },
+    {
+      "name": "nu_h",
+      "symbol": "",
+      "value": "0.10",
+      "description": "human latent progression rate (1/day)"
+    },
+    {
+      "name": "nu_v",
+      "symbol": "",
+      "value": "0.091",
+      "description": "mosquito latent progression rate (EIP ≈ 11–12 days) (1/day)"
+    },
+    {
+      "name": "gam_h",
+      "symbol": "",
+      "value": "0.0035",
+      "description": "human recovery rate (1/day)"
+    },
+    {
+      "name": "delta_h",
+      "symbol": "",
+      "value": "9.0e-5",
+      "description": "disease-induced death rate (1/day)"
+    },
+    {
+      "name": "rho_h",
+      "symbol": "",
+      "value": "5.5e-4",
+      "description": "loss of immunity (1/day)"
+    },
+    {
+      "name": "mu1h",
+      "symbol": "",
+      "value": "1.6e-5",
+      "description": "density-independent human death and emigration (1/day)"
+    },
+    {
+      "name": "mu2h",
+      "symbol": "",
+      "value": "3.0e-7",
+      "description": "density-dependent human death"
+    },
+    {
+      "name": "mu1v",
+      "symbol": "",
+      "value": "0.033",
+      "description": "density-independent mosquito death (1/day)"
+    },
+    {
+      "name": "mu2v",
+      "symbol": "",
+      "value": "2.0e-5",
+      "description": "density-dependent mosquito death"
+    }
+  ],
+  "variables": [
+    {
+      "name": "Nh",
+      "symbol": "",
+      "expr": "Sh + Eh + Ih + Rh",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "Nv",
+      "symbol": "",
+      "expr": "Sv + Ev + Iv",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "fh",
+      "symbol": "",
+      "expr": "mu1h + mu2h*Nh",
+      "description": "human per-capita death rate",
+      "output": false
+    },
+    {
+      "name": "fv",
+      "symbol": "",
+      "expr": "mu1v + mu2v*Nv",
+      "description": "mosquito per-capita death rate",
+      "output": false
+    },
+    {
+      "name": "bites",
+      "symbol": "",
+      "expr": "sig_v*Nv*sig_h*Nh/(sig_v*Nv + sig_h*Nh)",
+      "description": "total human–mosquito contacts per day",
+      "output": false
+    },
+    {
+      "name": "lambda_h",
+      "symbol": "",
+      "expr": "(bites/Nh)*bet_hv*Iv/Nv",
+      "description": "force of infection on humans",
+      "output": false
+    },
+    {
+      "name": "lambda_v",
+      "symbol": "",
+      "expr": "(bites/Nv)*(bet_vh*Ih/Nh + bet_vh_r*Rh/Nh)",
+      "description": "force of infection on mosquitoes",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "Lambda_h",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "psi_h*Nh",
+      "output": "",
+      "curve": 0,
+      "ox": 170,
+      "oy": 10
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lambda_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "nu_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "gam_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c4",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "rho_h",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f7",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "delta_h",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 270
+    },
+    {
+      "id": "f8",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "fh",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    },
+    {
+      "id": "f9",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "fh",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 270
+    },
+    {
+      "id": "f10",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "fh",
+      "output": "",
+      "curve": 0,
+      "ox": 570,
+      "oy": 270
+    },
+    {
+      "id": "f11",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "fh",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 270
+    },
+    {
+      "id": "f12",
+      "from": null,
+      "to": "c5",
+      "kind": "absolute",
+      "rate": "psi_v*Nv",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 226
+    },
+    {
+      "id": "f13",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "lambda_v",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f14",
+      "from": "c6",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "nu_v",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f15",
+      "from": "c5",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "fv",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 486
+    },
+    {
+      "id": "f16",
+      "from": "c6",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "fv",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 486
+    },
+    {
+      "id": "f17",
+      "from": "c7",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "fv",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 486
+    }
+  ]
+}

@@ -1,0 +1,210 @@
+{
+  "version": 1,
+  "id": "norovirus_simmons2013",
+  "category": "Water, enteric & NTDs",
+  "name": "Norovirus SEIAR with asymptomatic reinfection and waning disease immunity",
+  "description": "Norovirus gastroenteritis.\nParameter values: 0 of 8 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Simmons K, Gambhir M, Leon J, Lopman B. Duration of immunity to norovirus gastroenteritis. Emerg Infect Dis 2013;19(8):1260–1267",
+  "referenceUrl": "https://doi.org/10.3201/eid1908.130472",
+  "time": {
+    "start": "0",
+    "stop": "30",
+    "step": "0.05",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "susceptible to infection and disease",
+      "init": "0.3*N0",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "E",
+      "description": "exposed (presymptomatic)",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "I",
+      "description": "symptomatic",
+      "init": "100",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "A",
+      "description": "asymptomatic infected (post-symptomatic shedding, or reinfection of immune people)",
+      "init": "0",
+      "inN": true,
+      "color": "#E57373",
+      "x": 720,
+      "y": 140
+    },
+    {
+      "id": "c5",
+      "name": "R",
+      "description": "immune to disease but not to infection",
+      "init": "0.7*N0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 920,
+      "y": 140
+    }
+  ],
+  "parameters": [
+    {
+      "name": "inc_d",
+      "symbol": "",
+      "value": "1",
+      "description": "incubation, E → I [V, \"about 1 day\"] (day)"
+    },
+    {
+      "name": "sym_d",
+      "symbol": "",
+      "value": "2",
+      "description": "symptomatic duration, I → A [V, \"1 day, half the symptomatic phase\"] (day)"
+    },
+    {
+      "name": "shed_d",
+      "symbol": "",
+      "value": "10",
+      "description": "asymptomatic shedding, A → R [V, Model B] (day)"
+    },
+    {
+      "name": "eps_ea",
+      "symbol": "",
+      "value": "0.05",
+      "description": "relative infectiousness of E and A: 0.05 in Model B, 0.25 in Model C, 0 in Model A [V]"
+    },
+    {
+      "name": "theta_d",
+      "symbol": "",
+      "value": "5.1*365",
+      "description": "duration of disease immunity, R → S. Fitted values: 5.1 years (Model A/B), 8.7 (C), 4.1 (D, 20% genetically resistant) [V] (day)"
+    },
+    {
+      "name": "R0_nv",
+      "symbol": "",
+      "value": "1.7",
+      "description": "R0. Reported values: 1.64–1.88 for most models, 7.16 for C [V]"
+    },
+    {
+      "name": "mu_h",
+      "symbol": "",
+      "value": "1/(70*365)",
+      "description": "birth = death [I] (day^-1)"
+    },
+    {
+      "name": "N0",
+      "symbol": "",
+      "value": "100000",
+      "description": "total initial population [illustrative default]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "Dinf",
+      "symbol": "",
+      "expr": "eps_ea*inc_d + sym_d + eps_ea*shed_d",
+      "description": "effective infectious duration (2.55 days)",
+      "output": false
+    },
+    {
+      "name": "b_nv",
+      "symbol": "",
+      "expr": "R0_nv/Dinf",
+      "description": "about 0.667/day",
+      "output": false
+    },
+    {
+      "name": "lam",
+      "symbol": "",
+      "expr": "b_nv*(I + eps_ea*(E + A))/N",
+      "description": "",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "mu_h*N",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lam",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "1/inc_d",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "1/sym_d",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "1/shed_d",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c5",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "lam",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f7",
+      "from": "c5",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "1/theta_d",
+      "output": "",
+      "curve": 60
+    }
+  ]
+}

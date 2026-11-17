@@ -1,0 +1,208 @@
+{
+  "version": 1,
+  "id": "cwd_deer_environmental",
+  "category": "Animal & wildlife",
+  "name": "Chronic wasting disease in deer with environmental prion accumulation",
+  "description": "Chronic wasting disease (prion), mule deer / white-tailed deer.\nOnly 3 compartments, which makes this the cleanest demonstration of an environmental-reservoir model: with beta_env = 0 the epidemic is density-dependent and self-limiting, while with slow prion decay the environmental term creates a ratche\nParameter values: 0 of 10 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Miller MW, Hobbs NT, Tavener SJ (2006). Dynamics of prion disease transmission in mule deer. Ecological Applications 16(6):2208–2214",
+  "referenceUrl": "https://doi.org/10.1890/1051-0761(2006",
+  "time": {
+    "start": "0",
+    "stop": "100",
+    "step": "0.1",
+    "unit": "years"
+  },
+  "population": {
+    "name": "N_total"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "susceptible deer",
+      "init": "1000",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Ii",
+      "description": "infected deer (long subclinical + clinical infection, assumed infectious throughout)",
+      "init": "1",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Ev",
+      "description": "environmental prion load (infectious units; E avoided for clarity)",
+      "init": "0",
+      "inN": false,
+      "color": "#E8C468",
+      "x": 120,
+      "y": 356
+    }
+  ],
+  "parameters": [
+    {
+      "name": "beta_dir",
+      "symbol": "",
+      "value": "0.0008",
+      "description": "direct deer-to-deer transmission coefficient (density-dependent) [illustrative] (per deer per year)"
+    },
+    {
+      "name": "beta_env",
+      "symbol": "",
+      "value": "0.0002",
+      "description": "environment-to-deer transmission coefficient [illustrative] (per prion unit per year)"
+    },
+    {
+      "name": "alpha",
+      "symbol": "",
+      "value": "0.55",
+      "description": "CWD-induced mortality rate (mean time from infection to death ≈2 years) [unverified] (per year)"
+    },
+    {
+      "name": "mu",
+      "symbol": "",
+      "value": "0.15",
+      "description": "natural (non-CWD) mortality rate [illustrative] (per year)"
+    },
+    {
+      "name": "bdeer",
+      "symbol": "",
+      "value": "0.35",
+      "description": "maximum per-capita birth rate [illustrative] (per year)"
+    },
+    {
+      "name": "Kd",
+      "symbol": "",
+      "value": "1500",
+      "description": "carrying capacity [illustrative] (deer)"
+    },
+    {
+      "name": "shed",
+      "symbol": "",
+      "value": "1.0",
+      "description": "shedding from live infected animals (saliva, urine, faeces) [illustrative] (prion units per infected deer per year)"
+    },
+    {
+      "name": "carc",
+      "symbol": "",
+      "value": "10.0",
+      "description": "prion deposited by a carcass [illustrative] (prion units per CWD death)"
+    },
+    {
+      "name": "decay_e",
+      "symbol": "",
+      "value": "0.05",
+      "description": "loss of environmental infectivity (prions persist for years; this is the parameter the literature identifies as pivotal) [illustrative] (per year)"
+    },
+    {
+      "name": "harvest",
+      "symbol": "",
+      "value": "0",
+      "description": "hunter harvest rate (control lever; can be applied preferentially to Ii) [illustrative] (per year)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "N",
+      "symbol": "",
+      "expr": "S + Ii",
+      "description": "deer population",
+      "output": false
+    },
+    {
+      "name": "lambda",
+      "symbol": "",
+      "expr": "beta_dir * Ii + beta_env * Ev",
+      "description": "force of infection (direct + indirect, additive)",
+      "output": false
+    },
+    {
+      "name": "births",
+      "symbol": "",
+      "expr": "bdeer * N * pmax(1 - N / Kd, 0)",
+      "description": "logistic recruitment",
+      "output": false
+    },
+    {
+      "name": "prev",
+      "symbol": "",
+      "expr": "Ii / pmax(N, 1e-9)",
+      "description": "prevalence",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "births",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lambda",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu + harvest",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    },
+    {
+      "id": "f4",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu + alpha + harvest",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 270
+    },
+    {
+      "id": "f5",
+      "from": null,
+      "to": "c3",
+      "kind": "absolute",
+      "rate": "shed * Ii + carc * alpha * Ii",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 226
+    },
+    {
+      "id": "f6",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "decay_e",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 486
+    }
+  ]
+}

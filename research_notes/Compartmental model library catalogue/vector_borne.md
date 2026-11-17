@@ -1,0 +1,921 @@
+# Vector-borne disease compartmental (ODE) models — implementation-ready specifications
+
+Scope: 14 deterministic ODE models for a deSolve code generator. The basic Ross–Macdonald (SIS/SI) model and the dengue SEIR–SEI model are already implemented, so they are not repeated here. Every flow is `FROM > TO : rate`. A rate is per capita (multiplied by FROM) unless marked **[absolute]**. A blank side means outside the system. Vector compartments are marked "not in N" (N = the primary host total).
+
+**How far each model was checked (read this first).** Researcher tool budget limited how many full texts could be read this session. Each model has one of these labels:
+- **VERIFIED-FULL**: equations and parameter table read from the primary full text this session. These are Chitnis 2008 and Bowman 2005.
+- **VERIFIED-PARAMS**: parameter table read from the primary source this session. The equations were rebuilt from the paper's text description. These are Gao 2016 and Yakob & Clements 2013.
+- **STRUCTURE-FROM-RECALL**: model structure follows the cited paper as best recalled. Parameter values are recalled or illustrative and must be checked against the original before being cited as "the paper's values". These are Keeling & Gilligan 2000 (plague), Gaff 2007 (RVF) and Gubbins 2008 (bluetongue).
+- **ILLUSTRATIVE-COMPOSITE**: a standard structure for the disease built from the cited literature. The values are plausible but illustrative. These are malaria superinfection/boosting, dengue two-serotype, Lyme, VL, Chagas, yellow fever and trypanosomiasis.
+
+Reserved-name hygiene: `beta`, `gamma`, `sigma`, `q`, `c`, `C`, `D`, `I`, `T`, `F`, `t`, `pi`, `dt`, `df`, `pt`, `rt` are R names or functions, so they were avoided. Prefixes such as `bet_`, `gam_` and `sig_` are used instead.
+
+---
+
+## Key question 1: For each model, what are the compartments, flows (rate expressions), forces of infection (with explicit host/vector totals) and typical parameter values with units?
+
+### Takeaway
+All 14 models below fit the compartments + flows format with no more than 14 compartments. Two had to be simplified: superinfection uses a closed-form clearance rate, and fixed incubation delays use Erlang stages. Only Chitnis 2008 (malaria) and Bowman 2005 (WNV) are fully checked against the primary text. Gao 2016 (Zika) and Yakob & Clements 2013 (chikungunya) have checked parameter tables. The rest are recalled or illustrative and are labelled as such.
+
+### Cited Findings
+
+#### malaria_chitnis2008_seirs_sei — Malaria SEIRS humans / SEI mosquitoes with saturating biting (Chitnis, Hyman & Cushing 2008)  [VERIFIED-FULL]
+- Disease/area: Plasmodium falciparum malaria, generic high- or low-transmission settings in sub-Saharan Africa | Category: Vector-borne
+- Source: Chitnis N, Hyman JM, Cushing JM (2008). Determining important parameters in the spread of malaria through the sensitivity analysis of a mathematical model. *Bull Math Biol* 70(5):1272–1296. https://doi.org/10.1007/s11538-008-9299-0 — the equations (1a–g) and Table 3 baseline values were read from the author preprint ([PDF](https://archive.math.arizona.edu/cushing/DeterminingImportantParametersInTheSpreadofMalaria%20BMB2008.pdf)). The model comes from Chitnis, Cushing & Hyman 2006, *SIAM J Appl Math* 67:24–45 (https://doi.org/10.1137/050638941), which extends Ngwa & Shu 2000, *Math Comput Model* 32:747–763 (https://doi.org/10.1016/S0895-7177(00)00169-2). This entry also covers the requested Ngwa & Shu / SEIRS–SEI structure.
+- Time unit: days ; simulate 3650–7300 days (equilibrium is slow because of human demography)
+- Compartments:
+  - `Sh` — susceptible humans — 500
+  - `Eh` — exposed (latent) humans — 10
+  - `Ih` — infectious humans — 10
+  - `Rh` — recovered: immune, asymptomatic, slightly infectious — 4
+  - `Sv` — susceptible mosquitoes — 4800 — not in N
+  - `Ev` — exposed mosquitoes — 30 — not in N
+  - `Iv` — infectious mosquitoes — 20 — not in N
+  - (Disease-free equilibria from the high-transmission values: Nh ≈ 524 from μ2h·N² − (ψh−μ1h)N − Λh = 0, and Nv = (ψv−μ1v)/μ2v = 4850. These are my own calculations.)
+- Parameters (Table 3, "high transmission" value; the "low transmission" value is in brackets):
+  - `Lambda_h` = 0.033 [0.041] (humans/day) — immigration of humans
+  - `psi_h` = 1.1e-4 [5.5e-5] (1/day) — per-capita human birth rate
+  - `psi_v` = 0.13 [0.13] (1/day) — per-capita mosquito birth rate
+  - `sig_v` = 0.50 [0.33] (1/day) — bites one mosquito would want per day
+  - `sig_h` = 19 [4.3] (1/day) — maximum bites one human can receive per day
+  - `bet_hv` = 0.022 [0.022] (–) — P(infection) per bite, infectious mosquito → susceptible human
+  - `bet_vh` = 0.48 [0.24] (–) — P(infection) per bite, infectious human → mosquito
+  - `bet_vh_r` = 0.048 [0.024] (–) — P(infection) per bite, recovered human → mosquito
+  - `nu_h` = 0.10 [0.10] (1/day) — human latent progression rate
+  - `nu_v` = 0.091 [0.083] (1/day) — mosquito latent progression rate (EIP ≈ 11–12 days)
+  - `gam_h` = 0.0035 [0.0035] (1/day) — human recovery rate
+  - `delta_h` = 9.0e-5 [1.8e-5] (1/day) — disease-induced death rate
+  - `rho_h` = 5.5e-4 [2.7e-3] (1/day) — loss of immunity
+  - `mu1h` = 1.6e-5 [8.8e-6] (1/day) — density-independent human death and emigration
+  - `mu2h` = 3.0e-7 [2.0e-7] (1/(human·day)) — density-dependent human death
+  - `mu1v` = 0.033 [0.033] (1/day) — density-independent mosquito death
+  - `mu2v` = 2.0e-5 [4.0e-5] (1/(mosquito·day)) — density-dependent mosquito death
+  - Value source for all: Chitnis et al. 2008, Table 3, with the justification in their Appendix A. They report R0 = 4.4 (high) and R0 = 1.1 (low).
+- Derived variables:
+  - `Nh` = Sh + Eh + Ih + Rh
+  - `Nv` = Sv + Ev + Iv
+  - `fh` = mu1h + mu2h*Nh — human per-capita death rate
+  - `fv` = mu1v + mu2v*Nv — mosquito per-capita death rate
+  - `bites` = sig_v*Nv*sig_h*Nh/(sig_v*Nv + sig_h*Nh) — total human–mosquito contacts per day
+  - `lambda_h` = (bites/Nh)*bet_hv*Iv/Nv — force of infection on humans
+  - `lambda_v` = (bites/Nv)*(bet_vh*Ih/Nh + bet_vh_r*Rh/Nh) — force of infection on mosquitoes
+- Flows:
+  - `> Sh : Lambda_h` [absolute]
+  - `> Sh : psi_h*Nh` [absolute]
+  - `Sh > Eh : lambda_h`
+  - `Eh > Ih : nu_h`
+  - `Ih > Rh : gam_h`
+  - `Rh > Sh : rho_h`
+  - `Ih > : delta_h`
+  - `Sh > : fh`
+  - `Eh > : fh`
+  - `Ih > : fh`
+  - `Rh > : fh`
+  - `> Sv : psi_v*Nv` [absolute]
+  - `Sv > Ev : lambda_v`
+  - `Ev > Iv : nu_v`
+  - `Sv > : fv`
+  - `Ev > : fv`
+  - `Iv > : fv`
+- Notes:
+  - This is the exact model (1a–g) of the paper.
+  - The biting term moves smoothly from frequency dependence (humans plentiful) to mass action (mosquitoes plentiful).
+  - All newborn humans and mosquitoes are susceptible.
+  - The paper's backward-bifurcation discussion (Chitnis 2006) applies with these values.
+
+#### malaria_superinfection_boosting — Ross–Macdonald with superinfection clearance and boosted acquired immunity (Macdonald/Dietz superinfection + Aron 1988 boosting)  [ILLUSTRATIVE-COMPOSITE]
+- Disease/area: P. falciparum malaria, stable endemic areas | Category: Vector-borne
+- Sources:
+  - Superinfection clearance rate r_eff = h/(exp(h/r) − 1), the "Macdonald superinfection" form for independent infections of fixed duration 1/r arriving as a Poisson process. See Smith DL, Battle KE, Hay SI, et al. (2012) Ross, Macdonald, and a theory for the dynamics and control of mosquito-transmitted pathogens. *PLoS Pathog* 8(4):e1002588, https://doi.org/10.1371/journal.ppat.1002588 ; Anderson RM, May RM (1991) *Infectious Diseases of Humans*, OUP, ch. 14.
+  - Boosted immunity is from Aron JL (1988) Mathematical modelling of immunity to malaria. *Math Biosci* 90:385–396, https://doi.org/10.1016/0025-5564(88)90076-4. Immunity is lost only if no new exposure occurs within tau_imm, which gives loss rate h/(exp(h*tau_imm) − 1).
+  - Both formulas are as I recall them; I did not re-read the papers this session.
+- Time unit: days ; simulate 7300 days
+- Compartments:
+  - `Sh` — susceptible humans — 990
+  - `Ih` — infected/infectious humans (possibly carrying several broods) — 10
+  - `Rh` — immune humans: not infectious, immunity kept up by re-exposure — 0
+  - `Sv` — susceptible mosquitoes — 4950 — not in N
+  - `Ev` — mosquitoes in extrinsic incubation — 0 — not in N
+  - `Iv` — infectious mosquitoes — 50 — not in N
+- Parameters (illustrative, in the ranges Smith & McKenzie 2004 *Malaria J* 3:13 give, https://doi.org/10.1186/1475-2875-3-13):
+  - `a_bite` = 0.3 (1/day) — human-biting rate per mosquito
+  - `p_mh` = 0.1 (–) — mosquito → human transmission probability per bite
+  - `p_hm` = 0.5 (–) — human → mosquito transmission probability per bite
+  - `r_clear` = 0.005 (1/day) — clearance rate of a single infection (about 200 days)
+  - `tau_imm` = 1825 (days) — immune memory without boosting (illustrative)
+  - `mu_h` = 5.5e-5 (1/day) — human birth = death rate (50-year life)
+  - `mu_v` = 0.1 (1/day) — mosquito death rate
+  - `nu_v` = 0.1 (1/day) — 1/EIP
+  - `m_ratio` = 5 (mosquitoes/human) — sets the initial Nv; mosquito births balance deaths
+- Derived variables:
+  - `Nh` = Sh + Ih + Rh
+  - `Nv` = Sv + Ev + Iv
+  - `h_foi` = pmax(a_bite*p_mh*Iv/Nh, 1e-10) — human force of infection (EIR × b); the floor avoids 0/0
+  - `r_eff` = h_foi/(exp(h_foi/r_clear) - 1) — superinfection-adjusted clearance rate (tends to r_clear as h_foi → 0)
+  - `w_loss` = h_foi/(exp(h_foi*tau_imm) - 1) — immunity loss rate with boosting (tends to 1/tau_imm as h_foi → 0)
+  - `lambda_v` = a_bite*p_hm*Ih/Nh — mosquito force of infection
+- Flows:
+  - `> Sh : mu_h*Nh` [absolute]
+  - `Sh > Ih : h_foi`
+  - `Ih > Rh : r_eff`
+  - `Rh > Sh : w_loss`
+  - `Sh > : mu_h`
+  - `Ih > : mu_h`
+  - `Rh > : mu_h`
+  - `> Sv : mu_v*Nv` [absolute]
+  - `Sv > Ev : lambda_v`
+  - `Ev > Iv : nu_v`
+  - `Sv > : mu_v`
+  - `Ev > : mu_v`
+  - `Iv > : mu_v`
+- Notes:
+  - R0 ≈ m·a²·p_mh·p_hm·(nu_v/(nu_v+mu_v))/(r_clear·mu_v) ≈ 22 with these values. This is my own calculation and is illustrative.
+  - Aron's original model has more structure (for example, recovery back to S as well). This is a faithful simplification of the two key nonlinear mechanisms.
+  - With the 1e-10 floor, exp() overflow at large h gives Inf, and h/Inf = 0, which is correct.
+
+#### dengue_two_serotype — Two-serotype dengue with secondary infection (after Esteva & Vargas 2003)  [ILLUSTRATIVE-COMPOSITE]
+- Disease/area: Dengue (DENV, two co-circulating serotypes), tropical urban settings | Category: Vector-borne
+- Source:
+  - Model: Esteva L, Vargas C (2003). Coexistence of different serotypes of dengue virus. *J Math Biol* 46:31–47. https://doi.org/10.1007/s00285-002-0168-4
+  - Single-serotype precursor: Esteva L, Vargas C (1998). Analysis of a dengue disease transmission model. *Math Biosci* 150:131–151. https://doi.org/10.1016/S0025-5564(98)10003-2
+  - Structure as recalled. Parameters are illustrative, typical of Aedes aegypti modelling.
+- Time unit: days ; simulate 3650 days
+- Compartments:
+  - `Sh` — susceptible to both serotypes — 9989
+  - `I1` — primary infection with serotype 1 — 10
+  - `I2` — primary infection with serotype 2 — 1
+  - `R1` — recovered from serotype 1, susceptible to serotype 2 — 0
+  - `R2` — recovered from serotype 2, susceptible to serotype 1 — 0
+  - `I12` — secondary infection with serotype 2 after serotype 1 — 0
+  - `I21` — secondary infection with serotype 1 after serotype 2 — 0
+  - `Rh` — immune to both — 0
+  - `Sv` — susceptible mosquitoes — 20000 — not in N
+  - `Iv1` — mosquitoes infectious with serotype 1 — 0 — not in N
+  - `Iv2` — mosquitoes infectious with serotype 2 — 0 — not in N
+- Parameters (all illustrative):
+  - `a_bite` = 0.5 (1/day) — biting rate
+  - `p_vh` = 0.5 (–) — mosquito → human per-bite transmission probability
+  - `p_hv` = 0.5 (–) — human → mosquito per-bite transmission probability
+  - `gam_h` = 0.1429 (1/day) — recovery rate (7-day viraemia)
+  - `mu_h` = 4.2e-5 (1/day) — human birth/death rate (65-year life)
+  - `mu_v` = 0.0714 (1/day) — mosquito death rate (14-day life)
+  - `A_v` = 1428 (mosquitoes/day) — mosquito recruitment, = mu_v × 20000
+  - `x_sec` = 1.0 (–) — susceptibility of R1/R2 to the heterologous serotype relative to Sh. Esteva & Vargas's enhancement factor; values >1 model ADE.
+- Derived variables:
+  - `Nh` = Sh + I1 + I2 + R1 + R2 + I12 + I21 + Rh
+  - `Nv` = Sv + Iv1 + Iv2
+  - `lam1` = a_bite*p_vh*Iv1/Nh — human force of infection, serotype 1
+  - `lam2` = a_bite*p_vh*Iv2/Nh — human force of infection, serotype 2
+  - `lamv1` = a_bite*p_hv*(I1 + I21)/Nh — mosquito force of infection, serotype 1
+  - `lamv2` = a_bite*p_hv*(I2 + I12)/Nh — mosquito force of infection, serotype 2
+- Flows:
+  - `> Sh : mu_h*Nh` [absolute]
+  - `Sh > I1 : lam1`
+  - `Sh > I2 : lam2`
+  - `I1 > R1 : gam_h`
+  - `I2 > R2 : gam_h`
+  - `R1 > I12 : x_sec*lam2`
+  - `R2 > I21 : x_sec*lam1`
+  - `I12 > Rh : gam_h`
+  - `I21 > Rh : gam_h`
+  - each of `Sh`, `I1`, `I2`, `R1`, `R2`, `I12`, `I21`, `Rh` `> : mu_h` (8 death flows)
+  - `> Sv : A_v` [absolute]
+  - `Sv > Iv1 : lamv1`
+  - `Sv > Iv2 : lamv2`
+  - `Sv > : mu_v`
+  - `Iv1 > : mu_v`
+  - `Iv2 > : mu_v`
+- Notes:
+  - Mosquitoes are SI (no EIP), as in Esteva & Vargas. Add `Ev1`/`Ev2` stages for realism (13 compartments, still within the limit).
+  - A temporary cross-protection class can be inserted between I1 → R1 (e.g. `X1`, 1/120 days).
+  - Single-serotype R0 = a²·p_vh·p_hv·(Nv/Nh)/(gam_h·mu_v) ≈ 12 (R0 ≈ 3.5 on the per-generation square-root scale). This is my own calculation.
+
+#### zika_gao2016_sexual — Zika with mosquito-borne and sexual transmission (Gao et al. 2016)  [VERIFIED-PARAMS]
+- Disease/area: Zika virus, Latin America 2015–16 (fitted to Brazil, Colombia, El Salvador) | Category: Vector-borne
+- Source: Gao D, Lou Y, He D, Porco TC, Kuang Y, Chowell G, Ruan S (2016). Prevention and control of Zika as a mosquito-borne and sexually transmitted disease: a mathematical modeling analysis. *Sci Rep* 6:28070. https://doi.org/10.1038/srep28070 ; PMC: https://pmc.ncbi.nlm.nih.gov/articles/PMC4911567 . The Table 1 values were read from PMC this session. The equations appear only as an image in PMC; the version below is rebuilt from the paper's text description of the transmission terms.
+- Time unit: days ; simulate 365 days
+- Compartments:
+  - `Sh` — susceptible humans — 99990
+  - `Eh` — exposed humans (mildly infectious to mosquitoes and sexually) — 0
+  - `I1` — symptomatic acute — 10
+  - `I2` — convalescent (sexually infectious only) — 0
+  - `Ah` — asymptomatic — 0
+  - `Rh` — recovered — 0
+  - `Sv` — susceptible mosquitoes — 500000 — not in N
+  - `Ev` — exposed mosquitoes — 0 — not in N
+  - `Iv` — infectious mosquitoes — 0 — not in N
+- Parameters (Gao et al. 2016 Table 1 baseline value, with range):
+  - `a_bite` = 0.5 (bites/mosquito/day) [0.3–1]
+  - `b_vh` = 0.4 (–) [0.1–0.75] — P(mosquito → human) per bite
+  - `p_hv` = 0.5 (–) [0.3–0.75] — P(symptomatic human → mosquito) per bite
+  - `eta` = 0.1 (–) [0–0.3] — relative human → mosquito infectivity of Eh
+  - `bet_sex` = 0.05 (1/day) [0.001–0.10] — sexual transmission rate from symptomatic humans
+  - `kappa` = 0.6 (–) [0–1] — relative sexual infectivity of Eh
+  - `tau_c` = 0.3 (–) [0–1] — relative sexual infectivity of convalescent I2
+  - `theta` = 0.18 (–) [0.10–0.27] — proportion symptomatic
+  - `m_ratio` = 5 (mosquitoes/human) [1–10]
+  - `nu_h` = 0.2 (1/day) — 1/(5 d) intrinsic incubation [2–7 d]
+  - `nu_v` = 0.1 (1/day) — 1/(10 d) extrinsic incubation [8–12 d]
+  - `gam_h1` = 0.2 (1/day) — 1/(5 d) acute phase [3–7 d]
+  - `gam_h2` = 0.05 (1/day) — 1/(20 d) convalescent phase [14–30 d]
+  - `gam_ha` = 0.1429 (1/day) — 1/(7 d) asymptomatic infection [5–10 d]
+  - `mu_v` = 0.0714 (1/day) — 1/(14 d) mosquito life [4–35 d]
+- Derived variables:
+  - `Nh` = Sh + Eh + I1 + I2 + Ah + Rh
+  - `Nv` = Sv + Ev + Iv
+  - `lambda_h` = a_bite*b_vh*Iv/Nh + bet_sex*(kappa*Eh + I1 + tau_c*I2)/Nh — vector-borne plus sexual force of infection
+  - `lambda_v` = a_bite*p_hv*(eta*Eh + I1)/Nh — mosquito force of infection
+- Flows:
+  - `Sh > Eh : lambda_h`
+  - `Eh > I1 : theta*nu_h`
+  - `Eh > Ah : (1 - theta)*nu_h`
+  - `I1 > I2 : gam_h1`
+  - `I2 > Rh : gam_h2`
+  - `Ah > Rh : gam_ha`
+  - `> Sv : mu_v*Nv` [absolute]
+  - `Sv > Ev : lambda_v`
+  - `Ev > Iv : nu_v`
+  - `Sv > : mu_v`
+  - `Ev > : mu_v`
+  - `Iv > : mu_v`
+- Notes:
+  - No human demography over the outbreak.
+  - The paper states that asymptomatics do not infect mosquitoes and are not sexually infectious, and that convalescents transmit only sexually.
+  - The paper reports R0 = 2.055 (95% CI 0.523–6.300), with sexual transmission contributing about 3.04%.
+  - Writing a·b·Iv/Nh is the same as a·b·m·Iv/Nv when Nv = m·Nh.
+  - The paper's exact grouping (for example, whether θ enters the mosquito force of infection) should be checked against the equation image.
+
+#### chikungunya_yakob2013_reunion — Chikungunya SEIIR humans / SEI Aedes albopictus, Réunion 2005–06 (Yakob & Clements 2013)  [VERIFIED-PARAMS]
+- Disease/area: Chikungunya, Réunion Island epidemic 2005–2006 | Category: Vector-borne
+- Source: Yakob L, Clements ACA (2013). A mathematical model of chikungunya dynamics and control: the major epidemic on Réunion Island. *PLoS ONE* 8(3):e57448. https://doi.org/10.1371/journal.pone.0057448 . Parameter values were read from the paper this session; β1 and β2 were fitted by least squares, and the other values come from the literature cited in their table.
+- Time unit: days ; simulate 365 days
+- Compartments:
+  - `Sh` — susceptible humans — 785000
+  - `Eh` — exposed — 0
+  - `Ish` — symptomatic infectious — 10
+  - `Iah` — asymptomatic infectious — 0
+  - `Rh` — recovered — 0
+  - `Xv` — susceptible mosquitoes — 1.0e6 — not in N
+  - `Yv` — exposed mosquitoes — 0 — not in N
+  - `Zv` — infectious mosquitoes — 0 — not in N
+- Parameters:
+  - `beta1` = 0.14 (1/day) — mosquito → human transmission rate (fitted; Macdonald "abm"-type)
+  - `beta2` = 0.40 (1/day) — human → mosquito transmission rate (fitted)
+  - `lat_h` = 0.5 (1/day) — human latent rate (2–6 d; Thiboutot et al. 2010)
+  - `lat_v` = 0.5 (1/day) — mosquito latent rate (2–6 d for Ae. albopictus; Dubrulle et al. 2009)
+  - `omega` = 0.25 (1/day) — symptom-onset rate (pre-patent 4–7 d; Ziegler et al. 2008). Used only for the reporting lag.
+  - `phi_s` = 0.97 (–) — proportion symptomatic (0.83–0.97)
+  - `gam_h` = 0.25 (1/day) — recovery rate (1–7 d; Chhabra et al. 2008)
+  - `mu_v` = 0.05 (1/day) — mosquito mortality (20–30 d life; Delatte et al. 2009). Mosquito birth = death.
+  - Note: the paper does not state units; they are evidently per day.
+- Derived variables:
+  - `Nh` = Sh + Eh + Ish + Iah + Rh
+  - `Nv` = Xv + Yv + Zv
+  - `lambda_h` = beta1*Zv/Nv — human force of infection; beta1 already contains a·b·m
+  - `lambda_v` = beta2*(Ish + Iah)/Nh — mosquito force of infection; independent of m
+  - `inc_sympt` = phi_s*lat_h*Eh — symptomatic incidence, for comparison with case data; the paper adds an omega lag
+- Flows:
+  - `Sh > Eh : lambda_h`
+  - `Eh > Ish : phi_s*lat_h`
+  - `Eh > Iah : (1 - phi_s)*lat_h`
+  - `Ish > Rh : gam_h`
+  - `Iah > Rh : gam_h`
+  - `> Xv : mu_v*Nv` [absolute]
+  - `Xv > Yv : lambda_v`
+  - `Yv > Zv : lat_v`
+  - `Xv > : mu_v`
+  - `Yv > : mu_v`
+  - `Zv > : mu_v`
+- Notes:
+  - The equations are rebuilt from the text, because they are images in the source.
+  - The paper says β1 depends on the mosquito:human ratio while β2 does not, which is why β1 multiplies Zv/Nv.
+  - It is not confirmed whether asymptomatics infect mosquitoes; this spec assumes they do, with equal infectivity.
+  - R0 ≈ beta1·beta2·lat_v/((lat_v+mu_v)·gam_h·mu_v) ≈ 4.1. This is my own calculation.
+
+#### wnv_bowman2005 — West Nile virus: mosquitoes–birds–humans (Bowman et al. 2005)  [VERIFIED-FULL]
+- Disease/area: West Nile virus, North America (single season) | Category: Vector-borne
+- Source: Bowman C, Gumel AB, van den Driessche P, Wu J, Zhu H (2005). A mathematical model for assessing control strategies against West Nile virus. *Bull Math Biol* 67:1107–1133. https://doi.org/10.1016/j.bulm.2005.01.002 ; full text in the [YorkSpace repository](https://yorkspace.library.yorku.ca/bitstream/handle/10315/908/2005_bmb_wnv.pdf;sequence=1). The equations (1)–(9) and Table 1 were read this session. b1, β1 and β2 come from Wonham MJ, de-Camino-Beck T, Lewis MA (2004), An epidemiological model for West Nile virus: invasion analysis and control applications, *Proc R Soc B* 271:501–507, https://doi.org/10.1098/rspb.2003.2608 .
+- Time unit: days ; simulate 200 days
+- Compartments:
+  - `Mu` — uninfected female mosquitoes — 400000 — not in N
+  - `Mi` — infected (infectious) mosquitoes — 0 — not in N
+  - `Bu` — uninfected birds — 999990 — not in N
+  - `Bi` — infected birds — 10 — not in N
+  - `Sh` — susceptible humans — 766500
+  - `Eh` — infected, asymptomatic (incubating) — 0
+  - `Ih` — symptomatic — 0
+  - `Hh` — hospitalised — 0
+  - `Rh` — recovered (lifelong immunity) — 0
+- Parameters (Table 1):
+  - `Pi_M` = 20000 (mosquitoes/day) — mosquito recruitment. "Variable" in the paper; this value is illustrative.
+  - `mu_M` = 0.05 (1/day) — mosquito death. "Variable" in the paper; illustrative 20-day life.
+  - `Pi_B` = 1000 (birds/day) — bird recruitment
+  - `mu_B` = 0.001 (1/day) — 1/(1000 d) bird life
+  - `Pi_H` = 30 (humans/day) — human recruitment
+  - `mu_H` = 3.914e-5 (1/day) — 1/(70×365 d)
+  - `b1` = 0.09 (1/day) — biting rate on birds
+  - `b2_base` = 0.09 (1/day) — biting rate on humans before protection
+  - `comp_c` = 0 (–) — fraction complying with personal protection (0–1)
+  - `q_eff` = 0 (–) — efficacy of personal protection (0–1)
+  - `bet1` = 0.16 (–) — bird → mosquito transmission probability
+  - `bet2` = 0.88 (–) — mosquito → bird transmission probability
+  - `bet3` = 0.88 (–) — mosquito → human transmission probability
+  - `d_B` = 5e-5 (1/day) — WNV-induced bird death
+  - `d_H` = 5e-7 (1/day) — WNV-induced human death
+  - `alpha_h` = 0.0714 (1/day) — 1/(14 d) incubation in humans
+  - `delta_h` = 1 (1/day) — hospitalisation rate
+  - `tau_h` = 0.0714 (1/day) — 1/(14 d) recovery
+- Derived variables:
+  - `NM` = Mu + Mi
+  - `NB` = Bu + Bi
+  - `NH` = Sh + Eh + Ih + Hh + Rh
+  - `b2` = b2_base*(1 - comp_c*q_eff) — biting rate on humans after protection
+  - `lam_M` = b1*bet1*Bi/NB — mosquito force of infection
+  - `lam_B` = b1*bet2*Mi/NB — bird force of infection
+  - `lam_H` = b2*bet3*Mi/NH — human force of infection
+- Flows:
+  - `> Mu : Pi_M` [absolute]
+  - `Mu > Mi : lam_M`
+  - `Mu > : mu_M`
+  - `Mi > : mu_M`
+  - `> Bu : Pi_B` [absolute]
+  - `Bu > Bi : lam_B`
+  - `Bu > : mu_B`
+  - `Bi > : mu_B`
+  - `Bi > : d_B`
+  - `> Sh : Pi_H` [absolute]
+  - `Sh > Eh : lam_H`
+  - `Eh > Ih : alpha_h`
+  - `Ih > Hh : delta_h`
+  - `Hh > Rh : tau_h`
+  - `Hh > : d_H`
+  - each of `Sh`, `Eh`, `Ih`, `Hh`, `Rh` `> : mu_H`
+- Notes:
+  - Birds have no recovered class in Bowman et al.: infected birds stay infected until death. Wonham 2004 includes bird recovery and larval mosquitoes.
+  - No vertical transmission.
+  - Humans are dead-end hosts.
+  - The threshold depends only on mosquito–bird parameters. From the paper's expression, R0 = sqrt(b1²·bet1·bet2·mu_B·Pi_M/(mu_M²·(mu_B+d_B)·Pi_B)) ≈ 2.9 with the illustrative Pi_M and mu_M (my own calculation).
+  - Larviciding is modelled by lowering Pi_M, adulticiding by raising mu_M, and personal protection by comp_c and q_eff.
+
+#### lyme_tick_mouse — Lyme borreliosis: stage-structured Ixodes ticks with a mouse reservoir and deer as tick-only hosts  [ILLUSTRATIVE-COMPOSITE]
+- Disease/area: Lyme disease (Borrelia burgdorferi s.l.), temperate woodland in NE USA or Europe | Category: Vector-borne
+- Source:
+  - Structural basis: Rosà R, Pugliese A, Norman R, Hudson PJ (2003). Thresholds for disease persistence in models for tick-borne infections including non-viraemic transmission, extended feeding and tick aggregation. *J Theor Biol* 224:359–376, https://doi.org/10.1016/S0022-5193(03)00173-5 ; Rosà R, Pugliese A (2007). Effects of tick population dynamics and host densities on the persistence of tick-borne infections. *Math Biosci* 208:216–240, https://doi.org/10.1016/j.mbs.2006.10.002 .
+  - Structure as recalled and simplified. All values are illustrative and were tuned to give a stable tick population.
+- Time unit: days ; simulate 3650–7300 days
+- Compartments:
+  - `L` — questing larvae (born uninfected; no transovarial transmission) — 10000 — not in N
+  - `Ns` — uninfected questing nymphs — 1000 — not in N
+  - `Ni` — infected questing nymphs — 0 — not in N
+  - `As` — uninfected questing adults — 100 — not in N
+  - `Ai` — infected adults — 0 — not in N
+  - `Ms` — susceptible mice (reservoir) — 95
+  - `Mi` — infected mice (lifelong) — 5
+- Parameters (all illustrative):
+  - `a_L` = 1e-4 (1/(mouse·day)) — larval host-finding rate per mouse
+  - `a_N` = 1e-4 (1/(mouse·day)) — nymphal host-finding rate per mouse
+  - `a_A` = 0.005 (1/(deer·day)) — adult host-finding rate per deer
+  - `Deer` = 5 (deer) — deer density, constant; not competent for Borrelia
+  - `s_L` = 0.3 (–) — survival from fed larva to nymph
+  - `s_N` = 0.3 (–) — survival from fed nymph to adult
+  - `eps_egg` = 1000 (larvae/fed adult) — effective larvae per fed adult
+  - `mu_L` = 0.01 (1/day) — larval death
+  - `mu_L2` = 4.8e-5 (1/(larva·day)) — density-dependent larval death
+  - `mu_N` = 0.005 (1/day) — nymphal death
+  - `mu_A` = 0.005 (1/day) — adult death
+  - `p_NM` = 0.8 (–) — infected nymph → mouse transmission probability
+  - `p_ML` = 0.5 (–) — infected mouse → feeding larva transmission probability
+  - `mu_m` = 0.005 (1/day) — mouse death
+  - `K_m` = 100 (mice) — mouse population; recruitment = mu_m·K_m
+- Derived variables:
+  - `Hm` = Ms + Mi — mice
+  - `Nticks` = L + Ns + Ni + As + Ai
+  - `prev_mouse` = Mi/Hm — mouse infection prevalence
+  - `nip` = Ni/(Ns + Ni) — nymphal infection prevalence (the human-risk index)
+- Flows:
+  - `> L : eps_egg*a_A*Deer*(As + Ai)` [absolute]
+  - `L > Ns : a_L*s_L*(Hm - p_ML*Mi)`
+  - `L > Ni : a_L*s_L*p_ML*Mi`
+  - `L > : a_L*Hm*(1 - s_L) + mu_L + mu_L2*L`
+  - `Ns > As : a_N*s_N*(Hm - p_ML*Mi)`
+  - `Ns > Ai : a_N*s_N*p_ML*Mi`
+  - `Ns > : a_N*Hm*(1 - s_N) + mu_N`
+  - `Ni > Ai : a_N*s_N*Hm`
+  - `Ni > : a_N*Hm*(1 - s_N) + mu_N`
+  - `As > : a_A*Deer + mu_A` (fed adults leave and lay eggs)
+  - `Ai > : a_A*Deer + mu_A`
+  - `> Ms : mu_m*K_m` [absolute]
+  - `Ms > Mi : a_N*p_NM*Ni` (per-mouse rate of infective nymph bites = a_N·Ni)
+  - `Ms > : mu_m`
+  - `Mi > : mu_m`
+- Notes:
+  - No co-feeding or non-viraemic transmission, which Rosà et al. 2003 treat explicitly. No seasonality.
+  - Deer amplify ticks but not Borrelia (the dilution effect is possible via Deer).
+  - Questing stages are lumped with fed and moulting stages, so moulting delay is folded into mortality.
+  - Seasonality could be added with sin() multipliers on a_L, a_N and a_A.
+  - Treat the whole parameterisation as a demonstration, not a calibrated model.
+
+#### vl_leishmaniasis_isc — Visceral leishmaniasis (anthroponotic, Indian subcontinent) with asymptomatic, VL, treatment and PKDL; sandfly SEI (simplified after Stauch et al. 2011)  [ILLUSTRATIVE-COMPOSITE]
+- Disease/area: Visceral leishmaniasis (L. donovani, Phlebotomus argentipes), Bihar, India / Nepal | Category: Vector-borne
+- Source:
+  - Stauch A, Sarkar RR, Picado A, Ostyn B, Sundar S, Rijal S, Boelaert M, Dujardin J-C, Duerr H-P (2011). Visceral leishmaniasis in the Indian subcontinent: modelling epidemiology and control. *PLoS NTD* 5(11):e1405. https://doi.org/10.1371/journal.pntd.0001405 (abstract checked; full text not readable this session).
+  - Follow-up: Stauch et al. 2014, *PLoS NTD* 8(4):e2810, on vector control.
+  - Stauch et al. find transmission is mainly maintained by asymptomatic infections, and that vector control is far more effective than case treatment.
+  - Rock KS et al. 2016 / Le Rutte et al. 2016 (Parasites & Vectors / PLoS NTD) are refinements, not reproduced here.
+  - The structure below is a reduced version and all values are illustrative.
+- Time unit: days ; simulate 7300 days
+- Compartments:
+  - `Sh` — susceptible humans — 9800
+  - `Ah` — asymptomatic infected (weakly infectious) — 150
+  - `Kh` — clinical VL (kala-azar, infectious) — 10
+  - `Tx` — under treatment — 0
+  - `Ph` — post-kala-azar dermal leishmaniasis (infectious) — 0
+  - `Rh` — recovered/immune — 40
+  - `Sf` — susceptible sandflies — 49000 — not in N
+  - `Ef` — sandflies in extrinsic incubation — 500 — not in N
+  - `If` — infectious sandflies — 500 — not in N
+- Parameters (illustrative):
+  - `a_sf` = 0.25 (1/day) — sandfly biting rate (bite every 4 days)
+  - `p_fh` = 0.1 (–) — sandfly → human per-bite infection probability
+  - `k_A` = 0.025 (–) — per-bite infectivity of asymptomatic humans to sandflies
+  - `k_K` = 0.5 (–) — per-bite infectivity of VL patients
+  - `k_Tx` = 0.25 (–) — per-bite infectivity of treated patients
+  - `k_P` = 0.3 (–) — per-bite infectivity of PKDL patients
+  - `w_A` = 0.00667 (1/day) — exit from asymptomatic (150 d)
+  - `p_K` = 0.1 (–) — fraction of infections progressing to VL
+  - `r_tx` = 0.0167 (1/day) — VL onset → treatment (60 d)
+  - `d_K` = 0.00167 (1/day) — VL death before treatment
+  - `w_Tx` = 0.0357 (1/day) — treatment duration (28 d)
+  - `f_P` = 0.025 (–) — fraction developing PKDL after treatment
+  - `w_P` = 0.00091 (1/day) — PKDL duration (3 yr)
+  - `rho_h` = 0.000548 (1/day) — waning immunity (5 yr)
+  - `mu_h` = 4.57e-5 (1/day) — human birth/death (60-yr life)
+  - `mu_f` = 0.0714 (1/day) — sandfly death (14-d life)
+  - `nu_f` = 0.2 (1/day) — 1/EIP (5 d)
+- Derived variables:
+  - `Nh` = Sh + Ah + Kh + Tx + Ph + Rh
+  - `Nf` = Sf + Ef + If
+  - `lambda_h` = a_sf*p_fh*If/Nh — human force of infection
+  - `lambda_f` = a_sf*(k_A*Ah + k_K*Kh + k_Tx*Tx + k_P*Ph)/Nh — sandfly force of infection
+- Flows:
+  - `> Sh : mu_h*Nh` [absolute]
+  - `Sh > Ah : lambda_h`
+  - `Ah > Kh : p_K*w_A`
+  - `Ah > Rh : (1 - p_K)*w_A`
+  - `Kh > Tx : r_tx`
+  - `Kh > : d_K`
+  - `Tx > Ph : f_P*w_Tx`
+  - `Tx > Rh : (1 - f_P)*w_Tx`
+  - `Ph > Rh : w_P`
+  - `Rh > Sh : rho_h`
+  - each of `Sh`, `Ah`, `Kh`, `Tx`, `Ph`, `Rh` `> : mu_h`
+  - `> Sf : mu_f*Nf` [absolute]
+  - `Sf > Ef : lambda_f`
+  - `Ef > If : nu_f`
+  - `Sf > : mu_f`
+  - `Ef > : mu_f`
+  - `If > : mu_f`
+- Notes:
+  - R0 ≈ 2.3 by my calculation (illustrative).
+  - Stauch's model splits infection into several serological/PCR stages. These are collapsed into `Ah` here.
+  - Vector control is simulated by raising mu_f or lowering the sandfly recruitment.
+  - Asymptomatics dominate transmission here through sheer numbers, which matches Stauch's qualitative finding.
+
+#### chagas_household_cohen2001 — Domestic Chagas transmission: Triatoma infestans with humans, dogs and non-competent chickens (after Cohen & Gürtler 2001)  [ILLUSTRATIVE-COMPOSITE]
+- Disease/area: Chagas disease (Trypanosoma cruzi), rural households, Santiago del Estero, Argentina | Category: Vector-borne
+- Source:
+  - Cohen JE, Gürtler RE (2001). Modeling household transmission of American trypanosomiasis. *Science* 293(5530):694–698. https://doi.org/10.1126/science.1060638 . The key features are bug feeding partitioned by host abundance, dogs as main reservoirs, and chickens as non-competent blood sources. Structure as recalled.
+  - Per-contact bug → human probability ≈ 5.8×10⁻⁴: Nouvellet P, Dumonteil E, Gourbière S (2013) The improbable transmission of Trypanosoma cruzi to human: the missing link in the dynamics and control of Chagas disease. *PLoS NTD* 7(11):e2505, https://doi.org/10.1371/journal.pntd.0002505 . Recalled value; verify.
+  - Other values are illustrative.
+- Time unit: days ; simulate 7300 days
+- Compartments:
+  - `Hs` — uninfected humans — 5
+  - `Hi` — infected humans (chronic, lifelong) — 0
+  - `Gs` — uninfected dogs — 1.9
+  - `Gi` — infected dogs — 0.1
+  - `Vs` — uninfected triatomine bugs — 990 — not in N
+  - `Vi` — infected bugs (lifelong) — 10 — not in N
+- Parameters:
+  - `a_b` = 0.1429 (1/day) — blood meals per bug per day (weekly)
+  - `w_hum` = 1 (–) — feeding weight on humans
+  - `w_dog` = 2.5 (–) — feeding weight on dogs (dogs preferred)
+  - `w_chk` = 1 (–) — feeding weight on chickens
+  - `N_chk` = 5 (chickens) — constant
+  - `p_vh` = 5.8e-4 (–) — bug → human per-contact probability (Nouvellet 2013)
+  - `p_vg` = 0.001 (–) — bug → dog per-contact probability
+  - `p_hv` = 0.05 (–) — infected human → bug per-meal probability
+  - `p_gv` = 0.49 (–) — infected dog → bug per-meal probability
+  - `mu_hum` = 4.57e-5 (1/day) — human birth/death
+  - `mu_dog` = 9.13e-4 (1/day) — dog birth/death (3-yr life)
+  - `r_bug` = 0.02 (1/day) — bug per-capita recruitment
+  - `mu_bug` = 0.005 (1/day) — bug death
+  - `K_bug` = 1000 (bugs/house)
+- Derived variables:
+  - `Nh` = Hs + Hi
+  - `Ng` = Gs + Gi
+  - `Nv` = Vs + Vi
+  - `wsum` = w_hum*Nh + w_dog*Ng + w_chk*N_chk
+  - `f_hum` = w_hum*Nh/wsum — share of bites on humans
+  - `f_dog` = w_dog*Ng/wsum — share of bites on dogs
+  - `lam_hum` = a_b*f_hum*p_vh*Vi/Nh — human force of infection
+  - `lam_dog` = a_b*f_dog*p_vg*Vi/Ng — dog force of infection
+  - `lam_bug` = a_b*(f_hum*p_hv*Hi/Nh + f_dog*p_gv*Gi/Ng) — bug force of infection
+- Flows:
+  - `> Hs : mu_hum*Nh` [absolute]
+  - `Hs > Hi : lam_hum`
+  - `Hs > : mu_hum`
+  - `Hi > : mu_hum`
+  - `> Gs : mu_dog*Ng` [absolute]
+  - `Gs > Gi : lam_dog`
+  - `Gs > : mu_dog`
+  - `Gi > : mu_dog`
+  - `> Vs : r_bug*Nv` [absolute]
+  - `Vs > Vi : lam_bug`
+  - `Vs > : mu_bug + (r_bug - mu_bug)*Nv/K_bug`
+  - `Vi > : mu_bug + (r_bug - mu_bug)*Nv/K_bug`
+- Notes:
+  - Single household, with fractional host numbers allowed (deterministic).
+  - No congenital, oral or transfusion routes, and no recovery.
+  - Chickens dilute bites and raise bug carrying capacity in reality (bug K could be made a function of hosts).
+  - Insecticide spraying can be modelled with an ifelse() pulse on mu_bug.
+
+#### yellow_fever_urban_vacc — Urban yellow fever: SEIR humans with severe (toxic) phase and reactive vaccination; Aedes aegypti SEI  [ILLUSTRATIVE-COMPOSITE]
+- Disease/area: Yellow fever (urban cycle), e.g. Angola/DRC 2016-type outbreak | Category: Vector-borne
+- Source: a standard structure. Natural-history values are recalled, not re-checked this session:
+  - Intrinsic incubation median ≈ 4.3 d and EIP ≈ 10 d at 25 °C: Johansson MA, Arana-Vizcarrondo N, Biggerstaff BJ, Staples JE (2010) Incubation periods of yellow fever virus. *Am J Trop Med Hyg* 83(1):183–188, https://doi.org/10.4269/ajtmh.2010.09-0782
+  - ≈12% of infections severe, ≈47% CFR among severe: Johansson MA, Vasconcelos PFC, Staples JE (2014) The whole iceberg: estimating the incidence of yellow fever virus infection from the number of severe cases. *Trans R Soc Trop Med Hyg* 108(8):482–487, https://doi.org/10.1093/trstmh/tru092
+  - Vaccine seroconversion ≥99%: WHO position paper on yellow fever vaccines, *Wkly Epidemiol Rec* 2013;88:269–283
+  - Vector values are illustrative.
+- Time unit: days ; simulate 365 days
+- Compartments:
+  - `Sh` — susceptible — 79990
+  - `Eh` — incubating — 0
+  - `Ih` — viraemic (infectious) — 10
+  - `Sev` — severe/toxic phase (assumed non-infectious) — 0
+  - `Rh` — recovered — 0
+  - `Vh` — vaccinated/immune — 20000
+  - `Sv` — susceptible mosquitoes — 200000 — not in N
+  - `Ev` — exposed mosquitoes — 0 — not in N
+  - `Iv` — infectious mosquitoes — 0 — not in N
+- Parameters:
+  - `a_bite` = 0.5 (1/day)
+  - `p_vh` = 0.5 (–) — mosquito → human
+  - `p_hv` = 0.5 (–) — human → mosquito
+  - `nu_h` = 0.2326 (1/day) — 1/4.3 d intrinsic incubation (Johansson 2010)
+  - `gam_h` = 0.2222 (1/day) — 1/4.5 d viraemia
+  - `p_sev` = 0.12 (–) — fraction entering the severe phase (Johansson 2014)
+  - `cfr_sev` = 0.47 (–) — case fatality among severe (Johansson 2014)
+  - `w_sev` = 0.1429 (1/day) — 1/7 d duration of the severe phase
+  - `nu_v` = 0.1 (1/day) — 1/10 d EIP (Johansson 2010)
+  - `mu_v` = 0.0714 (1/day)
+  - `v_rate` = 0.01 (1/day) — campaign vaccination rate
+  - `v_eff` = 0.99 (–) — vaccine efficacy (WHO)
+  - `t_vac` = 60 (day) — campaign start
+- Derived variables:
+  - `Nh` = Sh + Eh + Ih + Sev + Rh + Vh
+  - `Nv` = Sv + Ev + Iv
+  - `lambda_h` = a_bite*p_vh*Iv/Nh — human force of infection
+  - `lambda_v` = a_bite*p_hv*Ih/Nh — mosquito force of infection
+  - `vacc` = ifelse(t >= t_vac, v_rate*v_eff, 0) — effective vaccination rate
+- Flows:
+  - `Sh > Eh : lambda_h`
+  - `Sh > Vh : vacc`
+  - `Eh > Ih : nu_h`
+  - `Ih > Sev : p_sev*gam_h`
+  - `Ih > Rh : (1 - p_sev)*gam_h`
+  - `Sev > : cfr_sev*w_sev` (YF deaths)
+  - `Sev > Rh : (1 - cfr_sev)*w_sev`
+  - `> Sv : mu_v*Nv` [absolute]
+  - `Sv > Ev : lambda_v`
+  - `Ev > Iv : nu_v`
+  - `Sv > : mu_v`
+  - `Ev > : mu_v`
+  - `Iv > : mu_v`
+- Notes:
+  - Outbreak timescale, so no human demography.
+  - Without vaccination, R0 ≈ a²·m·p_vh·p_hv·nu_v/(nu_v+mu_v)/(gam_h·mu_v) ≈ 4.6 by my calculation (illustrative).
+  - Vaccinating Eh/Ih/Rh is ignored, so vaccine doses are not counted.
+  - The sylvatic spillover (non-human primates, Haemagogus) cycle is omitted. It could be added as an absolute force term.
+
+#### rvf_gaff2007 — Rift Valley fever: Aedes (with transovarial transmission and eggs), Culex and livestock (Gaff, Hartley & Leahy 2007)  [STRUCTURE-FROM-RECALL]
+- Disease/area: Rift Valley fever, East Africa (Kenya-type floodplain) | Category: Vector-borne
+- Source: Gaff HD, Hartley DM, Leahy NP (2007). An epidemiological model of Rift Valley fever. *Electron J Differ Equ* 2007(115):1–12. Open access: https://ejde.math.txstate.edu/Volumes/2007/115/abstr.html . The abstract confirms two mosquito populations (Aedes, which can pass the virus to offspring, and Culex, which cannot) and one livestock population. The full-text fetch failed this session, so the equation forms and every value below are reconstructed or illustrative.
+- Time unit: days ; simulate 730 days
+- Compartments:
+  - `Pa` — uninfected Aedes eggs — 1e6 — not in N
+  - `Qa` — infected Aedes eggs (transovarial) — 0 — not in N
+  - `Sa` — susceptible Aedes — 1e5 — not in N
+  - `Ea` — exposed Aedes — 0 — not in N
+  - `Ia` — infectious Aedes — 10 — not in N
+  - `Pc` — Culex eggs — 1e5 — not in N
+  - `Sc` — susceptible Culex — 1e5 — not in N
+  - `Ec` — exposed Culex — 0 — not in N
+  - `Ic` — infectious Culex — 0 — not in N
+  - `Sl` — susceptible livestock — 1000
+  - `El` — exposed livestock — 0
+  - `Il` — infectious livestock — 0
+  - `Rl` — recovered livestock — 0
+- Parameters (illustrative):
+  - `b_a` = 0.2 (eggs/female/day)
+  - `q_tov` = 0.05 (–) — transovarial fraction of eggs from infectious Aedes
+  - `th_a` = 0.05 (1/day) — egg hatching rate (multiplied by the flood indicator)
+  - `mu_ea` = 0.001 (1/day) — Aedes egg mortality; desiccation-resistant eggs
+  - `K_a` = 2e5 (mosquitoes) — Aedes adult capacity
+  - `mu_a` = 0.05 (1/day) — Aedes adult mortality
+  - `eps_a` = 0.143 (1/day) — 1/7 d EIP in Aedes
+  - `a_a` = 0.3 (1/day) — Aedes biting rate
+  - `b_c` = 0.2 (eggs/female/day)
+  - `th_c` = 0.1 (1/day) — Culex hatching rate
+  - `mu_ec` = 0.1 (1/day) — Culex egg mortality
+  - `K_c` = 2e5 (mosquitoes) — Culex adult capacity
+  - `mu_c` = 0.05 (1/day) — Culex adult mortality
+  - `eps_c` = 0.143 (1/day) — 1/7 d EIP in Culex
+  - `a_c` = 0.3 (1/day) — Culex biting rate
+  - `p_al` = 0.3 (–) — Aedes → livestock per-bite probability
+  - `p_cl` = 0.3 (–) — Culex → livestock per-bite probability
+  - `p_la` = 0.3 (–) — livestock → Aedes per-bite probability
+  - `p_lc` = 0.3 (–) — livestock → Culex per-bite probability
+  - `eps_l` = 0.25 (1/day) — 1/4 d incubation in livestock
+  - `gam_l` = 0.25 (1/day) — 1/4 d infectious period
+  - `d_l` = 0.025 (1/day) — RVF-induced livestock death
+  - `mu_l` = 5.5e-4 (1/day) — livestock death (5-yr life); births = mu_l·Nl
+  - `flood_len` = 60 (days) — wet-season window each year
+- Derived variables:
+  - `Nas` = Sa + Ea + Ia — adult Aedes
+  - `Ncs` = Sc + Ec + Ic — adult Culex
+  - `Nl` = Sl + El + Il + Rl — livestock
+  - `flood` = ifelse(t - 365*floor(t/365) < flood_len, 1, 0) — annual flooding window
+  - `lam_l` = (a_a*p_al*Ia + a_c*p_cl*Ic)/Nl — livestock force of infection
+  - `lam_a` = a_a*p_la*Il/Nl — Aedes force of infection
+  - `lam_c` = a_c*p_lc*Il/Nl — Culex force of infection
+- Flows:
+  - `> Pa : b_a*(Sa + Ea) + b_a*(1 - q_tov)*Ia` [absolute]
+  - `> Qa : b_a*q_tov*Ia` [absolute]
+  - `Pa > Sa : th_a*flood*pmax(0, 1 - Nas/K_a)`
+  - `Qa > Ia : th_a*flood*pmax(0, 1 - Nas/K_a)`
+  - `Pa > : mu_ea`
+  - `Qa > : mu_ea`
+  - `Sa > Ea : lam_a`
+  - `Ea > Ia : eps_a`
+  - `Sa > : mu_a`
+  - `Ea > : mu_a`
+  - `Ia > : mu_a`
+  - `> Pc : b_c*Ncs` [absolute]
+  - `Pc > Sc : th_c*flood*pmax(0, 1 - Ncs/K_c)`
+  - `Pc > : mu_ec`
+  - `Sc > Ec : lam_c`
+  - `Ec > Ic : eps_c`
+  - `Sc > : mu_c`
+  - `Ec > : mu_c`
+  - `Ic > : mu_c`
+  - `> Sl : mu_l*Nl` [absolute]
+  - `Sl > El : lam_l`
+  - `El > Il : eps_l`
+  - `Il > Rl : gam_l`
+  - `Il > : d_l`
+  - each of `Sl`, `El`, `Il`, `Rl` `> : mu_l`
+- Notes:
+  - Gaff et al. 2007 has constant (non-seasonal) parameters. The `flood` forcing here is an optional extension that mimics flood-triggered hatching; set `flood_len = 365` to switch it off.
+  - Humans are omitted (dead-end hosts in Gaff 2007). The 13 compartments are within the 14 limit.
+  - Before any quantitative use, replace every value with Gaff et al.'s table, which is open access at the EJDE URL.
+
+#### plague_keeling_gilligan2000 — Bubonic plague: rats (SIR with inherited resistance), flea index, free infectious fleas, human SIR (Keeling & Gilligan 2000)  [STRUCTURE-FROM-RECALL]
+- Disease/area: Bubonic plague (Yersinia pestis), Rattus rattus – Xenopsylla cheopis – humans; historical Europe | Category: Vector-borne
+- Source: Keeling MJ, Gilligan CA (2000). Metapopulation dynamics of bubonic plague. *Nature* 407:903–906. https://doi.org/10.1038/35038073 ; and Keeling MJ, Gilligan CA (2000) Bubonic plague: a metapopulation model of a zoonosis. *Proc R Soc B* 267:2219–2230, https://doi.org/10.1098/rspb.2000.1272 (PMC1690796). The Nature paper confirms that the rat–flea system is five ODEs and that human cases depend mainly on R0 in rats. The equations and rat/flea values below are as recalled from that paper (also reproduced in Keeling & Rohani 2008, *Modeling Infectious Diseases in Humans and Animals*, Princeton UP). Verify before citing. The human block is an illustrative add-on.
+- Time unit: years ; simulate 50 years (the deterministic version shows damped epizootic cycles; persistence in the paper relies on stochastic metapopulation structure)
+- Compartments:
+  - `Srat` — susceptible rats — 2499 — not in N
+  - `Irat` — infected rats — 1 — not in N
+  - `Rrat` — resistant rats — 0 — not in N
+  - `Nf` — mean fleas per rat (flea index; not a head count) — 6.57 — not in N
+  - `Ff` — free infectious fleas (searching) — 0 — not in N
+  - `Shum` — susceptible humans — 10000
+  - `Ihum` — infected humans — 0
+  - `Rhum` — recovered humans — 0
+- Parameters (rat and flea values recalled from K&G 2000; per year):
+  - `r_R` = 5 (1/yr) — rat birth rate
+  - `p_inh` = 0.975 (–) — probability offspring of resistant rats inherit resistance
+  - `K_R` = 2500 (rats) — rat carrying capacity
+  - `d_R` = 0.2 (1/yr) — rat natural death
+  - `bet_R` = 4.7 (1/yr) — rat infection rate per free flea
+  - `a_s` = 0.004 (1/rat) — flea searching efficiency
+  - `m_R` = 20 (1/yr) — rat infectious-period rate (≈18 d)
+  - `g_R` = 0.02 (–) — probability an infected rat survives and becomes resistant
+  - `r_F` = 20 (1/yr) — flea growth rate on rats
+  - `K_F` = 6.57 (fleas/rat) — flea carrying capacity per rat
+  - `d_F` = 10 (1/yr) — death rate of free fleas
+  - Illustrative human values: `bet_H` = 0.01 (1/yr per free flea landing) ; `m_H` = 26 (1/yr; 2-week illness) ; `g_H` = 0.4 (–; survival without treatment) ; `mu_hum` = 0.02 (1/yr)
+- Derived variables:
+  - `Nrat` = Srat + Irat + Rrat
+  - `Nhum` = Shum + Ihum + Rhum
+  - `lam_rat` = bet_R*Ff*(1 - exp(-a_s*Nrat))/Nrat — rat force of infection: fleas that find rats infect them
+  - `fleas_to_humans` = Ff*exp(-a_s*Nrat) — free fleas that fail to find a rat and land on humans (K&G's human force of infection)
+  - `lam_hum` = bet_H*fleas_to_humans/Nhum — human force of infection
+- Flows:
+  - `> Srat : r_R*Srat` [absolute]
+  - `> Srat : r_R*(1 - p_inh)*Rrat` [absolute]
+  - `> Rrat : r_R*p_inh*Rrat` [absolute]
+  - `Srat > : d_R + r_R*Nrat/K_R`
+  - `Rrat > : d_R + r_R*Nrat/K_R`
+  - `Srat > Irat : lam_rat`
+  - `Irat > Rrat : m_R*g_R`
+  - `Irat > : m_R*(1 - g_R)` (plague death)
+  - `Irat > : d_R`
+  - `> Nf : r_F*Nf` [absolute]
+  - `Nf > : r_F*Nf/K_F` (logistic flea index)
+  - `> Ff : (d_R + m_R*(1 - g_R))*Irat*Nf` [absolute] (fleas leave dying infected rats)
+  - `Ff > : d_F`
+  - `> Shum : mu_hum*Nhum` [absolute]
+  - `Shum > Ihum : lam_hum`
+  - `Ihum > Rhum : m_H*g_H`
+  - `Ihum > : m_H*(1 - g_H)`
+  - each of `Shum`, `Ihum`, `Rhum` `> : mu_hum`
+- Notes:
+  - In K&G, rats with recovered immunity are written with the term r_R·R_R·(p − T_R/K_R). This is split here into non-negative flows, which is algebraically identical.
+  - `Nf` is a per-rat average, so it is not a population count; keep it out of every total.
+  - Rat dynamics in the paper are sometimes written with infected-rat births omitted, as here.
+  - The human SIR is a feed-forward extension: it does not affect rats.
+
+#### trypanosomiasis_rogers1988 — African trypanosomiasis: humans + cattle reservoir + tsetse with two-stage incubation (after Rogers 1988)  [ILLUSTRATIVE-COMPOSITE]
+- Disease/area: Rhodesian sleeping sickness / animal trypanosomiasis (T. brucei rhodesiense, Glossina spp.), East Africa | Category: Vector-borne
+- Source: Rogers DJ (1988). A general model for the African trypanosomiases. *Parasitology* 97(1):193–212. https://doi.org/10.1017/S0031182000066853 . It is a multi-host, single-vector Ross–Macdonald generalisation with host-specific feeding fractions and parasite-specific EIP. Structure as recalled; all values are illustrative, chosen within the ranges commonly quoted from Rogers.
+- Time unit: days ; simulate 7300 days
+- Compartments:
+  - `Sh` — susceptible humans — 995
+  - `Eh` — incubating humans — 0
+  - `Ih` — infectious humans — 5
+  - `Rh` — treated/recovered (temporary) — 0
+  - `Sc` — susceptible cattle — 490 — not in N
+  - `Ec` — incubating cattle — 0 — not in N
+  - `Ic` — infectious cattle — 10 — not in N
+  - `Rc` — recovered cattle — 0 — not in N
+  - `Sf` — susceptible tsetse — 5000 — not in N
+  - `Ef1` — tsetse in EIP stage 1 — 0 — not in N
+  - `Ef2` — tsetse in EIP stage 2 — 0 — not in N
+  - `If` — infectious tsetse — 0 — not in N
+- Parameters (illustrative):
+  - `a_f` = 0.25 (1/day) — feeding rate (every 4 d)
+  - `f_hum` = 0.1 (–) — fraction of meals on humans; the rest on cattle
+  - `b_fh` = 0.6 (–) — fly → human per-bite probability
+  - `b_fc` = 0.6 (–) — fly → cattle per-bite probability
+  - `p_hf` = 0.05 (–) — human → fly per-meal probability (low because mainly teneral flies are susceptible)
+  - `p_cf` = 0.05 (–) — cattle → fly per-meal probability
+  - `mu_f` = 0.03 (1/day) — tsetse mortality
+  - `eip` = 25 (days) — EIP of T. brucei (two Erlang stages at rate 2/eip each)
+  - `nu_h` = 0.0714 (1/day) — 1/14 d human incubation
+  - `gam_h` = 0.0083 (1/day) — 1/120 d to treatment/recovery
+  - `d_h` = 0.0017 (1/day) — disease death
+  - `rho_h` = 0.0167 (1/day) — loss of protection after treatment
+  - `mu_h` = 4.57e-5 (1/day) — human birth/death
+  - `nu_c` = 0.1 (1/day) — cattle incubation
+  - `gam_c` = 0.01 (1/day) — cattle recovery (100 d infectious)
+  - `rho_c` = 0.02 (1/day) — cattle waning
+  - `mu_c` = 3.65e-4 (1/day) — cattle birth/death (7.5 yr)
+- Derived variables:
+  - `Nh` = Sh + Eh + Ih + Rh
+  - `Nc` = Sc + Ec + Ic + Rc
+  - `Nf` = Sf + Ef1 + Ef2 + If
+  - `lam_h` = a_f*f_hum*b_fh*If/Nh — human force of infection
+  - `lam_c` = a_f*(1 - f_hum)*b_fc*If/Nc — cattle force of infection
+  - `lam_f` = a_f*(f_hum*p_hf*Ih/Nh + (1 - f_hum)*p_cf*Ic/Nc) — tsetse force of infection
+- Flows:
+  - `> Sh : mu_h*Nh` [absolute]
+  - `Sh > Eh : lam_h`
+  - `Eh > Ih : nu_h`
+  - `Ih > Rh : gam_h`
+  - `Ih > : d_h`
+  - `Rh > Sh : rho_h`
+  - each of `Sh`, `Eh`, `Ih`, `Rh` `> : mu_h`
+  - `> Sc : mu_c*Nc` [absolute]
+  - `Sc > Ec : lam_c`
+  - `Ec > Ic : nu_c`
+  - `Ic > Rc : gam_c`
+  - `Rc > Sc : rho_c`
+  - each of `Sc`, `Ec`, `Ic`, `Rc` `> : mu_c`
+  - `> Sf : mu_f*Nf` [absolute]
+  - `Sf > Ef1 : lam_f`
+  - `Ef1 > Ef2 : 2/eip`
+  - `Ef2 > If : 2/eip`
+  - each of `Sf`, `Ef1`, `Ef2`, `If` `> : mu_f`
+- Notes:
+  - Rogers' R0 formula is a sum over hosts of the Ross–Macdonald terms. Fly survival through the EIP is exp(−mu_f·eip) in the original; it is approximated here by (2/eip/(2/eip+mu_f))², which equals ≈0.25 vs 0.47 exact. Add more stages for closer agreement.
+  - For T. vivax or T. congolense, use eip ≈ 10 or 20 d and a cattle-only system.
+  - For gambiense HAT, set f_hum higher and use a long human infectious period of about 1–3 yr.
+
+#### bluetongue_gubbins2008 — Bluetongue: cattle + sheep + Culicoides with temperature-dependent biting, mortality and EIP (after Gubbins et al. 2008)  [STRUCTURE-FROM-RECALL]
+- Disease/area: Bluetongue virus (BTV-8), northern Europe / UK | Category: Vector-borne
+- Source: Gubbins S, Carpenter S, Baylis M, Wood JLN, Mellor PS (2008). Assessing the risk of bluetongue to UK livestock: uncertainty and sensitivity analyses of a temperature-dependent model for the basic reproduction number. *J R Soc Interface* 5(20):363–371. https://doi.org/10.1098/rsif.2007.1110 . The temperature functions are recalled from that paper (a(T) = 0.0002·T·(T−3.7)·(41.9−T)^(1/2.7); μ(T) = 0.009·exp(0.16T); ν(T) = 0.018·(T−13.4)); verify. A dynamic farm version is Szmaragd C et al. (2009) *PLoS ONE* 4(10):e7741, https://doi.org/10.1371/journal.pone.0007741 . Other values are illustrative.
+- Time unit: days ; simulate 365 days (start t = 0 at 1 January)
+- Compartments:
+  - `Scow` — susceptible cattle — 199
+  - `Icow` — infected cattle — 1
+  - `Rcow` — recovered cattle — 0
+  - `Ssh` — susceptible sheep — 800
+  - `Ish` — infected sheep — 0
+  - `Rsh` — recovered sheep — 0
+  - `Sv` — susceptible Culicoides — 100000 — not in N
+  - `Ev1` — EIP stage 1 — 0 — not in N
+  - `Ev2` — EIP stage 2 — 0 — not in N
+  - `Ev3` — EIP stage 3 — 0 — not in N
+  - `Iv` — infectious midges — 0 — not in N
+- Parameters:
+  - `T_mean` = 15 (°C) — illustrative
+  - `T_amp` = 7 (°C) — illustrative
+  - `t_shift` = 110 (day) — sets the temperature peak in mid-July
+  - `b_vh` = 0.9 (–) — vector → host per-bite probability
+  - `p_hv` = 0.05 (–) — host → vector per-bite probability (recalled range 0.01–0.15)
+  - `phi_c` = 0.75 (–) — biting preference weight for cattle (illustrative)
+  - `r_cow` = 0.0485 (1/day) — 1/20.6 d cattle viraemia (recalled)
+  - `r_sh` = 0.0625 (1/day) — 1/16 d sheep viraemia (recalled)
+  - `d_sh` = 0.006 (1/day) — BTV-induced sheep death (illustrative)
+  - `k_eip` = 3 (–) — EIP stages (fixed in the flows)
+- Derived variables:
+  - `Temp` = T_mean + T_amp*sin(2*3.14159265*(t - t_shift)/365) — daily temperature (°C)
+  - `a_bite` = pmax(0.0002*Temp*(Temp - 3.7)*pmax(41.9 - Temp, 0)^(1/2.7), 0) — biting rate (1/day)
+  - `mu_v` = 0.009*exp(0.16*Temp) — midge mortality (1/day)
+  - `nu_eip` = pmax(0.018*(Temp - 13.4), 0) — EIP completion rate (1/day)
+  - `Ncow` = Scow + Icow + Rcow
+  - `Nsh` = Ssh + Ish + Rsh
+  - `Nv` = Sv + Ev1 + Ev2 + Ev3 + Iv
+  - `Hw` = phi_c*Ncow + (1 - phi_c)*Nsh — preference-weighted host total
+  - `lam_cow` = a_bite*b_vh*phi_c*Iv/Hw — cattle force of infection
+  - `lam_sh` = a_bite*b_vh*(1 - phi_c)*Iv/Hw — sheep force of infection
+  - `lam_v` = a_bite*p_hv*(phi_c*Icow + (1 - phi_c)*Ish)/Hw — midge force of infection
+- Flows:
+  - `Scow > Icow : lam_cow`
+  - `Icow > Rcow : r_cow`
+  - `Ssh > Ish : lam_sh`
+  - `Ish > Rsh : r_sh`
+  - `Ish > : d_sh`
+  - `> Sv : mu_v*Nv` [absolute]
+  - `Sv > Ev1 : lam_v`
+  - `Ev1 > Ev2 : 3*nu_eip`
+  - `Ev2 > Ev3 : 3*nu_eip`
+  - `Ev3 > Iv : 3*nu_eip`
+  - each of `Sv`, `Ev1`, `Ev2`, `Ev3`, `Iv` `> : mu_v`
+- Notes:
+  - The constant 3.14159265 replaces the forbidden `pi`.
+  - Below 13.4 °C the EIP rate is 0, so midges stay latent and die. This reproduces the "seasonal vector-free period" effect.
+  - Vector abundance is held constant. Gubbins treats the vector:host ratio as an uncertain parameter (hundreds to thousands per host).
+  - At 20 °C with these values R0 ≈ 3.9 by my calculation (illustrative).
+  - Host demography is ignored within one season.
+
+### Inferences
+- The requested model families all fit the flow format if three things are done:
+  - Biting saturation, host-preference splitting and superinfection go in derived variables.
+  - Fixed delays (EIP, moulting) become Erlang stages.
+  - Seasonality and flooding use sin(), ifelse() and floor().
+- Both delay schemes (Erlang stages and exponential survival) tend to understate EIP mortality unless several stages are used. The tryps note shows the size of the difference.
+- Several common R-safe naming pitfalls appear here: `beta`, `gamma`, `sigma`, `q`, `D`, `I`, `dt` and `df` are all base or stats R names. The specs avoid them.
+
+### Gaps
+- **Not covered:**
+  - Kucharski et al. 2016 (Zika, French Polynesia; *PLoS NTD* 10(5):e0004726, https://doi.org/10.1371/journal.pntd.0004726). Its structure is SEIR–SEI, which essentially duplicates the implemented dengue model.
+  - Wonham et al. 2004 as a separate model. Its values feed the Bowman spec.
+- **Equation forms not checked against full text this session:**
+  - Gao 2016 and Yakob 2013: the equations are images in the HTML.
+  - Gaff 2007: the full-text fetch was refused by the fetch tool.
+  - Keeling & Gilligan 2000: not fetched.
+  - Stauch 2011: PMC showed a CAPTCHA.
+  - Gubbins 2008: not fetched.
+- **Parameter values that are illustrative and need calibration:** Lyme, VL, Chagas, trypanosomiasis, RVF, and the human block of the plague model. They should not be presented as published estimates.
+
+---
+
+## Key question 2: What is the primary source (authors, year, journal, DOI/URL) of each model, and where do its parameter values come from?
+
+### Takeaway
+Every model has a peer-reviewed primary source with a DOI or URL. Parameter provenance is strong (read from the primary table) for Chitnis 2008, Bowman 2005, Gao 2016 and Yakob & Clements 2013. It is moderate (recalled from the primary source) for Keeling & Gilligan 2000 and Gubbins 2008, and partial for yellow fever (Johansson 2010/2014). The remaining models have weak, illustrative provenance.
+
+### Cited Findings
+- Chitnis, Hyman & Cushing 2008, *Bull Math Biol* 70:1272–1296. The paper gives two baseline sets: high transmission (R0 = 4.4) and low transmission (R0 = 1.1). Table 3 lists 17 parameters with ranges, justified in Appendix A. — [Chitnis et al. 2008 preprint](https://archive.math.arizona.edu/cushing/DeterminingImportantParametersInTheSpreadofMalaria%20BMB2008.pdf); [Springer DOI](https://link.springer.com/doi/10.1007/s11538-008-9299-0)
+- Bowman et al. 2005, *Bull Math Biol* 67:1107–1133. Table 1 values: ΠB = 1000/day, 1/μB = 1000 d, ΠH = 30/day, 1/μH = 70×365 d, b1 = 0.09/day, β1 = 0.16, β2 = β3 = 0.88, dB = 5×10⁻⁵, dH = 5×10⁻⁷, 1/α = 14 d, δ = 1, 1/τ = 14 d. ΠM and μM are listed as "Variable". b1, β1 and β2 are taken from Wonham et al. 2004. — [Bowman et al. 2005 (YorkSpace)](https://yorkspace.library.yorku.ca/bitstream/handle/10315/908/2005_bmb_wnv.pdf;sequence=1)
+- Gao et al. 2016, *Sci Rep* 6:28070. Table 1: a = 0.5, b = 0.4, c = 0.5, η = 0.1, β = 0.05/day, κ = 0.6, τ = 0.3, θ = 18%, m = 5, 1/νh = 5 d, 1/νv = 10 d, 1/γh1 = 5 d, 1/γh2 = 20 d, 1/γh = 7 d, 1/μv = 14 d. The paper reports R0 = 2.055, with sexual transmission about 3.04% of it. — [Gao et al. 2016 (PMC)](https://pmc.ncbi.nlm.nih.gov/articles/PMC4911567)
+- Yakob & Clements 2013, *PLoS ONE* 8:e57448. β1 = 0.14 and β2 = 0.40 are least-squares fits to Réunion data. λ1 = λ2 = 0.5, ω = 0.25, ϕ = 0.97, γ = 0.25 and μ = 0.05 come from the literature. Mosquito birth equals death. — [Yakob & Clements 2013](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0057448)
+- Gaff, Hartley & Leahy 2007, *EJDE* 2007(115):1–12, open access. The model has two mosquito populations (Aedes, with transovarial transmission, and Culex) plus livestock, with a sensitivity analysis of the disease-free equilibrium. — [EJDE abstract](https://ejde.math.txstate.edu/Volumes/2007/115/abstr.html); [ODU repository](https://digitalcommons.odu.edu/biology_fac_pubs/49)
+- Keeling & Gilligan 2000. *Nature* 407:903–906 describes five ODEs for the rat–flea system, with human cases driven by R0 in rats. *Proc R Soc B* 267:2219–2230 adds sensitivity to flea searching efficiency and rat/flea movement. — [Nature](https://www.nature.com/articles/35038073); [PMC1690796](https://pmc.ncbi.nlm.nih.gov/articles/PMC1690796)
+- Stauch et al. 2011, *PLoS NTD* 5(11):e1405. Natural-history parameters come from a literature review, expert opinion and the KALANET trial. Transmission is mainly maintained by asymptomatic infections, and vector control is more effective than treatment. — [DOAJ record](https://doaj.org/article/090474c305d14de69ead51f19b49887d)
+- Stauch et al. 2014, *PLoS NTD* 8(4):e2810. Elimination becomes possible if sandfly density is cut by 67%, or breeding sites by more than 79%. — [DOAJ record](https://doaj.org/article/c75fd498252a425ab32ca195c75984f8)
+- Primary sources recalled but not opened this session (citations given in each model block):
+  - Ngwa & Shu 2000; Chitnis et al. 2006
+  - Esteva & Vargas 1998 and 2003
+  - Wonham et al. 2004
+  - Aron 1988; Smith et al. 2012; Smith & McKenzie 2004
+  - Rosà et al. 2003; Rosà & Pugliese 2007
+  - Cohen & Gürtler 2001; Nouvellet et al. 2013
+  - Johansson et al. 2010 and 2014; WHO yellow fever position paper 2013
+  - Rogers 1988
+  - Gubbins et al. 2008; Szmaragd et al. 2009
+
+### Inferences
+- For a generator library, the four verified models are good "reference" entries whose outputs can be checked against published R0 values:
+  - Chitnis: R0 4.4 / 1.1
+  - Gao: R0 ≈ 2.06
+  - Yakob: R0 ≈ 4 (my own calculation)
+  - Bowman: R0 depends on Pi_M
+- The other models should be shipped with an "illustrative parameters" flag.
+
+### Gaps
+- **Tables still to transcribe** (all open access): Gaff 2007 (EJDE), Stauch 2011 (PMC3226461) and Keeling & Gilligan 2000 Proc B (PMC1690796).
+- **Tables I could not reach:** Gubbins 2008, Rogers 1988 and Cohen & Gürtler 2001 are behind paywalls or were not reached. The recalled temperature functions and plague values are marked as such.
+- I found no single published compartmental model for Lyme disease that fits ≤14 compartments with ready-made parameter tables. The Lyme entry is a composite built in the style of Rosà & Pugliese.

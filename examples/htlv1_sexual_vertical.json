@@ -1,0 +1,295 @@
+{
+  "version": 1,
+  "id": "htlv1_sexual_vertical",
+  "category": "Sexually transmitted & blood-borne",
+  "name": "HTLV-1 lifelong infection with sexual and mother-to-child transmission and disease (ATL/HAM)",
+  "description": "HTLV-1.\nParameter values: 0 of 7 checked against the source; the rest are recalled or illustrative.",
+  "reference": "I found no canonical population-level deterministic HTLV-1 transmission ODE paper in this session; published HTLV ODE models are mostly within-host. This is a composite model with illustrative values. The epidemiological facts behind it (about 2–5%…",
+  "referenceUrl": "https://doi.org/10.3389/fmicb.2012.00388",
+  "time": {
+    "start": "0",
+    "stop": "200",
+    "step": "0.2",
+    "unit": "years"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Sf",
+      "description": "susceptible women",
+      "init": "0.49",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Hf",
+      "description": "HTLV-1 carrier women",
+      "init": "0.01",
+      "inN": true,
+      "color": "#6A2C9C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Sm",
+      "description": "susceptible men",
+      "init": "0.495",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 300
+    },
+    {
+      "id": "c4",
+      "name": "Hm",
+      "description": "carrier men",
+      "init": "0.005",
+      "inN": true,
+      "color": "#6A2C9C",
+      "x": 320,
+      "y": 300
+    },
+    {
+      "id": "c5",
+      "name": "Dz",
+      "description": "ATL/HAM disease (both sexes)",
+      "init": "0",
+      "inN": true,
+      "color": "#111111",
+      "x": 520,
+      "y": 220
+    }
+  ],
+  "parameters": [
+    {
+      "name": "cp",
+      "symbol": "",
+      "value": "1",
+      "description": "partner change rate (partners/yr) [illustrative]"
+    },
+    {
+      "name": "b_mf",
+      "symbol": "",
+      "value": "0.06",
+      "description": "male-to-female transmission (higher than reverse, per the literature) (per partnership/yr) [illustrative]"
+    },
+    {
+      "name": "b_fm",
+      "symbol": "",
+      "value": "0.01",
+      "description": "female-to-male transmission (per partnership/yr) [illustrative]"
+    },
+    {
+      "name": "p_mtct",
+      "symbol": "",
+      "value": "0.2",
+      "description": "infant infection probability from a carrier mother (prolonged breastfeeding) [illustrative]"
+    },
+    {
+      "name": "dis",
+      "symbol": "",
+      "value": "0.001",
+      "description": "progression carrier to disease (about 4% lifetime over a 40-yr exposure) (/yr) [illustrative]"
+    },
+    {
+      "name": "mu",
+      "symbol": "",
+      "value": "1/50",
+      "description": "natural death = birth (/yr) [illustrative]"
+    },
+    {
+      "name": "mu_d",
+      "symbol": "",
+      "value": "0.5",
+      "description": "disease-related death (ATL is rapidly fatal; HAM is not) (/yr) [illustrative]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "Nf",
+      "symbol": "",
+      "expr": "Sf+Hf+Dz/2",
+      "description": "women total (assumes disease split evenly by sex)",
+      "output": false
+    },
+    {
+      "name": "Nm",
+      "symbol": "",
+      "expr": "Sm+Hm+Dz/2",
+      "description": "men total",
+      "output": false
+    },
+    {
+      "name": "foi_f",
+      "symbol": "",
+      "expr": "cp*b_mf*Hm/Nm",
+      "description": "force of infection on women",
+      "output": false
+    },
+    {
+      "name": "foi_m",
+      "symbol": "",
+      "expr": "cp*b_fm*Hf/Nf",
+      "description": "force of infection on men",
+      "output": false
+    },
+    {
+      "name": "births",
+      "symbol": "",
+      "expr": "mu*N + mu_d*Dz",
+      "description": "births keeping N constant",
+      "output": false
+    },
+    {
+      "name": "pinf_birth",
+      "symbol": "",
+      "expr": "p_mtct*Hf/Nf",
+      "description": "fraction of births infected vertically",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "0.5*births*(1-pinf_birth)",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": null,
+      "to": "c2",
+      "kind": "absolute",
+      "rate": "0.5*births*pinf_birth",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 10
+    },
+    {
+      "id": "f3",
+      "from": null,
+      "to": "c3",
+      "kind": "absolute",
+      "rate": "0.5*births*(1-pinf_birth)",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 170
+    },
+    {
+      "id": "f4",
+      "from": null,
+      "to": "c4",
+      "kind": "absolute",
+      "rate": "0.5*births*pinf_birth",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 170
+    },
+    {
+      "id": "f5",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "foi_f",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "foi_m",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": "c2",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "dis",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "dis",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f9",
+      "from": "c5",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_d + mu",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 350
+    },
+    {
+      "id": "f10",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    },
+    {
+      "id": "f11",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 270
+    },
+    {
+      "id": "f12",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 430
+    },
+    {
+      "id": "f13",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 430
+    }
+  ]
+}

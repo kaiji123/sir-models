@@ -1,0 +1,227 @@
+{
+  "version": 1,
+  "id": "hiv_ctl_nowak_bangham",
+  "category": "Within-host",
+  "name": "Virus dynamics with a CTL immune response",
+  "description": "Within-host virus–immune-response dynamics (formulated for HIV/HTLV-1 and LCMV).\nFour compartments, and the only nonlinearity beyond standard mass action is the bilinear CTL proliferation term cz Ii Zc, which in the generator's grammar is an absolute inflow to Zc (the rate is not per-capita in a single source compartmen\nParameter values: 0 of 9 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Nowak MA, Bangham CRM (1996). Population dynamics of immune responses to persistent viruses. Science 272(5258):74–79",
+  "referenceUrl": "https://doi.org/10.1126/science.272.5258.74",
+  "time": {
+    "start": "0",
+    "stop": "200",
+    "step": "0.2",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Tc",
+      "description": "uninfected target cells",
+      "init": "1000",
+      "inN": false,
+      "color": "#DDDDDD",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Ii",
+      "description": "infected cells",
+      "init": "0",
+      "inN": false,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "V",
+      "description": "free virus",
+      "init": "1e-3",
+      "inN": false,
+      "color": "#2457C5",
+      "x": 120,
+      "y": 356
+    },
+    {
+      "id": "c4",
+      "name": "Zc",
+      "description": "virus-specific cytotoxic T lymphocytes (CTL)",
+      "init": "1",
+      "inN": false,
+      "color": "#DDDDDD",
+      "x": 120,
+      "y": 572
+    }
+  ],
+  "parameters": [
+    {
+      "name": "lam",
+      "symbol": "",
+      "value": "10",
+      "description": "target-cell production [illustrative] (cells day⁻¹)"
+    },
+    {
+      "name": "dT",
+      "symbol": "",
+      "value": "0.1",
+      "description": "target-cell death rate [illustrative] (per day)"
+    },
+    {
+      "name": "beta",
+      "symbol": "",
+      "value": "0.002",
+      "description": "infection rate constant [illustrative] (per virus per day)"
+    },
+    {
+      "name": "aI",
+      "symbol": "",
+      "value": "0.5",
+      "description": "infected-cell death rate in the absence of CTL [illustrative] (per day)"
+    },
+    {
+      "name": "pz",
+      "symbol": "",
+      "value": "1.0",
+      "description": "rate of CTL-mediated killing of infected cells (pz because p is used for production and c is reserved) [illustrative] (per CTL per day)"
+    },
+    {
+      "name": "kv",
+      "symbol": "",
+      "value": "50",
+      "description": "virus production per infected cell [illustrative] (virions cell⁻¹ day⁻¹)"
+    },
+    {
+      "name": "uV",
+      "symbol": "",
+      "value": "5",
+      "description": "virus clearance rate [illustrative] (per day)"
+    },
+    {
+      "name": "cz",
+      "symbol": "",
+      "value": "0.1",
+      "description": "rate of CTL proliferation driven by antigen [illustrative] (per infected cell per day)"
+    },
+    {
+      "name": "bz",
+      "symbol": "",
+      "value": "0.05",
+      "description": "CTL death rate [illustrative] (per day)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "R0v",
+      "symbol": "",
+      "expr": "beta * kv * (lam / dT) / (uV * aI)",
+      "description": "reproductive ratio without immune control",
+      "output": false
+    },
+    {
+      "name": "Istar_imm",
+      "symbol": "",
+      "expr": "bz / cz",
+      "description": "infected-cell abundance at the immune-controlled equilibrium: a key published insight is that this level is set entirely by CTL parameters, ",
+      "output": false
+    },
+    {
+      "name": "Zstar",
+      "symbol": "",
+      "expr": "(beta * Tc * V / Ii - aI) / pz",
+      "description": "equilibrium CTL level (evaluate symbolically, not in the ODE)",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "lam",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "dT",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "beta * V",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "aI + pz * Zc",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 270
+    },
+    {
+      "id": "f5",
+      "from": null,
+      "to": "c3",
+      "kind": "absolute",
+      "rate": "kv * Ii",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 226
+    },
+    {
+      "id": "f6",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "uV",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 486
+    },
+    {
+      "id": "f7",
+      "from": null,
+      "to": "c4",
+      "kind": "absolute",
+      "rate": "cz * Ii * Zc",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 442
+    },
+    {
+      "id": "f8",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "bz",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 702
+    }
+  ]
+}

@@ -1,0 +1,300 @@
+{
+  "version": 1,
+  "id": "varicella_zoster_brisson",
+  "category": "Respiratory",
+  "name": "Varicella with latent VZV, exogenous boosting and zoster reactivation (after Brisson et al. 2000)",
+  "description": "Varicella / herpes zoster.\nParameter values: 0 of 12 checked against the source; the rest are recalled or illustrative.",
+  "reference": "",
+  "referenceUrl": "",
+  "time": {
+    "start": "0",
+    "stop": "100",
+    "step": "0.1",
+    "unit": "years"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "M",
+      "description": "maternally protected",
+      "init": "0.005*N0",
+      "inN": true,
+      "color": "#F3C6D3",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "S",
+      "description": "susceptible to varicella",
+      "init": "0.08*N0",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "E",
+      "description": "latent (pre-infectious) varicella",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "Ip",
+      "description": "varicella, infectious",
+      "init": "100",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 720,
+      "y": 140
+    },
+    {
+      "id": "c5",
+      "name": "Lb",
+      "description": "VZV-latent, boosted (protected from zoster)",
+      "init": "0.5*N0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 920,
+      "y": 140
+    },
+    {
+      "id": "c6",
+      "name": "Zs",
+      "description": "VZV-latent, susceptible to zoster",
+      "init": "0.41*N0",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 1120,
+      "y": 140
+    },
+    {
+      "id": "c7",
+      "name": "Zo",
+      "description": "active zoster",
+      "init": "0",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 1320,
+      "y": 140
+    },
+    {
+      "id": "c8",
+      "name": "Rz",
+      "description": "post-zoster, immune",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 1520,
+      "y": 140
+    },
+    {
+      "id": "c9",
+      "name": "V",
+      "description": "varicella-vaccinated, immune; vaccine-strain latency ignored",
+      "init": "0",
+      "inN": true,
+      "color": "#2457C5",
+      "x": 120,
+      "y": 356
+    }
+  ],
+  "parameters": [
+    {
+      "name": "R0_v",
+      "symbol": "",
+      "value": "8",
+      "description": "illustrative (varicella R0 is often given as 7–12)"
+    },
+    {
+      "name": "sig_lat",
+      "symbol": "",
+      "value": "365/14",
+      "description": "14-day latent period (1/year) [illustrative]"
+    },
+    {
+      "name": "g_rec",
+      "symbol": "",
+      "value": "365/7",
+      "description": "7-day infectious period (1/year) [illustrative]"
+    },
+    {
+      "name": "xi_m",
+      "symbol": "",
+      "value": "2",
+      "description": "loss of maternal protection (1/year) [illustrative]"
+    },
+    {
+      "name": "w_boost",
+      "symbol": "",
+      "value": "1/20",
+      "description": "loss of boosted protection (1/year)"
+    },
+    {
+      "name": "boost_f",
+      "symbol": "",
+      "value": "1",
+      "description": "fraction of varicella exposures that boost latent people [illustrative]"
+    },
+    {
+      "name": "react",
+      "symbol": "",
+      "value": "0.004",
+      "description": "zoster reactivation rate in Zs (1/year) [illustrative]"
+    },
+    {
+      "name": "z_rec",
+      "symbol": "",
+      "value": "365/21",
+      "description": "zoster duration (1/year) [illustrative]"
+    },
+    {
+      "name": "rel_z",
+      "symbol": "",
+      "value": "0.2",
+      "description": "infectiousness of zoster relative to varicella [illustrative]"
+    },
+    {
+      "name": "p_vac",
+      "symbol": "",
+      "value": "0",
+      "description": "fraction of births vaccinated; vary between 0 and 0.9 [illustrative]"
+    },
+    {
+      "name": "mu",
+      "symbol": "",
+      "value": "0.0133",
+      "description": "birth = death rate (1/year) [illustrative]"
+    },
+    {
+      "name": "N0",
+      "symbol": "",
+      "value": "1e6",
+      "description": "value taken from the notes text [recalled]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "foi",
+      "symbol": "",
+      "expr": "R0_v*(g_rec + mu)*(Ip + rel_z*Zo)/N",
+      "description": "",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "(1-p_vac)*mu*N",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": null,
+      "to": "c9",
+      "kind": "absolute",
+      "rate": "p_vac*mu*N",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 226
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "xi_m",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "foi",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "sig_lat",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "g_rec",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "w_boost",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c6",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "boost_f*foi",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f9",
+      "from": "c6",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "react",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f10",
+      "from": "c7",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "z_rec",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f11",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    }
+  ]
+}

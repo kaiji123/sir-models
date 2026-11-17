@@ -1,0 +1,243 @@
+{
+  "version": 1,
+  "id": "asf_wild_boar_carcass",
+  "category": "Animal & wildlife",
+  "name": "African swine fever in wild boar with carcass-mediated environmental transmission",
+  "description": "African swine fever virus, Eurasian wild boar (Sus scrofa).\nThe key structural feature is that dead infectious hosts move into a long-lived environmental compartment rather than out of the system: Ii > Cr is the flow that lets ASF persist at very low host density, because Cr decays on a timescale of\nParameter values: 0 of 11 checked against the source; the rest are recalled or illustrative.",
+  "reference": "O'Neill X, White A, Ruiz-Fons F, Gortázar C (2020). Modelling the transmission and persistence of African swine fever in wild boar in contrasting European scenarios. Scientific Reports 10:5895",
+  "referenceUrl": "https://doi.org/10.1038/s41598-020-62736-y",
+  "time": {
+    "start": "0",
+    "stop": "1095",
+    "step": "2",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N_total"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "susceptible wild boar",
+      "init": "2000",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 220
+    },
+    {
+      "id": "c2",
+      "name": "E",
+      "description": "exposed (infected, not yet infectious)",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 220
+    },
+    {
+      "id": "c3",
+      "name": "Ii",
+      "description": "infectious wild boar",
+      "init": "2",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 220
+    },
+    {
+      "id": "c4",
+      "name": "R",
+      "description": "recovered/immune survivors",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 720,
+      "y": 140
+    },
+    {
+      "id": "c5",
+      "name": "Cr",
+      "description": "infectious carcasses in the environment",
+      "init": "0",
+      "inN": false,
+      "color": "#8E0E0E",
+      "x": 720,
+      "y": 300
+    }
+  ],
+  "parameters": [
+    {
+      "name": "beta_dir",
+      "symbol": "",
+      "value": "0.3",
+      "description": "direct boar-to-boar transmission rate [illustrative] (per day)"
+    },
+    {
+      "name": "beta_car",
+      "symbol": "",
+      "value": "0.05",
+      "description": "carcass-to-boar transmission coefficient (rooting/sniffing contact) [illustrative] (per carcass per day)"
+    },
+    {
+      "name": "sigma",
+      "symbol": "",
+      "value": "1/4",
+      "description": "rate of leaving the exposed class (incubation ≈4 d) [illustrative] (per day)"
+    },
+    {
+      "name": "gamma",
+      "symbol": "",
+      "value": "1/5",
+      "description": "rate of leaving infectiousness (≈5 d) [illustrative] (per day)"
+    },
+    {
+      "name": "cfr",
+      "symbol": "",
+      "value": "0.95",
+      "description": "case fatality (ASF genotype II is near-uniformly lethal) [unverified] (dimensionless)"
+    },
+    {
+      "name": "decay_c",
+      "symbol": "",
+      "value": "1/90",
+      "description": "carcass decay/removal rate (seasonally variable; much slower in winter) [illustrative] (per day)"
+    },
+    {
+      "name": "remove_c",
+      "symbol": "",
+      "value": "0",
+      "description": "active carcass-removal rate (the main control lever) [illustrative] (per day)"
+    },
+    {
+      "name": "bb",
+      "symbol": "",
+      "value": "0.004",
+      "description": "boar birth rate (strongly seasonal in reality) [illustrative] (per day)"
+    },
+    {
+      "name": "mub",
+      "symbol": "",
+      "value": "0.002",
+      "description": "boar natural death rate [illustrative] (per day)"
+    },
+    {
+      "name": "hunt",
+      "symbol": "",
+      "value": "0",
+      "description": "hunting/culling rate [illustrative] (per day)"
+    },
+    {
+      "name": "Kb",
+      "symbol": "",
+      "value": "2000",
+      "description": "carrying capacity [illustrative] (boar)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "N",
+      "symbol": "",
+      "expr": "S + E + Ii + R",
+      "description": "living boar population",
+      "output": false
+    },
+    {
+      "name": "lambda",
+      "symbol": "",
+      "expr": "beta_dir * Ii / N + beta_car * Cr",
+      "description": "total force of infection (frequency-dependent direct term plus density-dependent carcass term)",
+      "output": false
+    },
+    {
+      "name": "dens",
+      "symbol": "",
+      "expr": "bb * (1 - N / Kb)",
+      "description": "density-dependent per-capita birth rate",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "pmax(dens, 0) * N",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 90
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lambda",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "sigma",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c3",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "gamma * cfr",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "gamma * (1 - cfr)",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mub + hunt",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 350
+    },
+    {
+      "id": "f7",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mub + hunt",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 350
+    },
+    {
+      "id": "f8",
+      "from": "c5",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "decay_c + remove_c",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 430
+    }
+  ]
+}

@@ -1,0 +1,459 @@
+{
+  "version": 1,
+  "id": "flu_arino2008_antiviral",
+  "category": "Respiratory",
+  "name": "Pandemic influenza SLIAR model with antiviral treatment and pre-epidemic vaccination/prophylaxis (Arino et al. 2008)",
+  "description": "Pandemic influenza.\nParameter values: 0 of 25 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Arino J, Brauer F, van den Driessche P, Watmough J, Wu J. \"A model for influenza with vaccination and antiviral treatment.\" J Theor Biol 2008;253:118–130. https://doi.org/10.1016/j.jtbi.2008.02.026 (PDF:…",
+  "referenceUrl": "https://doi.org/10.1016/j.jtbi.2008.02.026",
+  "time": {
+    "start": "0",
+    "stop": "200",
+    "step": "0.2",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "untreated susceptible",
+      "init": "1",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 220
+    },
+    {
+      "id": "c2",
+      "name": "ST",
+      "description": "treated (prophylaxed or vaccinated) susceptible",
+      "init": "1988",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 380
+    },
+    {
+      "id": "c3",
+      "name": "L",
+      "description": "latent",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 300
+    },
+    {
+      "id": "c4",
+      "name": "LT",
+      "description": "treated latent",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c5",
+      "name": "Ip",
+      "description": "symptomatic infective",
+      "init": "12",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 300
+    },
+    {
+      "id": "c6",
+      "name": "IpT",
+      "description": "treated symptomatic infective",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 720,
+      "y": 220
+    },
+    {
+      "id": "c7",
+      "name": "A",
+      "description": "asymptomatic infective",
+      "init": "0",
+      "inN": true,
+      "color": "#E57373",
+      "x": 520,
+      "y": 460
+    },
+    {
+      "id": "c8",
+      "name": "AT",
+      "description": "treated asymptomatic infective",
+      "init": "0",
+      "inN": true,
+      "color": "#E57373",
+      "x": 720,
+      "y": 380
+    },
+    {
+      "id": "c9",
+      "name": "R",
+      "description": "recovered",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 920,
+      "y": 220
+    },
+    {
+      "id": "c10",
+      "name": "Dead",
+      "description": "influenza deaths (cumulative)",
+      "init": "0",
+      "inN": false,
+      "color": "#111111",
+      "x": 920,
+      "y": 380
+    }
+  ],
+  "parameters": [
+    {
+      "name": "k_lat",
+      "symbol": "",
+      "value": "0.526",
+      "description": "exit rate from L, i.e. 1/1.9 d (1/day)"
+    },
+    {
+      "name": "k_latT",
+      "symbol": "",
+      "value": "0.526",
+      "description": "exit rate from LT (1/day)"
+    },
+    {
+      "name": "alpha_r",
+      "symbol": "",
+      "value": "0.244",
+      "description": "exit rate from Ip, i.e. 1/4.1 d (1/day)"
+    },
+    {
+      "name": "eta_r",
+      "symbol": "",
+      "value": "0.244",
+      "description": "exit rate from A (1/day)"
+    },
+    {
+      "name": "alpha_T",
+      "symbol": "",
+      "value": "0.323",
+      "description": "exit rate from IpT (1/day)"
+    },
+    {
+      "name": "eta_T",
+      "symbol": "",
+      "value": "0.323",
+      "description": "exit rate from AT (1/day)"
+    },
+    {
+      "name": "p_sym",
+      "symbol": "",
+      "value": "0.667",
+      "description": "fraction of latents who become symptomatic"
+    },
+    {
+      "name": "tau_av",
+      "symbol": "",
+      "value": "0.4",
+      "description": "factor by which antivirals reduce the fraction who develop symptoms"
+    },
+    {
+      "name": "f_rec",
+      "symbol": "",
+      "value": "0.98",
+      "description": "fraction of Ip who recover (1 - CFR)"
+    },
+    {
+      "name": "fT_rec",
+      "symbol": "",
+      "value": "1.0",
+      "description": "fraction of IpT who recover"
+    },
+    {
+      "name": "eps_L",
+      "symbol": "",
+      "value": "0",
+      "description": "relative infectivity of latents; Longini assumes 0"
+    },
+    {
+      "name": "delta_a",
+      "symbol": "",
+      "value": "0.5",
+      "description": "relative infectivity of asymptomatics"
+    },
+    {
+      "name": "phi_L",
+      "symbol": "",
+      "value": "1.61",
+      "description": "treatment rate, = -ln(1-0.8), i.e. 80% treated within 1 day (1/day)"
+    },
+    {
+      "name": "phi_I",
+      "symbol": "",
+      "value": "1.61",
+      "description": "treatment rate, = -ln(1-0.8), i.e. 80% treated within 1 day (1/day)"
+    },
+    {
+      "name": "phi_A",
+      "symbol": "",
+      "value": "1.61",
+      "description": "treatment rate, = -ln(1-0.8), i.e. 80% treated within 1 day (1/day)"
+    },
+    {
+      "name": "theta_L",
+      "symbol": "",
+      "value": "0.0179",
+      "description": "relapse rate from treated back to untreated (1/day)"
+    },
+    {
+      "name": "theta_I",
+      "symbol": "",
+      "value": "0.0179",
+      "description": "relapse rate from treated back to untreated (1/day)"
+    },
+    {
+      "name": "theta_A",
+      "symbol": "",
+      "value": "0.0179",
+      "description": "relapse rate from treated back to untreated (1/day)"
+    },
+    {
+      "name": "sig_S",
+      "symbol": "",
+      "value": "0.7",
+      "description": "relative susceptibility of ST"
+    },
+    {
+      "name": "sig_L",
+      "symbol": "",
+      "value": "0.2",
+      "description": "relative infectivity of treated classes"
+    },
+    {
+      "name": "sig_I",
+      "symbol": "",
+      "value": "0.2",
+      "description": "relative infectivity of treated classes"
+    },
+    {
+      "name": "sig_A",
+      "symbol": "",
+      "value": "0.2",
+      "description": "relative infectivity of treated classes"
+    },
+    {
+      "name": "q_w",
+      "symbol": "",
+      "value": "0.4",
+      "description": "fraction of symptomatics who withdraw from mixing"
+    },
+    {
+      "name": "b0",
+      "symbol": "",
+      "value": "0.581",
+      "description": "transmission coefficient under standard incidence with q_w = 0.4 (1/day)"
+    },
+    {
+      "name": "g_vac",
+      "symbol": "",
+      "value": "0",
+      "description": "fraction of S0 treated or vaccinated before the epidemic; the paper explores 0–0.7"
+    }
+  ],
+  "variables": [
+    {
+      "name": "N_M",
+      "symbol": "",
+      "expr": "N - q_w*Ip - q_w*IpT",
+      "description": "mixing population",
+      "output": false
+    },
+    {
+      "name": "Lam",
+      "symbol": "",
+      "expr": "eps_L*L + eps_L*sig_L*LT + (1-q_w)*Ip + (1-q_w)*sig_I*IpT + delta_a*A + delta_a*sig_A*AT",
+      "description": "total infectivity",
+      "output": false
+    },
+    {
+      "name": "foi",
+      "symbol": "",
+      "expr": "b0*Lam/N_M",
+      "description": "force of infection on untreated susceptibles",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "foi",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c2",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "sig_S*foi",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c3",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "p_sym*k_lat",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c3",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "(1-p_sym)*k_lat",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "phi_L",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c4",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "theta_L",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f7",
+      "from": "c4",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "p_sym*tau_av*k_latT",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c4",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "(1-p_sym*tau_av)*k_latT",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f9",
+      "from": "c5",
+      "to": "c9",
+      "kind": "per_capita",
+      "rate": "f_rec*alpha_r",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f10",
+      "from": "c5",
+      "to": "c10",
+      "kind": "per_capita",
+      "rate": "(1-f_rec)*alpha_r",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f11",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "phi_I",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f12",
+      "from": "c6",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "theta_I",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f13",
+      "from": "c6",
+      "to": "c9",
+      "kind": "per_capita",
+      "rate": "fT_rec*alpha_T",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f14",
+      "from": "c6",
+      "to": "c10",
+      "kind": "per_capita",
+      "rate": "(1-fT_rec)*alpha_T",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f15",
+      "from": "c7",
+      "to": "c9",
+      "kind": "per_capita",
+      "rate": "eta_r",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f16",
+      "from": "c7",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "phi_A",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f17",
+      "from": "c8",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "theta_A",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f18",
+      "from": "c8",
+      "to": "c9",
+      "kind": "per_capita",
+      "rate": "eta_T",
+      "output": "",
+      "curve": 0
+    }
+  ]
+}

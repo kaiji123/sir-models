@@ -1,0 +1,446 @@
+{
+  "version": 1,
+  "id": "nipah_bat_pig_human",
+  "category": "Zoonoses & emerging",
+  "name": "Nipah virus bat → pig → human spillover with nosocomial transmission",
+  "description": "Nipah virus, Pteropus bats / pigs / humans.\n13 compartments — at the structural limit, so the pig Rp and bat Rb classes can be dropped for a leaner variant.\nParameter values: 0 of 16 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Structure after Pulliam JRC, Epstein JH, Dushoff J, Rahman SA, Bunning M, Jamaluddin AA, Hyatt AD, Field HE, Dobson AP, Daszak P, Henipavirus Ecology Research Group (2012). Agricultural intensification, priming for persistence and the emergence of Nipah…",
+  "referenceUrl": "https://doi.org/10.1098/rsif.2011.0223",
+  "time": {
+    "start": "0",
+    "stop": "730",
+    "step": "1",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N_total"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Sb",
+      "description": "susceptible bats",
+      "init": "9000",
+      "inN": false,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Ib",
+      "description": "infectious bats",
+      "init": "100",
+      "inN": false,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Rb",
+      "description": "immune bats",
+      "init": "900",
+      "inN": false,
+      "color": "#4E8A3E",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "Sp",
+      "description": "susceptible pigs",
+      "init": "10000",
+      "inN": false,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 356
+    },
+    {
+      "id": "c5",
+      "name": "Ep",
+      "description": "latent pigs",
+      "init": "0",
+      "inN": false,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 356
+    },
+    {
+      "id": "c6",
+      "name": "Ip",
+      "description": "infectious pigs",
+      "init": "0",
+      "inN": false,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 356
+    },
+    {
+      "id": "c7",
+      "name": "Rp",
+      "description": "recovered/immune pigs",
+      "init": "0",
+      "inN": false,
+      "color": "#4E8A3E",
+      "x": 720,
+      "y": 356
+    },
+    {
+      "id": "c8",
+      "name": "Sh",
+      "description": "susceptible humans",
+      "init": "50000",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 652
+    },
+    {
+      "id": "c9",
+      "name": "Eh",
+      "description": "latent humans",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 652
+    },
+    {
+      "id": "c10",
+      "name": "Ih",
+      "description": "infectious humans in the community",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 652
+    },
+    {
+      "id": "c11",
+      "name": "Hh",
+      "description": "hospitalised humans (source of nosocomial transmission)",
+      "init": "0",
+      "inN": true,
+      "color": "#6A2C9C",
+      "x": 720,
+      "y": 652
+    },
+    {
+      "id": "c12",
+      "name": "Rh",
+      "description": "recovered humans",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 920,
+      "y": 572
+    },
+    {
+      "id": "c13",
+      "name": "Dh",
+      "description": "human deaths (cumulative)",
+      "init": "0",
+      "inN": false,
+      "color": "#111111",
+      "x": 920,
+      "y": 732
+    }
+  ],
+  "parameters": [
+    {
+      "name": "beta_bb",
+      "symbol": "",
+      "value": "0.02",
+      "description": "bat-to-bat transmission rate [illustrative] (per day)"
+    },
+    {
+      "name": "gamma_b",
+      "symbol": "",
+      "value": "1/14",
+      "description": "bat recovery rate [illustrative] (per day)"
+    },
+    {
+      "name": "mu_b",
+      "symbol": "",
+      "value": "1/2920",
+      "description": "bat birth = death rate (8-year lifespan) [illustrative] (per day)"
+    },
+    {
+      "name": "wane_b",
+      "symbol": "",
+      "value": "1/365",
+      "description": "loss of bat immunity (drives periodic reintroduction) [illustrative] (per day)"
+    },
+    {
+      "name": "beta_bp",
+      "symbol": "",
+      "value": "5e-5",
+      "description": "bat-to-pig spillover coefficient (contaminated fruit/urine route) [illustrative] (per bat per day)"
+    },
+    {
+      "name": "beta_pp",
+      "symbol": "",
+      "value": "1.2",
+      "description": "pig-to-pig transmission rate (highly transmissible in intensive piggeries) [illustrative] (per day)"
+    },
+    {
+      "name": "sigma_p",
+      "symbol": "",
+      "value": "1/7",
+      "description": "pig latency rate [illustrative] (per day)"
+    },
+    {
+      "name": "gamma_p",
+      "symbol": "",
+      "value": "1/10",
+      "description": "pig recovery rate [illustrative] (per day)"
+    },
+    {
+      "name": "mu_p",
+      "symbol": "",
+      "value": "1/180",
+      "description": "pig turnover (birth = offtake), drives susceptible replenishment [illustrative] (per day)"
+    },
+    {
+      "name": "beta_ph",
+      "symbol": "",
+      "value": "1e-6",
+      "description": "pig-to-human transmission coefficient (occupational contact) [illustrative] (per pig per day)"
+    },
+    {
+      "name": "beta_hh",
+      "symbol": "",
+      "value": "0.02",
+      "description": "community human-to-human transmission rate [illustrative] (per day)"
+    },
+    {
+      "name": "beta_hosp",
+      "symbol": "",
+      "value": "0.15",
+      "description": "nosocomial/caregiver transmission rate from Hh [illustrative] (per day)"
+    },
+    {
+      "name": "sigma_h",
+      "symbol": "",
+      "value": "1/9",
+      "description": "human latency rate (incubation ≈9 d) [illustrative] (per day)"
+    },
+    {
+      "name": "eta_h",
+      "symbol": "",
+      "value": "1/4",
+      "description": "rate community case → hospital [illustrative] (per day)"
+    },
+    {
+      "name": "gamma_h",
+      "symbol": "",
+      "value": "1/14",
+      "description": "human removal rate [illustrative] (per day)"
+    },
+    {
+      "name": "cfr_h",
+      "symbol": "",
+      "value": "0.7",
+      "description": "human case fatality (Bangladesh outbreaks ≈70%) [unverified] (dimensionless)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "Nb",
+      "symbol": "",
+      "expr": "Sb + Ib + Rb",
+      "description": "bat population",
+      "output": false
+    },
+    {
+      "name": "Np",
+      "symbol": "",
+      "expr": "Sp + Ep + Ip + Rp",
+      "description": "pig population",
+      "output": false
+    },
+    {
+      "name": "N",
+      "symbol": "",
+      "expr": "Sh + Eh + Ih + Hh + Rh",
+      "description": "living human population",
+      "output": false
+    },
+    {
+      "name": "lambda_b",
+      "symbol": "",
+      "expr": "beta_bb * Ib / Nb",
+      "description": "bat force of infection",
+      "output": false
+    },
+    {
+      "name": "lambda_p",
+      "symbol": "",
+      "expr": "beta_pp * Ip / Np + beta_bp * Ib",
+      "description": "pig force of infection (within-herd frequency-dependent plus spillover)",
+      "output": false
+    },
+    {
+      "name": "lambda_h",
+      "symbol": "",
+      "expr": "beta_ph * Ip + beta_hh * Ih / N + beta_hosp * Hh / N",
+      "description": "human force of infection",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "mu_b * Nb",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lambda_b",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "gamma_b",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c3",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "wane_b",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f5",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_b",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    },
+    {
+      "id": "f6",
+      "from": null,
+      "to": "c4",
+      "kind": "absolute",
+      "rate": "mu_p * Np",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 226
+    },
+    {
+      "id": "f7",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "lambda_p",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "sigma_p",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f9",
+      "from": "c6",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "gamma_p",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f10",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_p",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 486
+    },
+    {
+      "id": "f11",
+      "from": "c8",
+      "to": "c9",
+      "kind": "per_capita",
+      "rate": "lambda_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f12",
+      "from": "c9",
+      "to": "c10",
+      "kind": "per_capita",
+      "rate": "sigma_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f13",
+      "from": "c10",
+      "to": "c11",
+      "kind": "per_capita",
+      "rate": "eta_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f14",
+      "from": "c10",
+      "to": "c12",
+      "kind": "per_capita",
+      "rate": "gamma_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f15",
+      "from": "c11",
+      "to": "c13",
+      "kind": "per_capita",
+      "rate": "gamma_h * cfr_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f16",
+      "from": "c11",
+      "to": "c12",
+      "kind": "per_capita",
+      "rate": "gamma_h * (1 - cfr_h)",
+      "output": "",
+      "curve": 0
+    }
+  ]
+}

@@ -1,0 +1,118 @@
+{
+  "version": 1,
+  "id": "leaky_vaccine",
+  "category": "Interventions",
+  "name": "SVIR with a leaky vaccine",
+  "description": "Vaccinated individuals are infected at a reduced rate (1 - eff) * lam.",
+  "reference": "Vynnycky & White (2010), An Introduction to Infectious Disease Modelling, ch. 7",
+  "referenceUrl": "",
+  "time": {
+    "start": "0",
+    "stop": "300",
+    "step": "1",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "Susceptible",
+      "init": "3999",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "V",
+      "description": "Vaccinated",
+      "init": "6000",
+      "inN": true,
+      "color": "#2457C5",
+      "x": 120,
+      "y": 300
+    },
+    {
+      "id": "c3",
+      "name": "I",
+      "description": "Infectious",
+      "init": "1",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "R",
+      "description": "Recovered",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 520,
+      "y": 140
+    }
+  ],
+  "parameters": [
+    {
+      "name": "beta",
+      "symbol": "",
+      "value": "0.4",
+      "description": "transmission rate per day"
+    },
+    {
+      "name": "gamma",
+      "symbol": "",
+      "value": "1 / 7",
+      "description": "recovery rate"
+    },
+    {
+      "name": "eff",
+      "symbol": "",
+      "value": "0.6",
+      "description": "vaccine efficacy against infection"
+    }
+  ],
+  "variables": [
+    {
+      "name": "lam",
+      "symbol": "",
+      "expr": "beta * I / N",
+      "description": "force of infection",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "lam",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "(1 - eff) * lam",
+      "output": "breakthrough",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "gamma",
+      "output": "",
+      "curve": 0
+    }
+  ]
+}

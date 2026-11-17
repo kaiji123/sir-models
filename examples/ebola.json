@@ -1,0 +1,239 @@
+{
+  "version": 1,
+  "id": "ebola",
+  "category": "Natural history",
+  "name": "Ebola (community, hospital, funeral)",
+  "description": "Transmission in the community (I), in hospital (H) and at funerals (F); structure after Legrand et al.\nParameter values are illustrative.",
+  "reference": "Legrand et al. (2007), Epidemiology and Infection 135:610-621",
+  "referenceUrl": "",
+  "time": {
+    "start": "0",
+    "stop": "300",
+    "step": "0.5",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "Susceptible",
+      "init": "99999",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 220
+    },
+    {
+      "id": "c2",
+      "name": "E",
+      "description": "Exposed",
+      "init": "1",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 220
+    },
+    {
+      "id": "c3",
+      "name": "I",
+      "description": "Infectious (community)",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 220
+    },
+    {
+      "id": "c4",
+      "name": "H",
+      "description": "Hospitalised",
+      "init": "0",
+      "inN": true,
+      "color": "#6A2C9C",
+      "x": 720,
+      "y": 348
+    },
+    {
+      "id": "c5",
+      "name": "Fu",
+      "description": "Dead, not yet buried (funeral)",
+      "init": "0",
+      "inN": true,
+      "color": "#5D4037",
+      "x": 920,
+      "y": 220
+    },
+    {
+      "id": "c6",
+      "name": "R",
+      "description": "Removed",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 720,
+      "y": 92
+    }
+  ],
+  "parameters": [
+    {
+      "name": "betaI",
+      "symbol": "β_I",
+      "value": "0.3",
+      "description": "transmission rate in the community"
+    },
+    {
+      "name": "betaH",
+      "symbol": "β_H",
+      "value": "0.05",
+      "description": "transmission rate in hospital"
+    },
+    {
+      "name": "betaF",
+      "symbol": "β_F",
+      "value": "0.4",
+      "description": "transmission rate at funerals"
+    },
+    {
+      "name": "alpha",
+      "symbol": "",
+      "value": "1 / 7",
+      "description": "1/(incubation period)"
+    },
+    {
+      "name": "theta",
+      "symbol": "",
+      "value": "0.5",
+      "description": "proportion of cases hospitalised"
+    },
+    {
+      "name": "delta",
+      "symbol": "",
+      "value": "0.7",
+      "description": "case fatality ratio"
+    },
+    {
+      "name": "gammaH",
+      "symbol": "γ_h",
+      "value": "1 / 5",
+      "description": "1/(onset to hospitalisation)"
+    },
+    {
+      "name": "gammaD",
+      "symbol": "γ_d",
+      "value": "1 / 9.6",
+      "description": "1/(onset to death)"
+    },
+    {
+      "name": "gammaI",
+      "symbol": "γ_i",
+      "value": "1 / 10",
+      "description": "1/(onset to recovery)"
+    },
+    {
+      "name": "gammaDH",
+      "symbol": "γ_dh",
+      "value": "1 / 4.6",
+      "description": "1/(hospitalisation to death)"
+    },
+    {
+      "name": "gammaIH",
+      "symbol": "γ_ih",
+      "value": "1 / 5",
+      "description": "1/(hospitalisation to recovery)"
+    },
+    {
+      "name": "gammaF",
+      "symbol": "γ_f",
+      "value": "1 / 2",
+      "description": "1/(death to burial)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "lam",
+      "symbol": "",
+      "expr": "(betaI * I + betaH * H + betaF * Fu) / N",
+      "description": "force of infection",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lam",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "alpha",
+      "output": "onsets",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "gammaH * theta",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c3",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "gammaD * (1 - theta) * delta",
+      "output": "",
+      "curve": -40
+    },
+    {
+      "id": "f5",
+      "from": "c3",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "gammaI * (1 - theta) * (1 - delta)",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "gammaDH * delta",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": "c4",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "gammaIH * (1 - delta)",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c5",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "gammaF",
+      "output": "burials",
+      "curve": 0,
+      "ox": 920,
+      "oy": 350
+    }
+  ]
+}

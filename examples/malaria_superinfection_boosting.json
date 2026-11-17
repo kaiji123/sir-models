@@ -1,0 +1,315 @@
+{
+  "version": 1,
+  "id": "malaria_superinfection_boosting",
+  "category": "Vector-borne",
+  "name": "Ross–Macdonald with superinfection clearance and boosted acquired immunity (Macdonald/Dietz superinfection + Aron 1988 boosting) [ILLUSTRATIVE-COMPOSITE]",
+  "description": "P. falciparum malaria, stable endemic areas.\nParameter values: 0 of 9 checked against the source; the rest are recalled or illustrative.",
+  "reference": "",
+  "referenceUrl": "",
+  "time": {
+    "start": "0",
+    "stop": "7300",
+    "step": "10",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Sh",
+      "description": "susceptible humans",
+      "init": "990",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Ih",
+      "description": "infected/infectious humans (possibly carrying several broods)",
+      "init": "10",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Rh",
+      "description": "immune humans: not infectious, immunity kept up by re-exposure",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "Sv",
+      "description": "susceptible mosquitoes",
+      "init": "4950",
+      "inN": false,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 356
+    },
+    {
+      "id": "c5",
+      "name": "Ev",
+      "description": "mosquitoes in extrinsic incubation",
+      "init": "0",
+      "inN": false,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 356
+    },
+    {
+      "id": "c6",
+      "name": "Iv",
+      "description": "infectious mosquitoes",
+      "init": "50",
+      "inN": false,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 356
+    }
+  ],
+  "parameters": [
+    {
+      "name": "a_bite",
+      "symbol": "",
+      "value": "0.3",
+      "description": "human-biting rate per mosquito (1/day)"
+    },
+    {
+      "name": "p_mh",
+      "symbol": "",
+      "value": "0.1",
+      "description": "mosquito → human transmission probability per bite"
+    },
+    {
+      "name": "p_hm",
+      "symbol": "",
+      "value": "0.5",
+      "description": "human → mosquito transmission probability per bite"
+    },
+    {
+      "name": "r_clear",
+      "symbol": "",
+      "value": "0.005",
+      "description": "clearance rate of a single infection (about 200 days) (1/day)"
+    },
+    {
+      "name": "tau_imm",
+      "symbol": "",
+      "value": "1825",
+      "description": "immune memory without boosting (illustrative) (days)"
+    },
+    {
+      "name": "mu_h",
+      "symbol": "",
+      "value": "5.5e-5",
+      "description": "human birth = death rate (50-year life) (1/day)"
+    },
+    {
+      "name": "mu_v",
+      "symbol": "",
+      "value": "0.1",
+      "description": "mosquito death rate (1/day)"
+    },
+    {
+      "name": "nu_v",
+      "symbol": "",
+      "value": "0.1",
+      "description": "1/EIP (1/day)"
+    },
+    {
+      "name": "m_ratio",
+      "symbol": "",
+      "value": "5",
+      "description": "sets the initial Nv; mosquito births balance deaths (mosquitoes/human)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "Nh",
+      "symbol": "",
+      "expr": "Sh + Ih + Rh",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "Nv",
+      "symbol": "",
+      "expr": "Sv + Ev + Iv",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "h_foi",
+      "symbol": "",
+      "expr": "pmax(a_bite*p_mh*Iv/Nh, 1e-10)",
+      "description": "human force of infection (EIR × b); the floor avoids 0/0",
+      "output": false
+    },
+    {
+      "name": "r_eff",
+      "symbol": "",
+      "expr": "h_foi/(exp(h_foi/r_clear) - 1)",
+      "description": "superinfection-adjusted clearance rate (tends to r_clear as h_foi → 0)",
+      "output": false
+    },
+    {
+      "name": "w_loss",
+      "symbol": "",
+      "expr": "h_foi/(exp(h_foi*tau_imm) - 1)",
+      "description": "immunity loss rate with boosting (tends to 1/tau_imm as h_foi → 0)",
+      "output": false
+    },
+    {
+      "name": "lambda_v",
+      "symbol": "",
+      "expr": "a_bite*p_hm*Ih/Nh",
+      "description": "mosquito force of infection",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "mu_h*Nh",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "h_foi",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "r_eff",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c3",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "w_loss",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f5",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_h",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    },
+    {
+      "id": "f6",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_h",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 270
+    },
+    {
+      "id": "f7",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_h",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 270
+    },
+    {
+      "id": "f8",
+      "from": null,
+      "to": "c4",
+      "kind": "absolute",
+      "rate": "mu_v*Nv",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 226
+    },
+    {
+      "id": "f9",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "lambda_v",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f10",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "nu_v",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f11",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_v",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 486
+    },
+    {
+      "id": "f12",
+      "from": "c5",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_v",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 486
+    },
+    {
+      "id": "f13",
+      "from": "c6",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_v",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 486
+    }
+  ]
+}

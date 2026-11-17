@@ -1,0 +1,359 @@
+{
+  "version": 1,
+  "id": "chagas_household_cohen2001",
+  "category": "Vector-borne",
+  "name": "Domestic Chagas transmission: Triatoma infestans with humans, dogs and non-competent chickens (after Cohen & Gürtler 2001) [ILLUSTRATIVE-COMPOSITE]",
+  "description": "Chagas disease (Trypanosoma cruzi), rural households, Santiago del Estero, Argentina.\nParameter values: 0 of 14 checked against the source; the rest are recalled or illustrative.",
+  "reference": "",
+  "referenceUrl": "",
+  "time": {
+    "start": "0",
+    "stop": "7300",
+    "step": "10",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Hs",
+      "description": "uninfected humans",
+      "init": "5",
+      "inN": true,
+      "color": "#6A2C9C",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Hi",
+      "description": "infected humans (chronic, lifelong)",
+      "init": "0",
+      "inN": true,
+      "color": "#6A2C9C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Gs",
+      "description": "uninfected dogs",
+      "init": "1.9",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 120,
+      "y": 356
+    },
+    {
+      "id": "c4",
+      "name": "Gi",
+      "description": "infected dogs",
+      "init": "0.1",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 320,
+      "y": 356
+    },
+    {
+      "id": "c5",
+      "name": "Vs",
+      "description": "uninfected triatomine bugs",
+      "init": "990",
+      "inN": false,
+      "color": "#2457C5",
+      "x": 120,
+      "y": 572
+    },
+    {
+      "id": "c6",
+      "name": "Vi",
+      "description": "infected bugs (lifelong)",
+      "init": "10",
+      "inN": false,
+      "color": "#2457C5",
+      "x": 320,
+      "y": 572
+    }
+  ],
+  "parameters": [
+    {
+      "name": "a_b",
+      "symbol": "",
+      "value": "0.1429",
+      "description": "blood meals per bug per day (weekly) (1/day)"
+    },
+    {
+      "name": "w_hum",
+      "symbol": "",
+      "value": "1",
+      "description": "feeding weight on humans"
+    },
+    {
+      "name": "w_dog",
+      "symbol": "",
+      "value": "2.5",
+      "description": "feeding weight on dogs (dogs preferred)"
+    },
+    {
+      "name": "w_chk",
+      "symbol": "",
+      "value": "1",
+      "description": "feeding weight on chickens"
+    },
+    {
+      "name": "N_chk",
+      "symbol": "",
+      "value": "5",
+      "description": "constant (chickens)"
+    },
+    {
+      "name": "p_vh",
+      "symbol": "",
+      "value": "5.8e-4",
+      "description": "bug → human per-contact probability (Nouvellet 2013)"
+    },
+    {
+      "name": "p_vg",
+      "symbol": "",
+      "value": "0.001",
+      "description": "bug → dog per-contact probability"
+    },
+    {
+      "name": "p_hv",
+      "symbol": "",
+      "value": "0.05",
+      "description": "infected human → bug per-meal probability"
+    },
+    {
+      "name": "p_gv",
+      "symbol": "",
+      "value": "0.49",
+      "description": "infected dog → bug per-meal probability"
+    },
+    {
+      "name": "mu_hum",
+      "symbol": "",
+      "value": "4.57e-5",
+      "description": "human birth/death (1/day)"
+    },
+    {
+      "name": "mu_dog",
+      "symbol": "",
+      "value": "9.13e-4",
+      "description": "dog birth/death (3-yr life) (1/day)"
+    },
+    {
+      "name": "r_bug",
+      "symbol": "",
+      "value": "0.02",
+      "description": "bug per-capita recruitment (1/day)"
+    },
+    {
+      "name": "mu_bug",
+      "symbol": "",
+      "value": "0.005",
+      "description": "bug death (1/day)"
+    },
+    {
+      "name": "K_bug",
+      "symbol": "",
+      "value": "1000",
+      "description": " (bugs/house)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "Nh",
+      "symbol": "",
+      "expr": "Hs + Hi",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "Ng",
+      "symbol": "",
+      "expr": "Gs + Gi",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "Nv",
+      "symbol": "",
+      "expr": "Vs + Vi",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "wsum",
+      "symbol": "",
+      "expr": "w_hum*Nh + w_dog*Ng + w_chk*N_chk",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "f_hum",
+      "symbol": "",
+      "expr": "w_hum*Nh/wsum",
+      "description": "share of bites on humans",
+      "output": false
+    },
+    {
+      "name": "f_dog",
+      "symbol": "",
+      "expr": "w_dog*Ng/wsum",
+      "description": "share of bites on dogs",
+      "output": false
+    },
+    {
+      "name": "lam_hum",
+      "symbol": "",
+      "expr": "a_b*f_hum*p_vh*Vi/Nh",
+      "description": "human force of infection",
+      "output": false
+    },
+    {
+      "name": "lam_dog",
+      "symbol": "",
+      "expr": "a_b*f_dog*p_vg*Vi/Ng",
+      "description": "dog force of infection",
+      "output": false
+    },
+    {
+      "name": "lam_bug",
+      "symbol": "",
+      "expr": "a_b*(f_hum*p_hv*Hi/Nh + f_dog*p_gv*Gi/Ng)",
+      "description": "bug force of infection",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "mu_hum*Nh",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lam_hum",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_hum",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    },
+    {
+      "id": "f4",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_hum",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 270
+    },
+    {
+      "id": "f5",
+      "from": null,
+      "to": "c3",
+      "kind": "absolute",
+      "rate": "mu_dog*Ng",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 226
+    },
+    {
+      "id": "f6",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "lam_dog",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_dog",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 486
+    },
+    {
+      "id": "f8",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_dog",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 486
+    },
+    {
+      "id": "f9",
+      "from": null,
+      "to": "c5",
+      "kind": "absolute",
+      "rate": "r_bug*Nv",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 442
+    },
+    {
+      "id": "f10",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "lam_bug",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f11",
+      "from": "c5",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_bug + (r_bug - mu_bug)*Nv/K_bug",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 702
+    },
+    {
+      "id": "f12",
+      "from": "c6",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_bug + (r_bug - mu_bug)*Nv/K_bug",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 702
+    }
+  ]
+}

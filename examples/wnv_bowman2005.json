@@ -1,0 +1,481 @@
+{
+  "version": 1,
+  "id": "wnv_bowman2005",
+  "category": "Vector-borne",
+  "name": "West Nile virus: mosquitoes–birds–humans (Bowman et al. 2005) [VERIFIED-FULL]",
+  "description": "West Nile virus, North America (single season).\nParameter values: 0 of 18 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Bowman C, Gumel AB, van den Driessche P, Wu J, Zhu H (2005). A mathematical model for assessing control strategies against West Nile virus. Bull Math Biol 67:1107–1133. https://doi.org/10.1016/j.bulm.2005.01.002 ; full text in the YorkSpace repository. The…",
+  "referenceUrl": "https://doi.org/10.1016/j.bulm.2005.01.002",
+  "time": {
+    "start": "0",
+    "stop": "200",
+    "step": "0.2",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Mu",
+      "description": "uninfected female mosquitoes",
+      "init": "400000",
+      "inN": false,
+      "color": "#F3C6D3",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Mi",
+      "description": "infected (infectious) mosquitoes",
+      "init": "0",
+      "inN": false,
+      "color": "#F3C6D3",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Bu",
+      "description": "uninfected birds",
+      "init": "999990",
+      "inN": false,
+      "color": "#DDDDDD",
+      "x": 120,
+      "y": 356
+    },
+    {
+      "id": "c4",
+      "name": "Bi",
+      "description": "infected birds",
+      "init": "10",
+      "inN": false,
+      "color": "#DDDDDD",
+      "x": 320,
+      "y": 356
+    },
+    {
+      "id": "c5",
+      "name": "Sh",
+      "description": "susceptible humans",
+      "init": "766500",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 572
+    },
+    {
+      "id": "c6",
+      "name": "Eh",
+      "description": "infected, asymptomatic (incubating)",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 572
+    },
+    {
+      "id": "c7",
+      "name": "Ih",
+      "description": "symptomatic",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 572
+    },
+    {
+      "id": "c8",
+      "name": "Hh",
+      "description": "hospitalised",
+      "init": "0",
+      "inN": true,
+      "color": "#6A2C9C",
+      "x": 720,
+      "y": 572
+    },
+    {
+      "id": "c9",
+      "name": "Rh",
+      "description": "recovered (lifelong immunity)",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 920,
+      "y": 572
+    }
+  ],
+  "parameters": [
+    {
+      "name": "Pi_M",
+      "symbol": "",
+      "value": "20000",
+      "description": "mosquito recruitment. \"Variable\" in the paper; this value is illustrative. (mosquitoes/day)"
+    },
+    {
+      "name": "mu_M",
+      "symbol": "",
+      "value": "0.05",
+      "description": "mosquito death. \"Variable\" in the paper; illustrative 20-day life. (1/day)"
+    },
+    {
+      "name": "Pi_B",
+      "symbol": "",
+      "value": "1000",
+      "description": "bird recruitment (birds/day)"
+    },
+    {
+      "name": "mu_B",
+      "symbol": "",
+      "value": "0.001",
+      "description": "1/(1000 d) bird life (1/day)"
+    },
+    {
+      "name": "Pi_H",
+      "symbol": "",
+      "value": "30",
+      "description": "human recruitment (humans/day)"
+    },
+    {
+      "name": "mu_H",
+      "symbol": "",
+      "value": "3.914e-5",
+      "description": "1/(70×365 d) (1/day)"
+    },
+    {
+      "name": "b1",
+      "symbol": "",
+      "value": "0.09",
+      "description": "biting rate on birds (1/day)"
+    },
+    {
+      "name": "b2_base",
+      "symbol": "",
+      "value": "0.09",
+      "description": "biting rate on humans before protection (1/day)"
+    },
+    {
+      "name": "comp_c",
+      "symbol": "",
+      "value": "0",
+      "description": "fraction complying with personal protection (0–1)"
+    },
+    {
+      "name": "q_eff",
+      "symbol": "",
+      "value": "0",
+      "description": "efficacy of personal protection (0–1)"
+    },
+    {
+      "name": "bet1",
+      "symbol": "",
+      "value": "0.16",
+      "description": "bird → mosquito transmission probability"
+    },
+    {
+      "name": "bet2",
+      "symbol": "",
+      "value": "0.88",
+      "description": "mosquito → bird transmission probability"
+    },
+    {
+      "name": "bet3",
+      "symbol": "",
+      "value": "0.88",
+      "description": "mosquito → human transmission probability"
+    },
+    {
+      "name": "d_B",
+      "symbol": "",
+      "value": "5e-5",
+      "description": "WNV-induced bird death (1/day)"
+    },
+    {
+      "name": "d_H",
+      "symbol": "",
+      "value": "5e-7",
+      "description": "WNV-induced human death (1/day)"
+    },
+    {
+      "name": "alpha_h",
+      "symbol": "",
+      "value": "0.0714",
+      "description": "1/(14 d) incubation in humans (1/day)"
+    },
+    {
+      "name": "delta_h",
+      "symbol": "",
+      "value": "1",
+      "description": "hospitalisation rate (1/day)"
+    },
+    {
+      "name": "tau_h",
+      "symbol": "",
+      "value": "0.0714",
+      "description": "1/(14 d) recovery (1/day)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "NM",
+      "symbol": "",
+      "expr": "Mu + Mi",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "NB",
+      "symbol": "",
+      "expr": "Bu + Bi",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "NH",
+      "symbol": "",
+      "expr": "Sh + Eh + Ih + Hh + Rh",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "b2",
+      "symbol": "",
+      "expr": "b2_base*(1 - comp_c*q_eff)",
+      "description": "biting rate on humans after protection",
+      "output": false
+    },
+    {
+      "name": "lam_M",
+      "symbol": "",
+      "expr": "b1*bet1*Bi/NB",
+      "description": "mosquito force of infection",
+      "output": false
+    },
+    {
+      "name": "lam_B",
+      "symbol": "",
+      "expr": "b1*bet2*Mi/NB",
+      "description": "bird force of infection",
+      "output": false
+    },
+    {
+      "name": "lam_H",
+      "symbol": "",
+      "expr": "b2*bet3*Mi/NH",
+      "description": "human force of infection",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "Pi_M",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lam_M",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_M",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    },
+    {
+      "id": "f4",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_M",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 270
+    },
+    {
+      "id": "f5",
+      "from": null,
+      "to": "c3",
+      "kind": "absolute",
+      "rate": "Pi_B",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 226
+    },
+    {
+      "id": "f6",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "lam_B",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_B",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 486
+    },
+    {
+      "id": "f8",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_B",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 486
+    },
+    {
+      "id": "f9",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "d_B",
+      "output": "",
+      "curve": 0,
+      "ox": 370,
+      "oy": 486
+    },
+    {
+      "id": "f10",
+      "from": null,
+      "to": "c5",
+      "kind": "absolute",
+      "rate": "Pi_H",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 442
+    },
+    {
+      "id": "f11",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "lam_H",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f12",
+      "from": "c6",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "alpha_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f13",
+      "from": "c7",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "delta_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f14",
+      "from": "c8",
+      "to": "c9",
+      "kind": "per_capita",
+      "rate": "tau_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f15",
+      "from": "c8",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "d_H",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 702
+    },
+    {
+      "id": "f16",
+      "from": "c5",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_H",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 702
+    },
+    {
+      "id": "f17",
+      "from": "c6",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_H",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 702
+    },
+    {
+      "id": "f18",
+      "from": "c7",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_H",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 702
+    },
+    {
+      "id": "f19",
+      "from": "c8",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_H",
+      "output": "",
+      "curve": 0,
+      "ox": 770,
+      "oy": 702
+    },
+    {
+      "id": "f20",
+      "from": "c9",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_H",
+      "output": "",
+      "curve": 0,
+      "ox": 920,
+      "oy": 702
+    }
+  ]
+}

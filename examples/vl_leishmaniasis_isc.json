@@ -1,0 +1,468 @@
+{
+  "version": 1,
+  "id": "vl_leishmaniasis_isc",
+  "category": "Vector-borne",
+  "name": "Visceral leishmaniasis (anthroponotic, Indian subcontinent) with asymptomatic, VL, treatment and PKDL; sandfly SEI (simplified after Stauch et al. 2011) [ILLUSTRATIVE-COMPOSITE]",
+  "description": "Visceral leishmaniasis (L. donovani, Phlebotomus argentipes), Bihar, India / Nepal.\nParameter values: 0 of 17 checked against the source; the rest are recalled or illustrative.",
+  "reference": "",
+  "referenceUrl": "",
+  "time": {
+    "start": "0",
+    "stop": "7300",
+    "step": "10",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Sh",
+      "description": "susceptible humans",
+      "init": "9800",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Ah",
+      "description": "asymptomatic infected (weakly infectious)",
+      "init": "150",
+      "inN": true,
+      "color": "#E57373",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Kh",
+      "description": "clinical VL (kala-azar, infectious)",
+      "init": "10",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "Tx",
+      "description": "under treatment",
+      "init": "0",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 720,
+      "y": 140
+    },
+    {
+      "id": "c5",
+      "name": "Ph",
+      "description": "post-kala-azar dermal leishmaniasis (infectious)",
+      "init": "0",
+      "inN": true,
+      "color": "#F0A35E",
+      "x": 920,
+      "y": 140
+    },
+    {
+      "id": "c6",
+      "name": "Rh",
+      "description": "recovered/immune",
+      "init": "40",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 1120,
+      "y": 140
+    },
+    {
+      "id": "c7",
+      "name": "Sf",
+      "description": "susceptible sandflies",
+      "init": "49000",
+      "inN": false,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 356
+    },
+    {
+      "id": "c8",
+      "name": "Ef",
+      "description": "sandflies in extrinsic incubation",
+      "init": "500",
+      "inN": false,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 356
+    },
+    {
+      "id": "c9",
+      "name": "If",
+      "description": "infectious sandflies",
+      "init": "500",
+      "inN": false,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 356
+    }
+  ],
+  "parameters": [
+    {
+      "name": "a_sf",
+      "symbol": "",
+      "value": "0.25",
+      "description": "sandfly biting rate (bite every 4 days) (1/day)"
+    },
+    {
+      "name": "p_fh",
+      "symbol": "",
+      "value": "0.1",
+      "description": "sandfly → human per-bite infection probability"
+    },
+    {
+      "name": "k_A",
+      "symbol": "",
+      "value": "0.025",
+      "description": "per-bite infectivity of asymptomatic humans to sandflies"
+    },
+    {
+      "name": "k_K",
+      "symbol": "",
+      "value": "0.5",
+      "description": "per-bite infectivity of VL patients"
+    },
+    {
+      "name": "k_Tx",
+      "symbol": "",
+      "value": "0.25",
+      "description": "per-bite infectivity of treated patients"
+    },
+    {
+      "name": "k_P",
+      "symbol": "",
+      "value": "0.3",
+      "description": "per-bite infectivity of PKDL patients"
+    },
+    {
+      "name": "w_A",
+      "symbol": "",
+      "value": "0.00667",
+      "description": "exit from asymptomatic (150 d) (1/day)"
+    },
+    {
+      "name": "p_K",
+      "symbol": "",
+      "value": "0.1",
+      "description": "fraction of infections progressing to VL"
+    },
+    {
+      "name": "r_tx",
+      "symbol": "",
+      "value": "0.0167",
+      "description": "VL onset → treatment (60 d) (1/day)"
+    },
+    {
+      "name": "d_K",
+      "symbol": "",
+      "value": "0.00167",
+      "description": "VL death before treatment (1/day)"
+    },
+    {
+      "name": "w_Tx",
+      "symbol": "",
+      "value": "0.0357",
+      "description": "treatment duration (28 d) (1/day)"
+    },
+    {
+      "name": "f_P",
+      "symbol": "",
+      "value": "0.025",
+      "description": "fraction developing PKDL after treatment"
+    },
+    {
+      "name": "w_P",
+      "symbol": "",
+      "value": "0.00091",
+      "description": "PKDL duration (3 yr) (1/day)"
+    },
+    {
+      "name": "rho_h",
+      "symbol": "",
+      "value": "0.000548",
+      "description": "waning immunity (5 yr) (1/day)"
+    },
+    {
+      "name": "mu_h",
+      "symbol": "",
+      "value": "4.57e-5",
+      "description": "human birth/death (60-yr life) (1/day)"
+    },
+    {
+      "name": "mu_f",
+      "symbol": "",
+      "value": "0.0714",
+      "description": "sandfly death (14-d life) (1/day)"
+    },
+    {
+      "name": "nu_f",
+      "symbol": "",
+      "value": "0.2",
+      "description": "1/EIP (5 d) (1/day)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "Nh",
+      "symbol": "",
+      "expr": "Sh + Ah + Kh + Tx + Ph + Rh",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "Nf",
+      "symbol": "",
+      "expr": "Sf + Ef + If",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "lambda_h",
+      "symbol": "",
+      "expr": "a_sf*p_fh*If/Nh",
+      "description": "human force of infection",
+      "output": false
+    },
+    {
+      "name": "lambda_f",
+      "symbol": "",
+      "expr": "a_sf*(k_A*Ah + k_K*Kh + k_Tx*Tx + k_P*Ph)/Nh",
+      "description": "sandfly force of infection",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "mu_h*Nh",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lambda_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "p_K*w_A",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c2",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "(1 - p_K)*w_A",
+      "output": "",
+      "curve": 50
+    },
+    {
+      "id": "f5",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "r_tx",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "d_K",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 270
+    },
+    {
+      "id": "f7",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "f_P*w_Tx",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c4",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "(1 - f_P)*w_Tx",
+      "output": "",
+      "curve": 50
+    },
+    {
+      "id": "f9",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "w_P",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f10",
+      "from": "c6",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "rho_h",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f11",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_h",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    },
+    {
+      "id": "f12",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_h",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 270
+    },
+    {
+      "id": "f13",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_h",
+      "output": "",
+      "curve": 0,
+      "ox": 570,
+      "oy": 270
+    },
+    {
+      "id": "f14",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_h",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 270
+    },
+    {
+      "id": "f15",
+      "from": "c5",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_h",
+      "output": "",
+      "curve": 0,
+      "ox": 920,
+      "oy": 270
+    },
+    {
+      "id": "f16",
+      "from": "c6",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_h",
+      "output": "",
+      "curve": 0,
+      "ox": 1120,
+      "oy": 270
+    },
+    {
+      "id": "f17",
+      "from": null,
+      "to": "c7",
+      "kind": "absolute",
+      "rate": "mu_f*Nf",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 226
+    },
+    {
+      "id": "f18",
+      "from": "c7",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "lambda_f",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f19",
+      "from": "c8",
+      "to": "c9",
+      "kind": "per_capita",
+      "rate": "nu_f",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f20",
+      "from": "c7",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_f",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 486
+    },
+    {
+      "id": "f21",
+      "from": "c8",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_f",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 486
+    },
+    {
+      "id": "f22",
+      "from": "c9",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_f",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 486
+    }
+  ]
+}

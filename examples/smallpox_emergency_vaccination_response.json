@@ -1,0 +1,284 @@
+{
+  "version": 1,
+  "id": "smallpox_emergency_vaccination_response",
+  "category": "Zoonoses & emerging",
+  "name": "Smallpox outbreak response: traced (ring) versus mass vaccination",
+  "description": "Smallpox, human; emergency public-health vaccination response.\nThis is a public-health response-logistics model: the policy question it answers is whether contact-traced vaccination or population-wide vaccination averts more deaths given a finite daily vaccination capacity.\nParameter values: 0 of 11 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Kaplan EH, Craft DL, Wein LM (2002). Emergency response to a smallpox attack: the case for mass vaccination. PNAS 99(16):10935–10940",
+  "referenceUrl": "https://doi.org/10.1073/pnas.162282799",
+  "time": {
+    "start": "0",
+    "stop": "180",
+    "step": "0.2",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N_total"
+  },
+  "solver": {
+    "hmax": "0.2"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "susceptible, not yet vaccinated",
+      "init": "1e7",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 220
+    },
+    {
+      "id": "c2",
+      "name": "E",
+      "description": "infected, latent (not infectious, not yet symptomatic)",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 220
+    },
+    {
+      "id": "c3",
+      "name": "Ii",
+      "description": "infectious, in the community",
+      "init": "10",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "Q",
+      "description": "isolated/removed from circulation (hospitalised or quarantined)",
+      "init": "0",
+      "inN": true,
+      "color": "#00838F",
+      "x": 720,
+      "y": 220
+    },
+    {
+      "id": "c5",
+      "name": "V",
+      "description": "vaccinated and protected",
+      "init": "0",
+      "inN": true,
+      "color": "#2457C5",
+      "x": 520,
+      "y": 300
+    },
+    {
+      "id": "c6",
+      "name": "R",
+      "description": "recovered, immune",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 920,
+      "y": 140
+    },
+    {
+      "id": "c7",
+      "name": "D",
+      "description": "cumulative deaths",
+      "init": "0",
+      "inN": false,
+      "color": "#111111",
+      "x": 920,
+      "y": 300
+    },
+    {
+      "id": "c8",
+      "name": "CV",
+      "description": "cumulative vaccine doses delivered",
+      "init": "0",
+      "inN": false,
+      "color": "#8E0E0E",
+      "x": 120,
+      "y": 516
+    }
+  ],
+  "parameters": [
+    {
+      "name": "beta",
+      "symbol": "",
+      "value": "0.105",
+      "description": "transmission rate (gives roughly 3 secondary cases per infectious person over the symptomatic period) [illustrative] (per day)"
+    },
+    {
+      "name": "sigma",
+      "symbol": "",
+      "value": "1/14",
+      "description": "rate of leaving latency (mean latent period ≈14 d) [unverified] (per day)"
+    },
+    {
+      "name": "theta",
+      "symbol": "",
+      "value": "1/3",
+      "description": "rate at which symptomatic cases are detected and isolated (≈3 d from rash to isolation) [illustrative] (per day)"
+    },
+    {
+      "name": "gamma",
+      "symbol": "",
+      "value": "1/14",
+      "description": "rate of resolution (recovery or death) in isolation [illustrative] (per day)"
+    },
+    {
+      "name": "cfr",
+      "symbol": "",
+      "value": "0.3",
+      "description": "case fatality of ordinary variola major [unverified] (dimensionless)"
+    },
+    {
+      "name": "eps_pre",
+      "symbol": "",
+      "value": "0.95",
+      "description": "efficacy of vaccination of a susceptible [illustrative] (dimensionless)"
+    },
+    {
+      "name": "eps_post",
+      "symbol": "",
+      "value": "0.5",
+      "description": "efficacy of post-exposure vaccination of a latent individual (protection declines sharply after the first few days) [illustrative] (dimensionless)"
+    },
+    {
+      "name": "tau_v",
+      "symbol": "",
+      "value": "7",
+      "description": "delay before the vaccination campaign starts [illustrative] (days)"
+    },
+    {
+      "name": "nu_ring",
+      "symbol": "",
+      "value": "4",
+      "description": "traced-vaccination intensity [illustrative] (contacts traced and vaccinated per isolated case per day)"
+    },
+    {
+      "name": "nu_mass",
+      "symbol": "",
+      "value": "0",
+      "description": "per-capita mass-vaccination rate once the campaign is running [illustrative] (per day)"
+    },
+    {
+      "name": "cap",
+      "symbol": "",
+      "value": "2e5",
+      "description": "maximum daily vaccination throughput [illustrative] (doses per day)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "N",
+      "symbol": "",
+      "expr": "S + E + Ii + Q + V + R",
+      "description": "living population",
+      "output": false
+    },
+    {
+      "name": "active",
+      "symbol": "",
+      "expr": "ifelse(t < tau_v, 0, 1)",
+      "description": "campaign switch",
+      "output": false
+    },
+    {
+      "name": "want",
+      "symbol": "",
+      "expr": "active * (nu_mass * (S + E) + nu_ring * theta * Ii)",
+      "description": "doses demanded per day",
+      "output": false
+    },
+    {
+      "name": "rate_v",
+      "symbol": "",
+      "expr": "pmin(want, cap) / pmax(S + E, 1)",
+      "description": "per-capita vaccination rate, capped by logistic throughput",
+      "output": false
+    },
+    {
+      "name": "lambda",
+      "symbol": "",
+      "expr": "beta * Ii / N",
+      "description": "force of infection",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lambda",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "rate_v * eps_pre",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "rate_v * eps_post",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "sigma",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "theta",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c4",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "gamma * cfr",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": "c4",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "gamma * (1 - cfr)",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": null,
+      "to": "c8",
+      "kind": "absolute",
+      "rate": "pmin(want, cap)",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 386
+    }
+  ]
+}

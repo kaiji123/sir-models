@@ -1,0 +1,168 @@
+{
+  "version": 1,
+  "id": "superinfection_nowak_may",
+  "category": "Classic extensions",
+  "name": "two-strain superinfection (virulence evolution)",
+  "description": "evolution of virulence; generic parasite.\nWithout superinfection (s_sup = 0) the strain with the highest R0 = b·(Λ/μ)/(μ+v) excludes the other.\nParameter values: 0 of 7 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Nowak M.A. & May R.M. (1994) \"Superinfection and the evolution of parasite virulence\", Proc. R. Soc. Lond. B 255:81–89",
+  "referenceUrl": "https://doi.org/10.1098/rspb.1994.0012",
+  "time": {
+    "start": "0",
+    "stop": "200",
+    "step": "0.2",
+    "unit": "years"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "X",
+      "description": "uninfected hosts",
+      "init": "990",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Y1",
+      "description": "infected with the more virulent strain 1",
+      "init": "5",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Y2",
+      "description": "infected with the less virulent strain 2",
+      "init": "5",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 320,
+      "y": 140
+    }
+  ],
+  "parameters": [
+    {
+      "name": "Lambda",
+      "symbol": "",
+      "value": "100",
+      "description": "host recruitment (hosts/yr) [illustrative]"
+    },
+    {
+      "name": "mu",
+      "symbol": "",
+      "value": "0.1",
+      "description": "natural host death (1/yr) [illustrative]"
+    },
+    {
+      "name": "b1",
+      "symbol": "",
+      "value": "0.005",
+      "description": "transmission, strain 1 [illustrative]"
+    },
+    {
+      "name": "b2",
+      "symbol": "",
+      "value": "0.004",
+      "description": "transmission, strain 2 [illustrative]"
+    },
+    {
+      "name": "v1",
+      "symbol": "",
+      "value": "0.5",
+      "description": "virulence (extra death), strain 1 (1/yr) [illustrative]"
+    },
+    {
+      "name": "v2",
+      "symbol": "",
+      "value": "0.2",
+      "description": "virulence, strain 2 (1/yr) [illustrative]"
+    },
+    {
+      "name": "s_sup",
+      "symbol": "",
+      "value": "1.0",
+      "description": "superinfection coefficient (strain 1 superinfecting Y2 hosts) [illustrative]"
+    }
+  ],
+  "variables": [],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "Lambda",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "b1*Y1",
+      "output": "",
+      "curve": 50
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "b2*Y2",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c3",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "s_sup*b1*Y1",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    },
+    {
+      "id": "f6",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu + v1",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 270
+    },
+    {
+      "id": "f7",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu + v2",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 270
+    }
+  ]
+}

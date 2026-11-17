@@ -1,0 +1,256 @@
+{
+  "version": 1,
+  "id": "sir_two_age",
+  "category": "Transmission routes",
+  "name": "SIR with two age groups",
+  "description": "Children and adults with a who-acquires-infection-from-whom (WAIFW) matrix and ageing.",
+  "reference": "Anderson & May (1991), Infectious Diseases of Humans, ch. 9; Keeling & Rohani (2008), Modeling Infectious Diseases in Humans and Animals, §3.1",
+  "referenceUrl": "",
+  "time": {
+    "start": "0",
+    "stop": "50",
+    "step": "0.02",
+    "unit": "years"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Sc",
+      "description": "Susceptible children",
+      "init": "2000",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Ic",
+      "description": "Infectious children",
+      "init": "10",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Rc",
+      "description": "Recovered children",
+      "init": "17990",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "Sa",
+      "description": "Susceptible adults",
+      "init": "1000",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 332
+    },
+    {
+      "id": "c5",
+      "name": "Ia",
+      "description": "Infectious adults",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 332
+    },
+    {
+      "id": "c6",
+      "name": "Ra",
+      "description": "Recovered adults",
+      "init": "79000",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 520,
+      "y": 332
+    }
+  ],
+  "parameters": [
+    {
+      "name": "b_cc",
+      "symbol": "β_cc",
+      "value": "1000",
+      "description": "transmission child -> child per year"
+    },
+    {
+      "name": "b_ca",
+      "symbol": "β_ca",
+      "value": "300",
+      "description": "transmission adult -> child per year"
+    },
+    {
+      "name": "b_ac",
+      "symbol": "β_ac",
+      "value": "300",
+      "description": "transmission child -> adult per year"
+    },
+    {
+      "name": "b_aa",
+      "symbol": "β_aa",
+      "value": "400",
+      "description": "transmission adult -> adult per year"
+    },
+    {
+      "name": "gamma",
+      "symbol": "",
+      "value": "365 / 7",
+      "description": "recovery rate per year"
+    },
+    {
+      "name": "ageing",
+      "symbol": "",
+      "value": "1 / 15",
+      "description": "rate of moving from child to adult per year"
+    },
+    {
+      "name": "mu",
+      "symbol": "",
+      "value": "1 / 70",
+      "description": "birth rate per year (deaths in adults keep N constant)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "lam_c",
+      "symbol": "λ_c",
+      "expr": "(b_cc * Ic + b_ca * Ia) / N",
+      "description": "force of infection on children",
+      "output": false
+    },
+    {
+      "name": "lam_a",
+      "symbol": "λ_a",
+      "expr": "(b_ac * Ic + b_aa * Ia) / N",
+      "description": "force of infection on adults",
+      "output": false
+    },
+    {
+      "name": "mu_a",
+      "symbol": "",
+      "expr": "mu * N / (Sa + Ia + Ra)",
+      "description": "adult death rate balancing births",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "mu * N",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lam_c",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "gamma",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "lam_a",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "gamma",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c1",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "ageing",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": "c2",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "ageing",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c3",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "ageing",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f9",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_a",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 462
+    },
+    {
+      "id": "f10",
+      "from": "c5",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_a",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 462
+    },
+    {
+      "id": "f11",
+      "from": "c6",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_a",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 462
+    }
+  ]
+}

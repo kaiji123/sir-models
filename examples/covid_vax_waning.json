@@ -1,0 +1,299 @@
+{
+  "version": 1,
+  "id": "covid_vax_waning",
+  "category": "Respiratory",
+  "name": "COVID-19 SEIR-H with two-level vaccine protection, waning and reinfection",
+  "description": "COVID-19.\nvh_red would need a separate exposed class for vaccinated people (E_v) to act properly.\nParameter values: 0 of 13 checked against the source; the rest are recalled or illustrative.",
+  "reference": "[ILLUSTRATIVE] generic structure of the kind used in many 2021 vaccination models. Values are chosen to be plausible, not taken from a single paper. Waning anchor: Andrews N et al. \"Covid-19 vaccine effectiveness against the Omicron (B.1.1.529) variant.\" N…",
+  "referenceUrl": "https://doi.org/10.1056/NEJMoa2119451",
+  "time": {
+    "start": "0",
+    "stop": "730",
+    "step": "1",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "susceptible, unvaccinated",
+      "init": "0.7*1e6",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 220
+    },
+    {
+      "id": "c2",
+      "name": "V",
+      "description": "recently vaccinated (high protection)",
+      "init": "0",
+      "inN": true,
+      "color": "#2457C5",
+      "x": 1320,
+      "y": 220
+    },
+    {
+      "id": "c3",
+      "name": "Wv",
+      "description": "vaccinated, waned protection",
+      "init": "0",
+      "inN": true,
+      "color": "#A5D6A7",
+      "x": 1120,
+      "y": 220
+    },
+    {
+      "id": "c4",
+      "name": "E",
+      "description": "exposed",
+      "init": "100",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 220
+    },
+    {
+      "id": "c5",
+      "name": "Ip",
+      "description": "infectious",
+      "init": "100",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 220
+    },
+    {
+      "id": "c6",
+      "name": "Hc",
+      "description": "hospitalised",
+      "init": "0",
+      "inN": true,
+      "color": "#6A2C9C",
+      "x": 720,
+      "y": 220
+    },
+    {
+      "id": "c7",
+      "name": "R",
+      "description": "recovered (hybrid or natural immunity)",
+      "init": "0.3*1e6",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 920,
+      "y": 140
+    },
+    {
+      "id": "c8",
+      "name": "Dead",
+      "description": "COVID deaths",
+      "init": "0",
+      "inN": false,
+      "color": "#111111",
+      "x": 920,
+      "y": 300
+    }
+  ],
+  "parameters": [
+    {
+      "name": "R0_eff",
+      "symbol": "",
+      "value": "3",
+      "description": "illustrative"
+    },
+    {
+      "name": "sig_lat",
+      "symbol": "",
+      "value": "1/3",
+      "description": "latent period of 3 days (1/day) [illustrative]"
+    },
+    {
+      "name": "g_rec",
+      "symbol": "",
+      "value": "1/5",
+      "description": "infectious period of 5 days (1/day) [illustrative]"
+    },
+    {
+      "name": "p_hosp",
+      "symbol": "",
+      "value": "0.02",
+      "description": "hospitalised fraction, unvaccinated [illustrative]"
+    },
+    {
+      "name": "h_rec",
+      "symbol": "",
+      "value": "1/8",
+      "description": "hospital stay (1/day) [illustrative]"
+    },
+    {
+      "name": "p_die",
+      "symbol": "",
+      "value": "0.15",
+      "description": "in-hospital fatality [illustrative]"
+    },
+    {
+      "name": "vac_rate",
+      "symbol": "",
+      "value": "0.005",
+      "description": "per-capita vaccination rate of S (1/day) [illustrative]"
+    },
+    {
+      "name": "ve_V",
+      "symbol": "",
+      "value": "0.8",
+      "description": "leaky protection against infection [illustrative]"
+    },
+    {
+      "name": "ve_W",
+      "symbol": "",
+      "value": "0.3",
+      "description": "leaky protection against infection [illustrative]"
+    },
+    {
+      "name": "vh_red",
+      "symbol": "",
+      "value": "0.8",
+      "description": "extra reduction in hospitalisation if infected after vaccination [illustrative]"
+    },
+    {
+      "name": "wane_V",
+      "symbol": "",
+      "value": "1/120",
+      "description": "waning from V to Wv (1/day) [illustrative]"
+    },
+    {
+      "name": "wane_R",
+      "symbol": "",
+      "value": "1/180",
+      "description": "waning of infection immunity, R to Wv (1/day) [illustrative]"
+    },
+    {
+      "name": "boost_rate",
+      "symbol": "",
+      "value": "0.002",
+      "description": "booster from Wv back to V (1/day) [illustrative]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "foi",
+      "symbol": "",
+      "expr": "R0_eff*g_rec*Ip/N",
+      "description": "",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "foi",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c2",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "(1-ve_V)*foi",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f3",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "(1-ve_W)*foi",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f4",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "vac_rate",
+      "output": "",
+      "curve": 50
+    },
+    {
+      "id": "f5",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "wane_V",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f6",
+      "from": "c3",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "boost_rate",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": "c7",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "wane_R",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "sig_lat",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f9",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "p_hosp*g_rec",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f10",
+      "from": "c5",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "(1-p_hosp)*g_rec",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f11",
+      "from": "c6",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "(1-p_die)*h_rec",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f12",
+      "from": "c6",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "p_die*h_rec",
+      "output": "",
+      "curve": 0
+    }
+  ]
+}

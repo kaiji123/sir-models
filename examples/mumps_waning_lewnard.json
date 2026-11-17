@@ -1,0 +1,209 @@
+{
+  "version": 1,
+  "id": "mumps_waning_lewnard",
+  "category": "Respiratory",
+  "name": "Mumps SEIR with vaccine-derived immunity that wanes (Lewnard & Grad 2018)",
+  "description": "Mumps.\nthe booster flow acts on all of S, so it also reaches never-vaccinated people.\nParameter values: 0 of 8 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Lewnard JA, Grad YH. \"Vaccine waning and mumps re-emergence in the United States.\" Sci Transl Med 2018;10(433):eaao5945. https://doi.org/10.1126/scitranslmed.aao5945",
+  "referenceUrl": "https://doi.org/10.1126/scitranslmed.aao5945",
+  "time": {
+    "start": "0",
+    "stop": "100",
+    "step": "0.1",
+    "unit": "years"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "susceptible",
+      "init": "0.05*N0",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 220
+    },
+    {
+      "id": "c2",
+      "name": "E",
+      "description": "exposed",
+      "init": "10",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Ip",
+      "description": "infectious",
+      "init": "10",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 220
+    },
+    {
+      "id": "c4",
+      "name": "R",
+      "description": "infection-derived immunity, lifelong",
+      "init": "0.3*N0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 720,
+      "y": 220
+    },
+    {
+      "id": "c5",
+      "name": "V",
+      "description": "vaccine-derived immunity",
+      "init": "0.65*N0",
+      "inN": true,
+      "color": "#2457C5",
+      "x": 320,
+      "y": 300
+    }
+  ],
+  "parameters": [
+    {
+      "name": "R0_mu",
+      "symbol": "",
+      "value": "7",
+      "description": "illustrative"
+    },
+    {
+      "name": "sig_lat",
+      "symbol": "",
+      "value": "365/17",
+      "description": "17-day latent period (1/year) [illustrative]"
+    },
+    {
+      "name": "g_rec",
+      "symbol": "",
+      "value": "365/8",
+      "description": "8-day infectious period (1/year) [illustrative]"
+    },
+    {
+      "name": "p_vac",
+      "symbol": "",
+      "value": "0.92",
+      "description": "fraction of births effectively vaccinated (coverage × efficacy) [illustrative]"
+    },
+    {
+      "name": "w_vac",
+      "symbol": "",
+      "value": "1/27",
+      "description": "waning of vaccine immunity (1/year)"
+    },
+    {
+      "name": "boost_v",
+      "symbol": "",
+      "value": "0",
+      "description": "rate of a booster (third) dose that returns S to V; set > 0 for scenarios (1/year) [illustrative]"
+    },
+    {
+      "name": "mu",
+      "symbol": "",
+      "value": "0.0133",
+      "description": "birth = death rate (1/year) [illustrative]"
+    },
+    {
+      "name": "N0",
+      "symbol": "",
+      "value": "1e6",
+      "description": "value taken from the notes text [recalled]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "foi",
+      "symbol": "",
+      "expr": "R0_mu*(g_rec + mu)*Ip/N",
+      "description": "",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "(1-p_vac)*mu*N",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 90
+    },
+    {
+      "id": "f2",
+      "from": null,
+      "to": "c5",
+      "kind": "absolute",
+      "rate": "p_vac*mu*N",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 170
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "foi",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "sig_lat",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "g_rec",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c5",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "w_vac",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f7",
+      "from": "c1",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "boost_v",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 350
+    }
+  ]
+}

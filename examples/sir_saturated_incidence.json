@@ -1,0 +1,99 @@
+{
+  "version": 1,
+  "id": "sir_saturated_incidence",
+  "category": "Classic extensions",
+  "name": "SIR with saturated incidence (Capasso–Serio)",
+  "description": "cholera (Bari 1973 epidemic), generic.\nThe incidence g(I)S with g bounded represents protective behaviour or saturation at high prevalence.\nParameter values: 0 of 3 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Capasso V. & Serio G. (1978) \"A generalization of the Kermack–McKendrick deterministic epidemic model\", Math. Biosci. 42:43–61",
+  "referenceUrl": "https://doi.org/10.1016/0025-5564(78",
+  "time": {
+    "start": "0",
+    "stop": "365",
+    "step": "0.5",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "susceptible",
+      "init": "9990",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "I",
+      "description": "infectious",
+      "init": "10",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "R",
+      "description": "recovered",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 520,
+      "y": 140
+    }
+  ],
+  "parameters": [
+    {
+      "name": "beta",
+      "symbol": "",
+      "value": "5e-5",
+      "description": "transmission coefficient [illustrative]"
+    },
+    {
+      "name": "alpha_s",
+      "symbol": "",
+      "value": "0.002",
+      "description": "saturation (\"psychological\"/crowding) constant (1/person) [illustrative]"
+    },
+    {
+      "name": "gamma",
+      "symbol": "",
+      "value": "0.2",
+      "description": "recovery (1/day) [illustrative]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "lambda",
+      "symbol": "",
+      "expr": "beta*I/(1 + alpha_s*I)",
+      "description": "saturating force of infection",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lambda",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "gamma",
+      "output": "",
+      "curve": 0
+    }
+  ]
+}

@@ -1,0 +1,422 @@
+{
+  "version": 1,
+  "id": "bluetongue_gubbins2008",
+  "category": "Vector-borne",
+  "name": "Bluetongue: cattle + sheep + Culicoides with temperature-dependent biting, mortality and EIP (after Gubbins et al. 2008) [STRUCTURE-FROM-RECALL]",
+  "description": "Bluetongue virus (BTV-8), northern Europe / UK.\nParameter values: 0 of 10 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Gubbins S, Carpenter S, Baylis M, Wood JLN, Mellor PS (2008). Assessing the risk of bluetongue to UK livestock: uncertainty and sensitivity analyses of a temperature-dependent model for the basic reproduction number. J R Soc Interface 5(20):363–371.…",
+  "referenceUrl": "https://doi.org/10.1098/rsif.2007.1110",
+  "time": {
+    "start": "0",
+    "stop": "365",
+    "step": "0.5",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Scow",
+      "description": "susceptible cattle",
+      "init": "199",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Icow",
+      "description": "infected cattle",
+      "init": "1",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Rcow",
+      "description": "recovered cattle",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "Ssh",
+      "description": "susceptible sheep",
+      "init": "800",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 356
+    },
+    {
+      "id": "c5",
+      "name": "Ish",
+      "description": "infected sheep",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 356
+    },
+    {
+      "id": "c6",
+      "name": "Rsh",
+      "description": "recovered sheep",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 520,
+      "y": 356
+    },
+    {
+      "id": "c7",
+      "name": "Sv",
+      "description": "susceptible Culicoides",
+      "init": "100000",
+      "inN": false,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 572
+    },
+    {
+      "id": "c8",
+      "name": "Ev1",
+      "description": "EIP stage 1",
+      "init": "0",
+      "inN": false,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 572
+    },
+    {
+      "id": "c9",
+      "name": "Ev2",
+      "description": "EIP stage 2",
+      "init": "0",
+      "inN": false,
+      "color": "#E8C468",
+      "x": 520,
+      "y": 572
+    },
+    {
+      "id": "c10",
+      "name": "Ev3",
+      "description": "EIP stage 3",
+      "init": "0",
+      "inN": false,
+      "color": "#E8C468",
+      "x": 720,
+      "y": 572
+    },
+    {
+      "id": "c11",
+      "name": "Iv",
+      "description": "infectious midges",
+      "init": "0",
+      "inN": false,
+      "color": "#B71C1C",
+      "x": 920,
+      "y": 572
+    }
+  ],
+  "parameters": [
+    {
+      "name": "T_mean",
+      "symbol": "",
+      "value": "15",
+      "description": "illustrative (°C)"
+    },
+    {
+      "name": "T_amp",
+      "symbol": "",
+      "value": "7",
+      "description": "illustrative (°C)"
+    },
+    {
+      "name": "t_shift",
+      "symbol": "",
+      "value": "110",
+      "description": "sets the temperature peak in mid-July (day)"
+    },
+    {
+      "name": "b_vh",
+      "symbol": "",
+      "value": "0.9",
+      "description": "vector → host per-bite probability"
+    },
+    {
+      "name": "p_hv",
+      "symbol": "",
+      "value": "0.05",
+      "description": "host → vector per-bite probability (recalled range 0.01–0.15)"
+    },
+    {
+      "name": "phi_c",
+      "symbol": "",
+      "value": "0.75",
+      "description": "biting preference weight for cattle (illustrative)"
+    },
+    {
+      "name": "r_cow",
+      "symbol": "",
+      "value": "0.0485",
+      "description": "1/20.6 d cattle viraemia (recalled) (1/day)"
+    },
+    {
+      "name": "r_sh",
+      "symbol": "",
+      "value": "0.0625",
+      "description": "1/16 d sheep viraemia (recalled) (1/day)"
+    },
+    {
+      "name": "d_sh",
+      "symbol": "",
+      "value": "0.006",
+      "description": "BTV-induced sheep death (illustrative) (1/day)"
+    },
+    {
+      "name": "k_eip",
+      "symbol": "",
+      "value": "3",
+      "description": "EIP stages (fixed in the flows)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "Temp",
+      "symbol": "",
+      "expr": "T_mean + T_amp*sin(2*3.14159265*(t - t_shift)/365)",
+      "description": "daily temperature (°C)",
+      "output": false
+    },
+    {
+      "name": "a_bite",
+      "symbol": "",
+      "expr": "pmax(0.0002*Temp*(Temp - 3.7)*pmax(41.9 - Temp, 0)^(1/2.7), 0)",
+      "description": "biting rate (1/day)",
+      "output": false
+    },
+    {
+      "name": "mu_v",
+      "symbol": "",
+      "expr": "0.009*exp(0.16*Temp)",
+      "description": "midge mortality (1/day)",
+      "output": false
+    },
+    {
+      "name": "nu_eip",
+      "symbol": "",
+      "expr": "pmax(0.018*(Temp - 13.4), 0)",
+      "description": "EIP completion rate (1/day)",
+      "output": false
+    },
+    {
+      "name": "Ncow",
+      "symbol": "",
+      "expr": "Scow + Icow + Rcow",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "Nsh",
+      "symbol": "",
+      "expr": "Ssh + Ish + Rsh",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "Nv",
+      "symbol": "",
+      "expr": "Sv + Ev1 + Ev2 + Ev3 + Iv",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "Hw",
+      "symbol": "",
+      "expr": "phi_c*Ncow + (1 - phi_c)*Nsh",
+      "description": "preference-weighted host total",
+      "output": false
+    },
+    {
+      "name": "lam_cow",
+      "symbol": "",
+      "expr": "a_bite*b_vh*phi_c*Iv/Hw",
+      "description": "cattle force of infection",
+      "output": false
+    },
+    {
+      "name": "lam_sh",
+      "symbol": "",
+      "expr": "a_bite*b_vh*(1 - phi_c)*Iv/Hw",
+      "description": "sheep force of infection",
+      "output": false
+    },
+    {
+      "name": "lam_v",
+      "symbol": "",
+      "expr": "a_bite*p_hv*(phi_c*Icow + (1 - phi_c)*Ish)/Hw",
+      "description": "midge force of infection",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lam_cow",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "r_cow",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "lam_sh",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "r_sh",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c5",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "d_sh",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 486
+    },
+    {
+      "id": "f6",
+      "from": null,
+      "to": "c7",
+      "kind": "absolute",
+      "rate": "mu_v*Nv",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 442
+    },
+    {
+      "id": "f7",
+      "from": "c7",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "lam_v",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c8",
+      "to": "c9",
+      "kind": "per_capita",
+      "rate": "3*nu_eip",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f9",
+      "from": "c9",
+      "to": "c10",
+      "kind": "per_capita",
+      "rate": "3*nu_eip",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f10",
+      "from": "c10",
+      "to": "c11",
+      "kind": "per_capita",
+      "rate": "3*nu_eip",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f11",
+      "from": "c7",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_v",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 702
+    },
+    {
+      "id": "f12",
+      "from": "c8",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_v",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 702
+    },
+    {
+      "id": "f13",
+      "from": "c9",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_v",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 702
+    },
+    {
+      "id": "f14",
+      "from": "c10",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_v",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 702
+    },
+    {
+      "id": "f15",
+      "from": "c11",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_v",
+      "output": "",
+      "curve": 0,
+      "ox": 920,
+      "oy": 702
+    }
+  ]
+}

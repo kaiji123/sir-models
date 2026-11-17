@@ -1,0 +1,290 @@
+{
+  "version": 1,
+  "id": "gonorrhoea_core_group_hethcote_yorke",
+  "category": "Sexually transmitted & blood-borne",
+  "name": "Gonorrhoea SIS with core/non-core groups, two sexes",
+  "description": "Gonorrhoea, heterosexual.\nParameter values: 0 of 7 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Hethcote HW, Yorke JA. Gonorrhea Transmission Dynamics and Control. Lecture Notes in Biomathematics vol. 56. Springer-Verlag, 1984",
+  "referenceUrl": "https://doi.org/10.1007/978-3-662-07544-9",
+  "time": {
+    "start": "0",
+    "stop": "20",
+    "step": "0.02",
+    "unit": "years"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Sm_c",
+      "description": "susceptible core men",
+      "init": "0.019",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Im_c",
+      "description": "infected core men",
+      "init": "0.001",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Sm_n",
+      "description": "susceptible non-core men",
+      "init": "0.98",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 356
+    },
+    {
+      "id": "c4",
+      "name": "Im_n",
+      "description": "infected non-core men",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 356
+    },
+    {
+      "id": "c5",
+      "name": "Sf_c",
+      "description": "susceptible core women",
+      "init": "0.019",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 572
+    },
+    {
+      "id": "c6",
+      "name": "If_c",
+      "description": "infected core women",
+      "init": "0.001",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 572
+    },
+    {
+      "id": "c7",
+      "name": "Sf_n",
+      "description": "susceptible non-core women",
+      "init": "0.98",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 788
+    },
+    {
+      "id": "c8",
+      "name": "If_n",
+      "description": "infected non-core women",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 788
+    }
+  ],
+  "parameters": [
+    {
+      "name": "cp_c",
+      "symbol": "",
+      "value": "20",
+      "description": "core partner rate (partners/yr) [illustrative]"
+    },
+    {
+      "name": "cp_n",
+      "symbol": "",
+      "value": "1",
+      "description": "non-core partner rate (partners/yr) [illustrative]"
+    },
+    {
+      "name": "b_mf",
+      "symbol": "",
+      "value": "0.5",
+      "description": "male-to-female transmission probability (per partnership) [illustrative]"
+    },
+    {
+      "name": "b_fm",
+      "symbol": "",
+      "value": "0.25",
+      "description": "female-to-male transmission probability (per partnership) [illustrative]"
+    },
+    {
+      "name": "dur_m",
+      "symbol": "",
+      "value": "0.05",
+      "description": "mean infectious duration in men (most symptomatic, treated in about 2–3 weeks) (yr) [illustrative]"
+    },
+    {
+      "name": "dur_f",
+      "symbol": "",
+      "value": "0.25",
+      "description": "mean infectious duration in women (many asymptomatic) (yr) [illustrative]"
+    },
+    {
+      "name": "eps_mix",
+      "symbol": "",
+      "value": "0.6",
+      "description": "assortativity [illustrative]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "Nm_c",
+      "symbol": "",
+      "expr": "Sm_c+Im_c",
+      "description": "core men total",
+      "output": false
+    },
+    {
+      "name": "Nm_n",
+      "symbol": "",
+      "expr": "Sm_n+Im_n",
+      "description": "non-core men total",
+      "output": false
+    },
+    {
+      "name": "Nf_c",
+      "symbol": "",
+      "expr": "Sf_c+If_c",
+      "description": "core women total",
+      "output": false
+    },
+    {
+      "name": "Nf_n",
+      "symbol": "",
+      "expr": "Sf_n+If_n",
+      "description": "non-core women total",
+      "output": false
+    },
+    {
+      "name": "pf_mix",
+      "symbol": "",
+      "expr": "(cp_c*If_c + cp_n*If_n)/(cp_c*Nf_c + cp_n*Nf_n)",
+      "description": "prevalence among female partnerships (proportionate mixing)",
+      "output": false
+    },
+    {
+      "name": "pm_mix",
+      "symbol": "",
+      "expr": "(cp_c*Im_c + cp_n*Im_n)/(cp_c*Nm_c + cp_n*Nm_n)",
+      "description": "prevalence among male partnerships (proportionate mixing)",
+      "output": false
+    },
+    {
+      "name": "foi_m_c",
+      "symbol": "",
+      "expr": "cp_c*b_fm*(eps_mix*If_c/Nf_c + (1-eps_mix)*pf_mix)",
+      "description": "force of infection, core men",
+      "output": false
+    },
+    {
+      "name": "foi_m_n",
+      "symbol": "",
+      "expr": "cp_n*b_fm*(eps_mix*If_n/Nf_n + (1-eps_mix)*pf_mix)",
+      "description": "force of infection, non-core men",
+      "output": false
+    },
+    {
+      "name": "foi_f_c",
+      "symbol": "",
+      "expr": "cp_c*b_mf*(eps_mix*Im_c/Nm_c + (1-eps_mix)*pm_mix)",
+      "description": "force of infection, core women",
+      "output": false
+    },
+    {
+      "name": "foi_f_n",
+      "symbol": "",
+      "expr": "cp_n*b_mf*(eps_mix*Im_n/Nm_n + (1-eps_mix)*pm_mix)",
+      "description": "force of infection, non-core women",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "foi_m_c",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c2",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "1/dur_m",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f3",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "foi_m_n",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c4",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "1/dur_m",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f5",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "foi_f_c",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c6",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "1/dur_f",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f7",
+      "from": "c7",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "foi_f_n",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c8",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "1/dur_f",
+      "output": "",
+      "curve": 60
+    }
+  ]
+}

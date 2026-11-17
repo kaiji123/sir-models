@@ -1,0 +1,163 @@
+{
+  "version": 1,
+  "id": "seeiir",
+  "category": "Natural history",
+  "name": "SEEIIR (gamma-distributed periods)",
+  "description": "Two latent and two infectious stages give gamma-distributed (Erlang k = 2) latent and infectious\nperiods with the same means as the SEIR model (\"linear chain trick\").",
+  "reference": "Keeling & Rohani (2008), Modeling Infectious Diseases in Humans and Animals, §3.3",
+  "referenceUrl": "",
+  "time": {
+    "start": "0",
+    "stop": "200",
+    "step": "1",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "Susceptible",
+      "init": "9999",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "E1",
+      "description": "Latent, stage 1",
+      "init": "1",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "E2",
+      "description": "Latent, stage 2",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "I1",
+      "description": "Infectious, stage 1",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 720,
+      "y": 140
+    },
+    {
+      "id": "c5",
+      "name": "I2",
+      "description": "Infectious, stage 2",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 920,
+      "y": 140
+    },
+    {
+      "id": "c6",
+      "name": "R",
+      "description": "Recovered",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 1120,
+      "y": 140
+    }
+  ],
+  "parameters": [
+    {
+      "name": "beta",
+      "symbol": "",
+      "value": "0.5",
+      "description": "transmission rate per day"
+    },
+    {
+      "name": "sigma",
+      "symbol": "",
+      "value": "1 / 5",
+      "description": "1/(mean latent period)"
+    },
+    {
+      "name": "gamma",
+      "symbol": "",
+      "value": "1 / 7",
+      "description": "1/(mean infectious period)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "lam",
+      "symbol": "",
+      "expr": "beta * (I1 + I2) / N",
+      "description": "force of infection",
+      "output": false
+    },
+    {
+      "name": "prevalence",
+      "symbol": "",
+      "expr": "I1 + I2",
+      "description": "number infectious",
+      "output": true
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lam",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "2 * sigma",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "2 * sigma",
+      "output": "onsets",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "2 * gamma",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "2 * gamma",
+      "output": "",
+      "curve": 0
+    }
+  ]
+}

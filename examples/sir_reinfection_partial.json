@@ -1,0 +1,205 @@
+{
+  "version": 1,
+  "id": "sir_reinfection_partial",
+  "category": "Classic extensions",
+  "name": "SIR with reinfection of recovered (partial immunity; reinfection threshold)",
+  "description": "TB, pertussis, RSV, malaria-like partial immunity.\nGomes et al. report that above the reinfection threshold reinfection dominates, prevalence is high and vaccination fails to protect (abstract via repository).\nParameter values: 0 of 5 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Gomes M.G.M., White L.J., Medley G.F. (2004) \"Infection, reinfection, and vaccination under suboptimal immune protection: epidemiological perspectives\", J. Theor. Biol. 228(4):539–549",
+  "referenceUrl": "https://doi.org/10.1016/j.jtbi.2004.02.015",
+  "time": {
+    "start": "0",
+    "stop": "200",
+    "step": "0.2",
+    "unit": "years"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "susceptible",
+      "init": "9990",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "I",
+      "description": "infectious",
+      "init": "10",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 220
+    },
+    {
+      "id": "c3",
+      "name": "R",
+      "description": "recovered, partially immune",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 520,
+      "y": 220
+    },
+    {
+      "id": "c4",
+      "name": "V",
+      "description": "vaccinated at birth (same partial protection as R)",
+      "init": "0",
+      "inN": true,
+      "color": "#2457C5",
+      "x": 120,
+      "y": 300
+    }
+  ],
+  "parameters": [
+    {
+      "name": "mu",
+      "symbol": "",
+      "value": "1/70",
+      "description": "birth/death (1/yr) [illustrative]"
+    },
+    {
+      "name": "gamma",
+      "symbol": "",
+      "value": "52",
+      "description": "recovery (1 week) (1/yr) [illustrative]"
+    },
+    {
+      "name": "beta",
+      "symbol": "",
+      "value": "260",
+      "description": "transmission (R0 ≈ 5) (1/yr) [illustrative]"
+    },
+    {
+      "name": "sigma_r",
+      "symbol": "",
+      "value": "0.25",
+      "description": "relative susceptibility to reinfection (reinfection threshold at R0 = 1/sigma_r = 4) [illustrative]"
+    },
+    {
+      "name": "p_nb",
+      "symbol": "",
+      "value": "0",
+      "description": "newborn vaccine coverage (set to 0.9 to show vaccine failure above the reinfection threshold) [illustrative]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "lambda",
+      "symbol": "",
+      "expr": "beta*I/N",
+      "description": "",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "(1 - p_nb)*mu*N",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": null,
+      "to": "c4",
+      "kind": "absolute",
+      "rate": "p_nb*mu*N",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 170
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lambda",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c3",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "sigma_r*lambda",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f5",
+      "from": "c4",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "sigma_r*lambda",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "gamma",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    },
+    {
+      "id": "f8",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 350
+    },
+    {
+      "id": "f9",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 350
+    },
+    {
+      "id": "f10",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 430
+    }
+  ]
+}

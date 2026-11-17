@@ -1,0 +1,296 @@
+{
+  "version": 1,
+  "id": "chikungunya_yakob2013_reunion",
+  "category": "Vector-borne",
+  "name": "Chikungunya SEIIR humans / SEI Aedes albopictus, Réunion 2005–06 (Yakob & Clements 2013) [VERIFIED-PARAMS]",
+  "description": "Chikungunya, Réunion Island epidemic 2005–2006.\nParameter values: 0 of 8 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Yakob L, Clements ACA (2013). A mathematical model of chikungunya dynamics and control: the major epidemic on Réunion Island. PLoS ONE 8(3):e57448. https://doi.org/10.1371/journal.pone.0057448 . Parameter values were read from the paper this session; β1…",
+  "referenceUrl": "https://doi.org/10.1371/journal.pone.0057448",
+  "time": {
+    "start": "0",
+    "stop": "365",
+    "step": "0.5",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Sh",
+      "description": "susceptible humans",
+      "init": "785000",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 220
+    },
+    {
+      "id": "c2",
+      "name": "Eh",
+      "description": "exposed",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 220
+    },
+    {
+      "id": "c3",
+      "name": "Ish",
+      "description": "symptomatic infectious",
+      "init": "10",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "Iah",
+      "description": "asymptomatic infectious",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 300
+    },
+    {
+      "id": "c5",
+      "name": "Rh",
+      "description": "recovered",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 720,
+      "y": 220
+    },
+    {
+      "id": "c6",
+      "name": "Xv",
+      "description": "susceptible mosquitoes",
+      "init": "1.0e6",
+      "inN": false,
+      "color": "#DDDDDD",
+      "x": 120,
+      "y": 516
+    },
+    {
+      "id": "c7",
+      "name": "Yv",
+      "description": "exposed mosquitoes",
+      "init": "0",
+      "inN": false,
+      "color": "#DDDDDD",
+      "x": 320,
+      "y": 516
+    },
+    {
+      "id": "c8",
+      "name": "Zv",
+      "description": "infectious mosquitoes",
+      "init": "0",
+      "inN": false,
+      "color": "#DDDDDD",
+      "x": 520,
+      "y": 516
+    }
+  ],
+  "parameters": [
+    {
+      "name": "beta1",
+      "symbol": "",
+      "value": "0.14",
+      "description": "mosquito → human transmission rate (fitted; Macdonald \"abm\"-type) (1/day)"
+    },
+    {
+      "name": "beta2",
+      "symbol": "",
+      "value": "0.40",
+      "description": "human → mosquito transmission rate (fitted) (1/day)"
+    },
+    {
+      "name": "lat_h",
+      "symbol": "",
+      "value": "0.5",
+      "description": "human latent rate (2–6 d; Thiboutot et al. 2010) (1/day)"
+    },
+    {
+      "name": "lat_v",
+      "symbol": "",
+      "value": "0.5",
+      "description": "mosquito latent rate (2–6 d for Ae. albopictus; Dubrulle et al. 2009) (1/day)"
+    },
+    {
+      "name": "omega",
+      "symbol": "",
+      "value": "0.25",
+      "description": "symptom-onset rate (pre-patent 4–7 d; Ziegler et al. 2008). Used only for the reporting lag. (1/day)"
+    },
+    {
+      "name": "phi_s",
+      "symbol": "",
+      "value": "0.97",
+      "description": "proportion symptomatic (0.83–0.97)"
+    },
+    {
+      "name": "gam_h",
+      "symbol": "",
+      "value": "0.25",
+      "description": "recovery rate (1–7 d; Chhabra et al. 2008) (1/day)"
+    },
+    {
+      "name": "mu_v",
+      "symbol": "",
+      "value": "0.05",
+      "description": "mosquito mortality (20–30 d life; Delatte et al. 2009). Mosquito birth = death. (1/day)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "Nh",
+      "symbol": "",
+      "expr": "Sh + Eh + Ish + Iah + Rh",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "Nv",
+      "symbol": "",
+      "expr": "Xv + Yv + Zv",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "lambda_h",
+      "symbol": "",
+      "expr": "beta1*Zv/Nv",
+      "description": "human force of infection; beta1 already contains a·b·m",
+      "output": false
+    },
+    {
+      "name": "lambda_v",
+      "symbol": "",
+      "expr": "beta2*(Ish + Iah)/Nh",
+      "description": "mosquito force of infection; independent of m",
+      "output": false
+    },
+    {
+      "name": "inc_sympt",
+      "symbol": "",
+      "expr": "phi_s*lat_h*Eh",
+      "description": "symptomatic incidence, for comparison with case data; the paper adds an omega lag",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lambda_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "phi_s*lat_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "(1 - phi_s)*lat_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c3",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "gam_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "gam_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": null,
+      "to": "c6",
+      "kind": "absolute",
+      "rate": "mu_v*Nv",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 386
+    },
+    {
+      "id": "f7",
+      "from": "c6",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "lambda_v",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c7",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "lat_v",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f9",
+      "from": "c6",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_v",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 646
+    },
+    {
+      "id": "f10",
+      "from": "c7",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_v",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 646
+    },
+    {
+      "id": "f11",
+      "from": "c8",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_v",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 646
+    }
+  ]
+}

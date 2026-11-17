@@ -1,0 +1,300 @@
+{
+  "version": 1,
+  "id": "hbv_carrier_vaccination",
+  "category": "Sexually transmitted & blood-borne",
+  "name": "Hepatitis B with acute infection, chronic carriers, vertical transmission and vaccination",
+  "description": "Hepatitis B.\nParameter values: 0 of 11 checked against the source; the rest are recalled or illustrative.",
+  "reference": "The conceptual basis is Medley GF, Lindop NA, Edmunds WJ, Nokes DJ. Hepatitis-B virus endemicity: heterogeneity, catastrophic dynamics and control. Nat Med 2001;7(5):619–624",
+  "referenceUrl": "https://doi.org/10.1038/87953",
+  "time": {
+    "start": "0",
+    "stop": "100",
+    "step": "0.1",
+    "unit": "years"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "susceptible",
+      "init": "0.6",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Ac",
+      "description": "acute infection",
+      "init": "0.01",
+      "inN": true,
+      "color": "#E57373",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Cr",
+      "description": "chronic carrier",
+      "init": "0.09",
+      "inN": true,
+      "color": "#8E0E0E",
+      "x": 720,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "R",
+      "description": "recovered/immune",
+      "init": "0.3",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 920,
+      "y": 140
+    },
+    {
+      "id": "c5",
+      "name": "V",
+      "description": "vaccinated",
+      "init": "0",
+      "inN": true,
+      "color": "#2457C5",
+      "x": 120,
+      "y": 140
+    }
+  ],
+  "parameters": [
+    {
+      "name": "beta_h",
+      "symbol": "",
+      "value": "0.95",
+      "description": "horizontal transmission coefficient (/yr) [recalled]"
+    },
+    {
+      "name": "eps_c",
+      "symbol": "",
+      "value": "0.16",
+      "description": "relative infectiousness of carriers vs acute [recalled]"
+    },
+    {
+      "name": "gam_a",
+      "symbol": "",
+      "value": "4",
+      "description": "exit from acute stage (about 3 months) (/yr) [recalled]"
+    },
+    {
+      "name": "q_c",
+      "symbol": "",
+      "value": "0.0886",
+      "description": "probability that horizontal adult infection leads to carriage [recalled]"
+    },
+    {
+      "name": "gam_c",
+      "symbol": "",
+      "value": "0.025",
+      "description": "carrier clearance (HBsAg loss) (/yr) [recalled]"
+    },
+    {
+      "name": "pv",
+      "symbol": "",
+      "value": "0.11",
+      "description": "fraction of births to carrier mothers infected perinatally [recalled]"
+    },
+    {
+      "name": "pc0",
+      "symbol": "",
+      "value": "0.885",
+      "description": "probability that perinatal infection leads to carriage [recalled]"
+    },
+    {
+      "name": "mu",
+      "symbol": "",
+      "value": "0.00693",
+      "description": "birth = natural death rate (/yr) [recalled]"
+    },
+    {
+      "name": "mu_c",
+      "symbol": "",
+      "value": "0.002",
+      "description": "HBV-related excess carrier mortality (/yr) [illustrative]"
+    },
+    {
+      "name": "vax",
+      "symbol": "",
+      "value": "0.0",
+      "description": "infant vaccination coverage times efficacy (scenario: 0.9) [illustrative]"
+    },
+    {
+      "name": "w_v",
+      "symbol": "",
+      "value": "0.1",
+      "description": "waning of vaccine immunity (/yr) [recalled]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "foi",
+      "symbol": "",
+      "expr": "beta_h*(Ac + eps_c*Cr)/N",
+      "description": "force of infection",
+      "output": false
+    },
+    {
+      "name": "births_ok",
+      "symbol": "",
+      "expr": "mu*N - mu*pv*Cr",
+      "description": "births not perinatally infected",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "births_ok*(1-vax) + mu_c*Cr",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": null,
+      "to": "c5",
+      "kind": "absolute",
+      "rate": "births_ok*vax",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f3",
+      "from": null,
+      "to": "c3",
+      "kind": "absolute",
+      "rate": "mu*pv*Cr*pc0",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 10
+    },
+    {
+      "id": "f4",
+      "from": null,
+      "to": "c2",
+      "kind": "absolute",
+      "rate": "mu*pv*Cr*(1-pc0)",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 10
+    },
+    {
+      "id": "f5",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "foi",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "q_c*gam_a",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": "c2",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "(1-q_c)*gam_a",
+      "output": "",
+      "curve": 50
+    },
+    {
+      "id": "f8",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "gam_c",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f9",
+      "from": "c5",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "w_v",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f10",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 270
+    },
+    {
+      "id": "f11",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 270
+    },
+    {
+      "id": "f12",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu + mu_c",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 270
+    },
+    {
+      "id": "f13",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 920,
+      "oy": 270
+    },
+    {
+      "id": "f14",
+      "from": "c5",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    }
+  ]
+}

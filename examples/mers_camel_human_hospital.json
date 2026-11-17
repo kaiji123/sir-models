@@ -1,0 +1,329 @@
+{
+  "version": 1,
+  "id": "mers_camel_human_hospital",
+  "category": "Zoonoses & emerging",
+  "name": "MERS-CoV with camel spillover and hospital amplification",
+  "description": "Middle East respiratory syndrome coronavirus, dromedary camels → humans.\nThe paper's central structural claim — repeated zoonotic index cases plus sub-critical human-to-human spread with hospital-based amplification — is captured by the two separate forces of infection and the two case accumulators, which let th\nParameter values: 0 of 12 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Chowell G, Blumberg S, Simonsen L, Miller MA, Viboud C (2014). Synthesizing data and models for the spread of MERS-CoV, 2013: key role of index cases and hospital transmission. Epidemics 9:40–51",
+  "referenceUrl": "https://doi.org/10.1016/j.epidem.2014.09.011",
+  "time": {
+    "start": "0",
+    "stop": "400",
+    "step": "0.5",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N_total"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Sc",
+      "description": "susceptible camels",
+      "init": "9000",
+      "inN": false,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Ic",
+      "description": "infectious camels (actively shedding, mostly juveniles)",
+      "init": "1000",
+      "inN": false,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Rc",
+      "description": "immune camels",
+      "init": "0",
+      "inN": false,
+      "color": "#4E8A3E",
+      "x": 120,
+      "y": 356
+    },
+    {
+      "id": "c4",
+      "name": "S",
+      "description": "susceptible humans",
+      "init": "1e6",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 652
+    },
+    {
+      "id": "c5",
+      "name": "E",
+      "description": "latent humans",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 652
+    },
+    {
+      "id": "c6",
+      "name": "Ii",
+      "description": "infectious humans in the community",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 652
+    },
+    {
+      "id": "c7",
+      "name": "Hh",
+      "description": "hospitalised humans (amplification setting)",
+      "init": "0",
+      "inN": true,
+      "color": "#6A2C9C",
+      "x": 720,
+      "y": 652
+    },
+    {
+      "id": "c8",
+      "name": "R",
+      "description": "recovered humans",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 920,
+      "y": 572
+    },
+    {
+      "id": "c9",
+      "name": "D",
+      "description": "human deaths (cumulative)",
+      "init": "0",
+      "inN": false,
+      "color": "#111111",
+      "x": 920,
+      "y": 732
+    }
+  ],
+  "parameters": [
+    {
+      "name": "beta_cc",
+      "symbol": "",
+      "value": "0.25",
+      "description": "camel-to-camel transmission rate [illustrative] (per day)"
+    },
+    {
+      "name": "gamma_c",
+      "symbol": "",
+      "value": "1/14",
+      "description": "camel recovery rate [illustrative] (per day)"
+    },
+    {
+      "name": "mu_c",
+      "symbol": "",
+      "value": "1/1825",
+      "description": "camel birth = death rate, replenishes susceptible calves [illustrative] (per day)"
+    },
+    {
+      "name": "wane_c",
+      "symbol": "",
+      "value": "1/730",
+      "description": "loss of camel immunity [illustrative] (per day)"
+    },
+    {
+      "name": "beta_ch",
+      "symbol": "",
+      "value": "2e-9",
+      "description": "camel-to-human spillover coefficient [illustrative] (per camel per day)"
+    },
+    {
+      "name": "beta_com",
+      "symbol": "",
+      "value": "0.04",
+      "description": "human-to-human transmission rate in the community [unverified] (per day)"
+    },
+    {
+      "name": "beta_hosp",
+      "symbol": "",
+      "value": "0.55",
+      "description": "human-to-human transmission rate in hospital [unverified] (per day)"
+    },
+    {
+      "name": "sigma",
+      "symbol": "",
+      "value": "1/5.2",
+      "description": "latency rate (mean incubation ≈5.2 d) [unverified] (per day)"
+    },
+    {
+      "name": "eta",
+      "symbol": "",
+      "value": "1/5",
+      "description": "rate community case → hospitalisation (mean ≈5 d onset-to-admission) [unverified] (per day)"
+    },
+    {
+      "name": "gamma_i",
+      "symbol": "",
+      "value": "1/10",
+      "description": "community removal rate [unverified] (per day)"
+    },
+    {
+      "name": "gamma_h",
+      "symbol": "",
+      "value": "1/13",
+      "description": "hospital removal rate [unverified] (per day)"
+    },
+    {
+      "name": "cfr",
+      "symbol": "",
+      "value": "0.4",
+      "description": "case fatality among hospitalised cases [unverified] (dimensionless)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "Nc",
+      "symbol": "",
+      "expr": "Sc + Ic + Rc",
+      "description": "camel population",
+      "output": false
+    },
+    {
+      "name": "N",
+      "symbol": "",
+      "expr": "S + E + Ii + Hh + R",
+      "description": "living human population",
+      "output": false
+    },
+    {
+      "name": "lambda_c",
+      "symbol": "",
+      "expr": "beta_cc * Ic / Nc",
+      "description": "camel force of infection",
+      "output": false
+    },
+    {
+      "name": "lambda_z",
+      "symbol": "",
+      "expr": "beta_ch * Ic",
+      "description": "zoonotic hazard to a susceptible human",
+      "output": false
+    },
+    {
+      "name": "lambda_s",
+      "symbol": "",
+      "expr": "beta_com * Ii / N + beta_hosp * Hh / N",
+      "description": "human-to-human force of infection",
+      "output": false
+    },
+    {
+      "name": "Rhuman",
+      "symbol": "",
+      "expr": "beta_com / (eta + gamma_i) + (eta / (eta + gamma_i)) * beta_hosp / gamma_h",
+      "description": "human-to-human reproduction number (authors' headline result: overall R below or near 1, ≈0.4–1.5 across published estimates, with hospital ",
+      "output": false
+    },
+    {
+      "name": "CZ_rate",
+      "symbol": "",
+      "expr": "(lambda_z) * S",
+      "description": "rate of new cumulative zoonotic (index) cases (integrate with cumsum for the cumulative count)",
+      "output": true
+    },
+    {
+      "name": "CS_rate",
+      "symbol": "",
+      "expr": "(lambda_s) * S",
+      "description": "rate of new cumulative secondary (human-acquired) cases (integrate with cumsum for the cumulative count)",
+      "output": true
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "mu_c * Nc",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lambda_c",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_c",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    },
+    {
+      "id": "f4",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "lambda_z + lambda_s",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "sigma",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c6",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "eta",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": "c6",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "gamma_i",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c7",
+      "to": "c9",
+      "kind": "per_capita",
+      "rate": "gamma_h * cfr",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f9",
+      "from": "c7",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "gamma_h * (1 - cfr)",
+      "output": "",
+      "curve": 0
+    }
+  ]
+}

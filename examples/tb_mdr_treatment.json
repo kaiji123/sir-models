@@ -1,0 +1,323 @@
+{
+  "version": 1,
+  "id": "tb_mdr_treatment",
+  "category": "Respiratory",
+  "name": "TB with treatment, acquired and transmitted MDR, and a fitness cost (after Dye & Williams 2000 and Cohen & Murray 2004)",
+  "description": "Tuberculosis.\nParameter values: 0 of 14 checked against the source; the rest are recalled or illustrative.",
+  "reference": "",
+  "referenceUrl": "",
+  "time": {
+    "start": "0",
+    "stop": "200",
+    "step": "0.2",
+    "unit": "years"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "uninfected",
+      "init": "0.7*N0",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 220
+    },
+    {
+      "id": "c2",
+      "name": "Ls",
+      "description": "latent, drug-sensitive",
+      "init": "0.29*N0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Lr",
+      "description": "latent, MDR",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 300
+    },
+    {
+      "id": "c4",
+      "name": "Is",
+      "description": "active TB, drug-sensitive",
+      "init": "0.002*N0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 220
+    },
+    {
+      "id": "c5",
+      "name": "Ir",
+      "description": "active TB, MDR",
+      "init": "10",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 920,
+      "y": 220
+    },
+    {
+      "id": "c6",
+      "name": "Rt",
+      "description": "recovered/treated, latent infection cleared or controlled",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 720,
+      "y": 220
+    }
+  ],
+  "parameters": [
+    {
+      "name": "beta_s",
+      "symbol": "",
+      "value": "10",
+      "description": "effective contacts per infectious case per year (1/year) [illustrative]"
+    },
+    {
+      "name": "fit_r",
+      "symbol": "",
+      "value": "0.8",
+      "description": "relative transmissibility of MDR"
+    },
+    {
+      "name": "p_fast",
+      "symbol": "",
+      "value": "0.14",
+      "description": "fraction who progress quickly after infection [illustrative]"
+    },
+    {
+      "name": "v_react",
+      "symbol": "",
+      "value": "0.0005",
+      "description": "reactivation from latency (1/year) [illustrative]"
+    },
+    {
+      "name": "x_prot",
+      "symbol": "",
+      "value": "0.65",
+      "description": "protection of latent and recovered people against reinfection-driven fast progression [illustrative]"
+    },
+    {
+      "name": "cure_nat",
+      "symbol": "",
+      "value": "0.2",
+      "description": "self-cure (1/year) [illustrative]"
+    },
+    {
+      "name": "mu_tb",
+      "symbol": "",
+      "value": "0.2",
+      "description": "TB death, untreated (1/year) [illustrative]"
+    },
+    {
+      "name": "det",
+      "symbol": "",
+      "value": "0.7",
+      "description": "detection and treatment rate (1/year) [illustrative]"
+    },
+    {
+      "name": "succ_s",
+      "symbol": "",
+      "value": "0.85",
+      "description": "treatment success for DS-TB [illustrative]"
+    },
+    {
+      "name": "a_res",
+      "symbol": "",
+      "value": "0.03",
+      "description": "fraction of DS treatments that produce MDR [illustrative]"
+    },
+    {
+      "name": "succ_r",
+      "symbol": "",
+      "value": "0.5",
+      "description": "first-line treatment success for MDR [illustrative]"
+    },
+    {
+      "name": "relapse",
+      "symbol": "",
+      "value": "0.002",
+      "description": "relapse from Rt to DS active disease (1/year) [illustrative]"
+    },
+    {
+      "name": "mu",
+      "symbol": "",
+      "value": "0.02",
+      "description": "birth = non-TB death rate (1/year)"
+    },
+    {
+      "name": "N0",
+      "symbol": "",
+      "value": "1e6",
+      "description": "value taken from the notes text [recalled]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "foi_s",
+      "symbol": "",
+      "expr": "beta_s*Is/N",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "foi_r",
+      "symbol": "",
+      "expr": "beta_s*fit_r*Ir/N",
+      "description": "",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "mu*N + mu_tb*(Is + Ir)",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 90
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "p_fast*foi_s",
+      "output": "",
+      "curve": 50
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "(1-p_fast)*foi_s",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c1",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "p_fast*foi_r",
+      "output": "",
+      "curve": 50
+    },
+    {
+      "id": "f5",
+      "from": "c1",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "(1-p_fast)*foi_r",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c2",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "v_react + p_fast*(1-x_prot)*foi_s",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": "c2",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "p_fast*(1-x_prot)*foi_r",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c3",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "v_react + p_fast*(1-x_prot)*foi_r",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f9",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "p_fast*(1-x_prot)*foi_s",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f10",
+      "from": "c6",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "relapse + p_fast*(1-x_prot)*foi_s",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f11",
+      "from": "c6",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "p_fast*(1-x_prot)*foi_r",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f12",
+      "from": "c4",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "cure_nat + det*succ_s",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f13",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "det*a_res",
+      "output": "",
+      "curve": 50
+    },
+    {
+      "id": "f14",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "cure_nat + det*succ_r",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f15",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu + mu_tb",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 350
+    }
+  ]
+}

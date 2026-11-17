@@ -1,0 +1,357 @@
+{
+  "version": 1,
+  "id": "mpox_human_animal_reservoir",
+  "category": "Zoonoses & emerging",
+  "name": "Mpox with a rodent reservoir and residual smallpox vaccination immunity",
+  "description": "Mpox (monkeypox), rodent reservoir → humans.\nTwo usable regimes from one structure: (a) the classical African setting — spillover-driven, R0h < 1, outbreaks that fade without the reservoir term; (b) a 2022-style outbreak — set beta_rh = 0, raise beta_hh above threshold, and read S as\nParameter values: 0 of 15 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Bhunu CP, Mushayabasa S (2011). Modelling the transmission dynamics of pox-like infections. IAENG International Journal of Applied Mathematics 41(2):141–149. URL https://www.iaeng.org/IJAM/issues_v41/issue_2/IJAM_41_2_09.pdf . Historical human-to-human…",
+  "referenceUrl": "https://doi.org/10.1093/oxfordjournals.aje.a114747",
+  "time": {
+    "start": "0",
+    "stop": "1825",
+    "step": "2",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N_total"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Sr",
+      "description": "susceptible rodents",
+      "init": "10000",
+      "inN": false,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Er",
+      "description": "latent rodents",
+      "init": "0",
+      "inN": false,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Ir",
+      "description": "infectious rodents",
+      "init": "100",
+      "inN": false,
+      "color": "#B71C1C",
+      "x": 120,
+      "y": 356
+    },
+    {
+      "id": "c4",
+      "name": "S",
+      "description": "susceptible humans",
+      "init": "1e5",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 652
+    },
+    {
+      "id": "c5",
+      "name": "V",
+      "description": "humans with vaccine-derived (smallpox) protection",
+      "init": "2e4",
+      "inN": true,
+      "color": "#2457C5",
+      "x": 320,
+      "y": 652
+    },
+    {
+      "id": "c6",
+      "name": "E",
+      "description": "latent humans",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 520,
+      "y": 652
+    },
+    {
+      "id": "c7",
+      "name": "Ii",
+      "description": "infectious humans",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 720,
+      "y": 652
+    },
+    {
+      "id": "c8",
+      "name": "R",
+      "description": "recovered humans",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 920,
+      "y": 572
+    },
+    {
+      "id": "c9",
+      "name": "D",
+      "description": "cumulative human mpox deaths",
+      "init": "0",
+      "inN": false,
+      "color": "#111111",
+      "x": 920,
+      "y": 732
+    }
+  ],
+  "parameters": [
+    {
+      "name": "br",
+      "symbol": "",
+      "value": "0.004",
+      "description": "rodent birth rate [illustrative] (per day)"
+    },
+    {
+      "name": "mu_r",
+      "symbol": "",
+      "value": "0.004",
+      "description": "rodent natural death rate [illustrative] (per day)"
+    },
+    {
+      "name": "beta_rr",
+      "symbol": "",
+      "value": "0.15",
+      "description": "rodent-to-rodent transmission rate [illustrative] (per day)"
+    },
+    {
+      "name": "sigma_r",
+      "symbol": "",
+      "value": "1/7",
+      "description": "rodent latency rate [illustrative] (per day)"
+    },
+    {
+      "name": "gamma_r",
+      "symbol": "",
+      "value": "1/21",
+      "description": "rodent recovery/removal rate [illustrative] (per day)"
+    },
+    {
+      "name": "beta_rh",
+      "symbol": "",
+      "value": "2e-6",
+      "description": "rodent-to-human spillover coefficient (hunting/bushmeat) [illustrative] (per rodent per day)"
+    },
+    {
+      "name": "beta_hh",
+      "symbol": "",
+      "value": "0.035",
+      "description": "human-to-human transmission rate [illustrative] (per day)"
+    },
+    {
+      "name": "sigma_h",
+      "symbol": "",
+      "value": "1/8.5",
+      "description": "human latency rate (incubation ≈8.5 d) [illustrative] (per day)"
+    },
+    {
+      "name": "gamma_h",
+      "symbol": "",
+      "value": "1/21",
+      "description": "human removal rate (rash duration 2–4 weeks) [illustrative] (per day)"
+    },
+    {
+      "name": "cfr",
+      "symbol": "",
+      "value": "0.035",
+      "description": "human case fatality (clade I historical ≈1–10%) [illustrative] (dimensionless)"
+    },
+    {
+      "name": "nu",
+      "symbol": "",
+      "value": "0",
+      "description": "vaccination rate of susceptibles (ring/targeted campaign lever) [illustrative] (per day)"
+    },
+    {
+      "name": "eps_v",
+      "symbol": "",
+      "value": "0.85",
+      "description": "vaccine protection against infection (smallpox vaccine cross-protection ≈85%) [unverified] (dimensionless)"
+    },
+    {
+      "name": "wane_v",
+      "symbol": "",
+      "value": "1/7300",
+      "description": "waning of vaccine protection (20-year mean) [illustrative] (per day)"
+    },
+    {
+      "name": "mu_h",
+      "symbol": "",
+      "value": "1/21900",
+      "description": "human natural death rate [illustrative] (per day)"
+    },
+    {
+      "name": "bh",
+      "symbol": "",
+      "value": "5",
+      "description": "human recruitment [illustrative] (humans per day)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "Nr",
+      "symbol": "",
+      "expr": "Sr + Er + Ir",
+      "description": "rodent population",
+      "output": false
+    },
+    {
+      "name": "N",
+      "symbol": "",
+      "expr": "S + V + E + Ii + R",
+      "description": "living human population",
+      "output": false
+    },
+    {
+      "name": "lambda_r",
+      "symbol": "",
+      "expr": "beta_rr * Ir / Nr",
+      "description": "rodent force of infection",
+      "output": false
+    },
+    {
+      "name": "lambda_h",
+      "symbol": "",
+      "expr": "beta_rh * Ir + beta_hh * Ii / N",
+      "description": "human force of infection",
+      "output": false
+    },
+    {
+      "name": "R0h",
+      "symbol": "",
+      "expr": "beta_hh / (gamma_h + mu_h)",
+      "description": "human-to-human reproduction number (historically ≈0.3; a 2022-type MSM-outbreak scenario is produced by raising beta_hh so that R0h > 1)",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "br * Nr",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lambda_r",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_r",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 270
+    },
+    {
+      "id": "f4",
+      "from": null,
+      "to": "c4",
+      "kind": "absolute",
+      "rate": "bh",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 522
+    },
+    {
+      "id": "f5",
+      "from": "c4",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "lambda_h",
+      "output": "",
+      "curve": 50
+    },
+    {
+      "id": "f6",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "nu",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "lambda_h * (1 - eps_v)",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c5",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "wane_v",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f9",
+      "from": "c6",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "sigma_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f10",
+      "from": "c7",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "gamma_h * (1 - cfr)",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f11",
+      "from": "c7",
+      "to": "c9",
+      "kind": "per_capita",
+      "rate": "gamma_h * cfr",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f12",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_h",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 782
+    }
+  ]
+}

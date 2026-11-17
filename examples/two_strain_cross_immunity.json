@@ -1,0 +1,339 @@
+{
+  "version": 1,
+  "id": "two_strain_cross_immunity",
+  "category": "Classic extensions",
+  "name": "two-strain SIR with partial cross-immunity (reduced susceptibility)",
+  "description": "influenza strains, dengue serotypes (without ADE), RSV.\nThere are 8 compartments and no simultaneous coinfection.\nParameter values: 0 of 8 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Keeling M.J. & Rohani P. (2008), Chapter 4 (\"Multi-pathogen / multi-host\"), Section 4.1 and companion Program 4.1 (from memory; the companion site was unreachable). Original framework: Castillo-Chavez C., Hethcote H.W., Andreasen V., Levin S.A., Liu W.M.…",
+  "referenceUrl": "https://doi.org/10.1007/BF00275810",
+  "time": {
+    "start": "0",
+    "stop": "50",
+    "step": "0.05",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "naive to both",
+      "init": "0.9*N0",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 220
+    },
+    {
+      "id": "c2",
+      "name": "I1",
+      "description": "first infection, strain 1",
+      "init": "10",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "I2",
+      "description": "first infection, strain 2",
+      "init": "10",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 300
+    },
+    {
+      "id": "c4",
+      "name": "R1",
+      "description": "recovered from 1, susceptible to 2",
+      "init": "0.05*N0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c5",
+      "name": "R2",
+      "description": "recovered from 2, susceptible to 1",
+      "init": "0.05*N0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 520,
+      "y": 300
+    },
+    {
+      "id": "c6",
+      "name": "J1",
+      "description": "infected with strain 1 after recovering from 2",
+      "init": "0",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 720,
+      "y": 140
+    },
+    {
+      "id": "c7",
+      "name": "J2",
+      "description": "infected with strain 2 after recovering from 1",
+      "init": "0",
+      "inN": true,
+      "color": "#DDDDDD",
+      "x": 720,
+      "y": 300
+    },
+    {
+      "id": "c8",
+      "name": "R12",
+      "description": "immune to both",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 920,
+      "y": 220
+    }
+  ],
+  "parameters": [
+    {
+      "name": "mu",
+      "symbol": "",
+      "value": "1/(50*365)",
+      "description": "birth/death (1/day) [illustrative]"
+    },
+    {
+      "name": "beta1",
+      "symbol": "",
+      "value": "0.5",
+      "description": "strain 1 transmission (1/day) [illustrative]"
+    },
+    {
+      "name": "beta2",
+      "symbol": "",
+      "value": "0.45",
+      "description": "strain 2 transmission (1/day) [illustrative]"
+    },
+    {
+      "name": "gamma1",
+      "symbol": "",
+      "value": "1/7",
+      "description": "recovery, strain 1 (1/day) [illustrative]"
+    },
+    {
+      "name": "gamma2",
+      "symbol": "",
+      "value": "1/7",
+      "description": "recovery, strain 2 (1/day) [illustrative]"
+    },
+    {
+      "name": "sigma12",
+      "symbol": "",
+      "value": "0.5",
+      "description": "susceptibility to strain 2 after strain 1 (1 = no cross-immunity, 0 = full) [illustrative]"
+    },
+    {
+      "name": "sigma21",
+      "symbol": "",
+      "value": "0.5",
+      "description": "susceptibility to strain 1 after strain 2 [illustrative]"
+    },
+    {
+      "name": "N0",
+      "symbol": "",
+      "value": "100000",
+      "description": "value taken from the notes text [recalled]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "lambda1",
+      "symbol": "",
+      "expr": "beta1*(I1 + J1)/N",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "lambda2",
+      "symbol": "",
+      "expr": "beta2*(I2 + J2)/N",
+      "description": "",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "mu*N",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 90
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lambda1",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "lambda2",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c2",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "gamma1",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c3",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "gamma2",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c4",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "sigma12*lambda2",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f7",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "sigma21*lambda1",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c6",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "gamma1",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f9",
+      "from": "c7",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "gamma2",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f10",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 350
+    },
+    {
+      "id": "f11",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 270
+    },
+    {
+      "id": "f12",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 430
+    },
+    {
+      "id": "f13",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 270
+    },
+    {
+      "id": "f14",
+      "from": "c5",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 430
+    },
+    {
+      "id": "f15",
+      "from": "c6",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 270
+    },
+    {
+      "id": "f16",
+      "from": "c7",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 430
+    },
+    {
+      "id": "f17",
+      "from": "c8",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu",
+      "output": "",
+      "curve": 0,
+      "ox": 920,
+      "oy": 350
+    }
+  ]
+}

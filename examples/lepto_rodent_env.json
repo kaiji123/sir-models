@@ -1,0 +1,291 @@
+{
+  "version": 1,
+  "id": "lepto_rodent_env",
+  "category": "Water, enteric & NTDs",
+  "name": "Leptospirosis: rodent reservoir, environmental leptospires, humans as dead-end hosts",
+  "description": "Leptospirosis.\nParameter values: 0 of 13 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Structure after Holt J, Davis S, Leirs H. A model of leptospirosis infection in an African rodent to determine risk to humans: seasonal fluctuations and the impact of rodent control. Acta Trop 2006;99(2–3):218–225",
+  "referenceUrl": "https://doi.org/10.1016/j.actatropica.2006.08.003",
+  "time": {
+    "start": "0",
+    "stop": "5",
+    "step": "0.005",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Sh",
+      "description": "susceptible humans",
+      "init": "9990",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "Ih",
+      "description": "infected (clinical) humans",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "Rh",
+      "description": "recovered humans",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "Sr",
+      "description": "susceptible rodents",
+      "init": "900",
+      "inN": false,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 356
+    },
+    {
+      "id": "c5",
+      "name": "Ir",
+      "description": "infected (chronically shedding) rodents",
+      "init": "100",
+      "inN": false,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 356
+    },
+    {
+      "id": "c6",
+      "name": "Bl",
+      "description": "leptospires in the environment (arbitrary units)",
+      "init": "0",
+      "inN": false,
+      "color": "#DDDDDD",
+      "x": 120,
+      "y": 572
+    }
+  ],
+  "parameters": [
+    {
+      "name": "b_r",
+      "symbol": "",
+      "value": "1/180",
+      "description": "rodent birth rate per rodent [I] (day^-1)"
+    },
+    {
+      "name": "K_r",
+      "symbol": "",
+      "value": "1000",
+      "description": "rodent carrying capacity [I] (rodents)"
+    },
+    {
+      "name": "mu_r",
+      "symbol": "",
+      "value": "1/365",
+      "description": "rodent death [I] (day^-1)"
+    },
+    {
+      "name": "bd_r",
+      "symbol": "",
+      "value": "0.002",
+      "description": "direct rodent transmission, scaled by Ir/Nr [I] (day^-1 per infected rodent)"
+    },
+    {
+      "name": "be_r",
+      "symbol": "",
+      "value": "0.05",
+      "description": "rodent infection from the environment [I] (day^-1)"
+    },
+    {
+      "name": "sh_r",
+      "symbol": "",
+      "value": "1",
+      "description": "shedding [I] (units day^-1 per infected rodent)"
+    },
+    {
+      "name": "del_b",
+      "symbol": "",
+      "value": "0.1",
+      "description": "leptospire decay [I] (day^-1)"
+    },
+    {
+      "name": "K_b",
+      "symbol": "",
+      "value": "1000",
+      "description": "half-saturation [I] (units)"
+    },
+    {
+      "name": "be_h",
+      "symbol": "",
+      "value": "1e-4",
+      "description": "human exposure rate. It scales with flooding: multiply by (1 + amp_fcos(6.2831853t/365)) [I] (day^-1)"
+    },
+    {
+      "name": "gam_h",
+      "symbol": "",
+      "value": "1/14",
+      "description": "human recovery [M/I] (day^-1)"
+    },
+    {
+      "name": "cfr_h",
+      "symbol": "",
+      "value": "0.005",
+      "description": "disease death hazard (CFR about 5–10% in severe cases) [I] (day^-1)"
+    },
+    {
+      "name": "omega_h",
+      "symbol": "",
+      "value": "1/(5*365)",
+      "description": "waning serovar immunity [I] (day^-1)"
+    },
+    {
+      "name": "mu_h",
+      "symbol": "",
+      "value": "1/(70*365)",
+      "description": "human birth/death [I] (day^-1)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "Nr",
+      "symbol": "",
+      "expr": "Sr + Ir",
+      "description": "",
+      "output": false
+    },
+    {
+      "name": "envB",
+      "symbol": "",
+      "expr": "Bl/(K_b + Bl)",
+      "description": "",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c4",
+      "kind": "absolute",
+      "rate": "b_r*Nr*(1 - Nr/K_r)",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 226
+    },
+    {
+      "id": "f2",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "bd_r*Ir/Nr + be_r*envB",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_r",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 486
+    },
+    {
+      "id": "f4",
+      "from": "c5",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "mu_r",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 486
+    },
+    {
+      "id": "f5",
+      "from": null,
+      "to": "c6",
+      "kind": "absolute",
+      "rate": "sh_r*Ir",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 442
+    },
+    {
+      "id": "f6",
+      "from": "c6",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "del_b",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 702
+    },
+    {
+      "id": "f7",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "mu_h*N",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 10
+    },
+    {
+      "id": "f8",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "be_h*envB",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f9",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "gam_h",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f10",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "cfr_h",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 270
+    },
+    {
+      "id": "f11",
+      "from": "c3",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "omega_h",
+      "output": "",
+      "curve": 60
+    }
+  ]
+}

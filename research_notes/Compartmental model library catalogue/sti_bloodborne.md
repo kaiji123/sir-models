@@ -1,0 +1,716 @@
+# Sexually transmitted & blood-borne infection compartmental models (deterministic ODE catalogue)
+
+Scope: 12 implementation-ready model specs for an R/deSolve code generator. Excluded as already implemented: generic HIV acute/chronic/AIDS (Anderson & May) and generic SICR chronic carriers.
+
+**How to read the provenance tags** (they matter for every parameter):
+- **[verified]**: I confirmed the value in this session from the paper's text, its abstract, or a secondary source that cites it (URL given).
+- **[recalled]**: the value comes from my own background knowledge of the literature. I did not confirm it in this session, so check it against the primary source before calling it "from the paper".
+- **[illustrative]**: a plausible value I chose so the model runs. It is not taken from the source.
+
+**Identifier rules applied:** R reserved words and base/stats function names are not used as bare identifiers. That rules out `C`, `D`, `I`, `T`, `F`, `c`, `pi`, `beta`, `gamma`, `sigma`, `rate` and `q`. Instead the specs use names like `Ch`, `Tx`, `Fail`, `beta_h`, `sig_inc` and `pi_cef`.
+
+---
+
+## Key Question 1: For each model, what are the compartments, flows, rate expressions, force of infection and typical parameter values?
+
+### Takeaway
+All 12 models fit the "FROM > TO : rate" format with 14 or fewer compartments. Partner-change rates and mixing are written out as derived variables. Three models have parameter tables I verified in this session:
+- gonorrhoea AMR (Whittles 2017)
+- HCV in PWID (Martin 2013)
+- syphilis natural-history durations (Garnett 1997, via Feldman & Mishra 2019)
+
+The chlamydia asymptomatic duration (Althaus 2010) is also verified. The other models use a mix of recalled and illustrative values, and each one is tagged.
+
+---
+
+### hiv_art_tasp_granich — HIV universal test-and-treat (4 untreated + 4 ART stages)
+- Disease/area: HIV, generalised heterosexual epidemic (South Africa) | Category: Sexually transmitted & blood-borne
+- Source: Granich RM, Gilks CF, Dye C, De Cock KM, Williams BG. Universal voluntary HIV testing with immediate antiretroviral therapy as a strategy for elimination of HIV transmission: a mathematical model. *Lancet* 2009;373(9657):48–57. DOI: 10.1016/S0140-6736(08)61697-9 ([LSHTM record](https://researchonline.lshtm.ac.uk/id/eprint/312973); [PDF copy](https://mysite.science.uottawa.ca/rsmith43/mat4996/granichgilks.pdf))
+- Time unit: years ; simulation length 50 years (the paper's prevalence horizon is <1% within 50 years)
+- Compartments:
+  - `S` — susceptible adults aged 15+ — 0.85
+  - `I1` — untreated HIV, stage 1 — 0.04
+  - `I2` — untreated HIV, stage 2 — 0.04
+  - `I3` — untreated HIV, stage 3 — 0.04
+  - `I4` — untreated HIV, stage 4 (AIDS) — 0.03
+  - `A1` — on ART, entered from stage 1 — 0
+  - `A2` — on ART, entered from stage 2 — 0
+  - `A3` — on ART, entered from stage 3 — 0
+  - `A4` — on ART, entered from stage 4 — 0
+  - (proportions; N is approximately 1)
+- Parameters:
+  - `lambda0` = 0.6 (/yr) — transmission coefficient at low prevalence — [illustrative; the paper fitted this to SA data]
+  - `alpha_h` = 4 (–) — strength of the prevalence-dependent decline in transmission — [illustrative]
+  - `n_h` = 1 (–) — shape exponent of that decline — [illustrative]
+  - `rho_p` = 0.4 (/yr) — progression rate between untreated stages (4 stages of 2.5 yr give about 10 yr mean survival) — [recalled structure; illustrative value]
+  - `rho_a` = 0.1 (/yr) — progression between stages while on ART (slower) — [illustrative]
+  - `eps_art` = 0.01 (–) — relative infectiousness on ART (99% reduction) — [recalled from Granich; verify]
+  - `tau` = 1 (/yr) — testing plus ART initiation rate; 1/yr = annual universal test-and-treat — [the strategy in the paper; the rate form is my illustrative choice]
+  - `dropout` = 0.015 (/yr) — ART discontinuation — [illustrative]
+  - `mu` = 0.02 (/yr) — background adult mortality/exit — [illustrative]
+  - `t_start` = 10 (yr) — year the strategy starts — [illustrative]
+- Derived variables:
+  - `P` = (I1+I2+I3+I4+A1+A2+A3+A4)/N — HIV prevalence
+  - `lam_eff` = lambda0*exp(-alpha_h*P^n_h) — saturating transmission rate (heterogeneity proxy)
+  - `foi` = lam_eff*(I1+I2+I3+I4 + eps_art*(A1+A2+A3+A4))/N — force of infection
+  - `tau_t` = ifelse(t >= t_start, tau, 0) — time-switched testing/ART rate
+- Flows:
+  - ` > S : mu*N + rho_p*I4 + rho_a*A4` (absolute) — births replace all deaths, keeping N constant
+  - `S > I1 : foi`
+  - `I1 > I2 : rho_p`
+  - `I2 > I3 : rho_p`
+  - `I3 > I4 : rho_p`
+  - `I4 > : rho_p` — AIDS death
+  - `I1 > A1 : tau_t`
+  - `I2 > A2 : tau_t`
+  - `I3 > A3 : tau_t`
+  - `I4 > A4 : tau_t`
+  - `A1 > A2 : rho_a`
+  - `A2 > A3 : rho_a`
+  - `A3 > A4 : rho_a`
+  - `A4 > : rho_a` — death on ART
+  - `A1 > I1 : dropout`
+  - `A2 > I2 : dropout`
+  - `A3 > I3 : dropout`
+  - `A4 > I4 : dropout`
+  - `S > : mu`
+  - `I1 > : mu`
+  - `I2 > : mu`
+  - `I3 > : mu`
+  - `I4 > : mu`
+  - `A1 > : mu`
+  - `A2 > : mu`
+  - `A3 > : mu`
+  - `A4 > : mu`
+- Notes:
+  - Granich et al. used a deterministic transmission model for the long-term dynamics. All transmission is heterosexual, and the strategy is annual testing of everyone aged 15+ with immediate ART ([search summary of abstract](https://researchonline.lshtm.ac.uk/id/eprint/312973)).
+  - The exp(-alpha*P^n) form is my recollection of how Granich captured heterogeneity in risk without explicit risk groups. Check it against the PDF.
+  - All numeric values here are illustrative. Calibrate `lambda0` so that pre-intervention prevalence is about 15–20%.
+
+### hiv_core_noncore_mixing — HIV in core and non-core risk groups with preferential mixing and ART
+- Disease/area: HIV, heterogeneous sexual activity | Category: Sexually transmitted & blood-borne
+- Source: The core-group concept and the mixing structure come from Hethcote HW, Yorke JA. *Gonorrhea Transmission Dynamics and Control*. Lecture Notes in Biomathematics 56, Springer, 1984. DOI: 10.1007/978-3-662-07544-9 [recalled]. The preferential-mixing formulation follows Garnett GP, Anderson RM, "Factors controlling the spread of HIV in heterosexual communities in developing countries: patterns of mixing between different age and sexual activity classes", *Phil Trans R Soc Lond B* 1993;342:137–159 [recalled]. Parameter values are illustrative.
+- Time unit: years ; simulation length 60 years
+- Compartments:
+  - `S_h` — susceptible, high activity (core) — 0.049
+  - `I_h` — infected untreated, high activity — 0.001
+  - `Y_h` — AIDS, high activity — 0
+  - `A_h` — on ART, high activity — 0
+  - `S_l` — susceptible, low activity — 0.95
+  - `I_l` — infected untreated, low activity — 0
+  - `Y_l` — AIDS, low activity — 0
+  - `A_l` — on ART, low activity — 0
+- Parameters:
+  - `cp_h` = 10 (partners/yr) — partner change rate, core — [illustrative]
+  - `cp_l` = 1 (partners/yr) — partner change rate, non-core — [illustrative]
+  - `beta_p` = 0.05 (per partnership) — transmission probability per partnership — [illustrative]
+  - `eps_mix` = 0.5 (–) — assortativity: 0 = proportionate mixing, 1 = fully assortative — [illustrative]
+  - `nu_i` = 0.1 (/yr) — progression from chronic infection to AIDS — [illustrative]
+  - `delta_y` = 1 (/yr) — AIDS mortality — [illustrative]
+  - `tau` = 0.2 (/yr) — ART initiation — [illustrative]
+  - `eps_art` = 0.04 (–) — relative infectiousness on ART (96% reduction; HPTN 052, Cohen et al. *NEJM* 2011, DOI 10.1056/NEJMoa1105243) — [recalled]
+  - `mu` = 0.03 (/yr) — exit from the sexually active population — [illustrative]
+  - `f_h` = 0.05 (–) — fraction of recruits entering the core — [illustrative]
+- Derived variables:
+  - `N_h` = S_h+I_h+Y_h+A_h — core group total
+  - `N_l` = S_l+I_l+Y_l+A_l — non-core group total
+  - `Ninf_h` = I_h + eps_art*A_h — effective infectious count, core
+  - `Ninf_l` = I_l + eps_art*A_l — effective infectious count, non-core
+  - `act_h` = cp_h*(N_h - Y_h) — partnerships offered by the core (AIDS cases assumed inactive)
+  - `act_l` = cp_l*(N_l - Y_l) — partnerships offered by the non-core
+  - `prop_inf` = (cp_h*Ninf_h + cp_l*Ninf_l)/(act_h + act_l) — infectious fraction among partnerships under proportionate mixing
+  - `foi_h` = cp_h*beta_p*(eps_mix*Ninf_h/(N_h - Y_h) + (1-eps_mix)*prop_inf) — force of infection, core
+  - `foi_l` = cp_l*beta_p*(eps_mix*Ninf_l/(N_l - Y_l) + (1-eps_mix)*prop_inf) — force of infection, non-core
+- Flows:
+  - ` > S_h : f_h*(mu*N + delta_y*(Y_h+Y_l))` (absolute)
+  - ` > S_l : (1-f_h)*(mu*N + delta_y*(Y_h+Y_l))` (absolute)
+  - `S_h > I_h : foi_h`
+  - `S_l > I_l : foi_l`
+  - `I_h > Y_h : nu_i`
+  - `I_l > Y_l : nu_i`
+  - `I_h > A_h : tau`
+  - `I_l > A_l : tau`
+  - `Y_h > : delta_y`
+  - `Y_l > : delta_y`
+  - `S_h > : mu`
+  - `I_h > : mu`
+  - `Y_h > : mu`
+  - `A_h > : mu`
+  - `S_l > : mu`
+  - `I_l > : mu`
+  - `Y_l > : mu`
+  - `A_l > : mu`
+- Notes:
+  - This is the Garnett–Anderson "epsilon" mixing matrix written out for two groups.
+  - Population is single-sex/aggregate. To get a sexed version, duplicate the groups into M and F (16 compartments, which exceeds the limit) or drop Y.
+  - If either group denominator can reach zero, wrap it in max(…, 1e-9).
+  - All values are illustrative.
+
+### hiv_prep_msm — HIV among MSM with PrEP and treatment as prevention
+- Disease/area: HIV in MSM; PrEP | Category: Sexually transmitted & blood-borne
+- Source: Structure is a generic composite in the style of many PrEP models. The efficacy value comes from McCormack S, Dunn DT, et al. Pre-exposure prophylaxis to prevent the acquisition of HIV-1 infection (PROUD). *Lancet* 2016;387:53–60. DOI: 10.1016/S0140-6736(15)00056-2. That trial reported an 86% relative reduction [recalled; not re-verified in this session].
+- Time unit: years ; simulation length 30 years
+- Compartments:
+  - `S` — susceptible not on PrEP — 0.88
+  - `Sp` — susceptible on PrEP — 0
+  - `Ia` — acute (primary) infection — 0.005
+  - `Ic` — chronic undiagnosed — 0.06
+  - `Dx` — diagnosed, not on ART — 0.02
+  - `Av` — on ART, virally suppressed — 0.035
+- Parameters:
+  - `cp` = 5 (partners/yr) — partner change rate — [illustrative]
+  - `beta_c` = 0.1 (per partnership) — transmission probability per partnership from chronic infection — [illustrative]
+  - `ra` = 10 (–) — relative infectiousness of acute infection — [illustrative; the literature range is about 5–26]
+  - `sig_a` = 4 (/yr) — exit from acute stage (about 3 months) — [illustrative]
+  - `eff_prep` = 0.86 (–) — PrEP efficacy — [recalled, PROUD]
+  - `eps_art` = 0 (–) — infectiousness when virally suppressed (U=U) — [illustrative]
+  - `kappa_p` = 0.2 (/yr) — PrEP uptake — [illustrative]
+  - `omega_p` = 0.5 (/yr) — PrEP discontinuation — [illustrative]
+  - `tau_d` = 0.5 (/yr) — diagnosis rate — [illustrative]
+  - `tau_a` = 2 (/yr) — ART initiation after diagnosis — [illustrative]
+  - `nu_d` = 0.1 (/yr) — HIV death if untreated — [illustrative]
+  - `mu` = 0.03 (/yr) — exit — [illustrative]
+  - `tau_p` = 4 (/yr) — HIV testing rate while on PrEP (3-monthly); only relevant if a PrEP-specific infection compartment is added — [illustrative]
+- Derived variables:
+  - `foi` = cp*beta_c*(ra*Ia + Ic + Dx + eps_art*Av)/N — force of infection
+- Flows:
+  - ` > S : mu*N + nu_d*(Ic+Dx)` (absolute)
+  - `S > Sp : kappa_p`
+  - `Sp > S : omega_p`
+  - `S > Ia : foi`
+  - `Sp > Ia : (1-eff_prep)*foi`
+  - `Ia > Ic : sig_a`
+  - `Ic > Dx : tau_d`
+  - `Dx > Av : tau_a`
+  - `Ic > : nu_d`
+  - `Dx > : nu_d`
+  - `S > : mu`
+  - `Sp > : mu`
+  - `Ia > : mu`
+  - `Ic > : mu`
+  - `Dx > : mu`
+  - `Av > : mu`
+- Notes:
+  - Everything except `eff_prep` is illustrative.
+  - Diagnosed people may reduce risk behaviour; to model that, multiply `Dx` by a factor < 1 inside `foi`.
+  - A high/low activity split can be added, as in `hiv_core_noncore_mixing`, while staying at 12 compartments.
+
+### gonorrhoea_core_group_hethcote_yorke — Gonorrhoea SIS with core/non-core groups, two sexes
+- Disease/area: Gonorrhoea, heterosexual | Category: Sexually transmitted & blood-borne
+- Source: Hethcote HW, Yorke JA. *Gonorrhea Transmission Dynamics and Control*. Lecture Notes in Biomathematics vol. 56. Springer-Verlag, 1984. DOI: 10.1007/978-3-662-07544-9 [recalled citation]. The headline result I recall is that a core of about 2% of the population sustains about 60% of infections [recalled; not verified this session].
+- Time unit: years (rates are high; daily output is advisable) ; simulation length 20 years
+- Compartments (fractions of each sex):
+  - `Sm_c` — susceptible core men — 0.019
+  - `Im_c` — infected core men — 0.001
+  - `Sm_n` — susceptible non-core men — 0.98
+  - `Im_n` — infected non-core men — 0
+  - `Sf_c` — susceptible core women — 0.019
+  - `If_c` — infected core women — 0.001
+  - `Sf_n` — susceptible non-core women — 0.98
+  - `If_n` — infected non-core women — 0
+- Parameters:
+  - `cp_c` = 20 (partners/yr) — core partner rate — [illustrative]
+  - `cp_n` = 1 (partners/yr) — non-core partner rate — [illustrative]
+  - `b_mf` = 0.5 (per partnership) — male-to-female transmission probability — [recalled order of magnitude; illustrative]
+  - `b_fm` = 0.25 (per partnership) — female-to-male transmission probability — [illustrative]
+  - `dur_m` = 0.05 (yr) — mean infectious duration in men (most symptomatic, treated in about 2–3 weeks) — [illustrative]
+  - `dur_f` = 0.25 (yr) — mean infectious duration in women (many asymptomatic) — [illustrative]
+  - `eps_mix` = 0.6 (–) — assortativity — [illustrative]
+- Derived variables:
+  - `Nm_c` = Sm_c+Im_c — core men total
+  - `Nm_n` = Sm_n+Im_n — non-core men total
+  - `Nf_c` = Sf_c+If_c — core women total
+  - `Nf_n` = Sf_n+If_n — non-core women total
+  - `pf_mix` = (cp_c*If_c + cp_n*If_n)/(cp_c*Nf_c + cp_n*Nf_n) — prevalence among female partnerships (proportionate mixing)
+  - `pm_mix` = (cp_c*Im_c + cp_n*Im_n)/(cp_c*Nm_c + cp_n*Nm_n) — prevalence among male partnerships (proportionate mixing)
+  - `foi_m_c` = cp_c*b_fm*(eps_mix*If_c/Nf_c + (1-eps_mix)*pf_mix) — force of infection, core men
+  - `foi_m_n` = cp_n*b_fm*(eps_mix*If_n/Nf_n + (1-eps_mix)*pf_mix) — force of infection, non-core men
+  - `foi_f_c` = cp_c*b_mf*(eps_mix*Im_c/Nm_c + (1-eps_mix)*pm_mix) — force of infection, core women
+  - `foi_f_n` = cp_n*b_mf*(eps_mix*Im_n/Nm_n + (1-eps_mix)*pm_mix) — force of infection, non-core women
+- Flows:
+  - `Sm_c > Im_c : foi_m_c`
+  - `Im_c > Sm_c : 1/dur_m`
+  - `Sm_n > Im_n : foi_m_n`
+  - `Im_n > Sm_n : 1/dur_m`
+  - `Sf_c > If_c : foi_f_c`
+  - `If_c > Sf_c : 1/dur_f`
+  - `Sf_n > If_n : foi_f_n`
+  - `If_n > Sf_n : 1/dur_f`
+- Notes:
+  - The model is a closed SIS with no immunity, which is the hallmark assumption in Hethcote–Yorke.
+  - Partnership balance holds when the core fractions and partner rates are equal across sexes, as they are here.
+  - Hethcote–Yorke also split each sex into symptomatic and asymptomatic infecteds. Adding that gives 12 compartments: for each group/sex, `I` becomes `Iy` (treated fast) and `Ia` (slow), with proportions `p_sym`.
+  - Screening or contact tracing can be represented as an extra `I > S` flow.
+
+### gonorrhoea_amr_whittles — Gonorrhoea in MSM with cefixime-sensitive and cefixime-resistant strains
+- Disease/area: Gonorrhoea, antimicrobial resistance | Category: Sexually transmitted & blood-borne
+- Source: Whittles LK, White PJ, Didelot X. Estimating the fitness cost and benefit of cefixime resistance in *Neisseria gonorrhoeae* to inform prescription policy: a modelling study. *PLoS Med* 2017;14(10):e1002416. DOI: 10.1371/journal.pmed.1002416 ([PMC5663337](https://pmc.ncbi.nlm.nih.gov/articles/PMC5663337)). The original model is stochastic; this is its deterministic analogue. Parameters are posterior means [verified].
+- Time unit: years (rates up to about 136/yr, so use a stiff solver or small output steps) ; simulation length 10 years
+- Compartments (counts):
+  - `S` — susceptible MSM — 600000 minus the infected
+  - `Us` — incubating, sensitive strain — 0
+  - `Es` — symptomatic, sensitive — 0
+  - `As` — asymptomatic, sensitive — 618
+  - `Tsc` — treated with cefixime, sensitive — 0
+  - `Tso` — treated with another antibiotic, sensitive — 0
+  - `Ur` — incubating, resistant strain — 0
+  - `Er` — symptomatic, resistant — 0
+  - `Ar` — asymptomatic, resistant — 49
+  - `Trc` — treated with cefixime, resistant — 0
+  - `Tro` — treated with another antibiotic, resistant — 0
+- Parameters:
+  - `theta` = 5.2 (/yr) — transmission rate — [verified; 95% CrI 4.1–6.5]
+  - `psi` = 0.63 (–) — proportion of infections becoming symptomatic — [verified; 0.48–0.76]
+  - `sig_inc` = 77 (/yr) — rate of leaving incubation (about 4.7 days) — [verified; 46–119]
+  - `nu` = 1.8 (/yr) — natural recovery from asymptomatic infection, sensitive strain — [verified; 0.9–3.0]
+  - `alpha_r` = 1.8 (–) — relative natural recovery rate of the resistant strain (fitness cost) — [verified; 1.4–2.4]
+  - `mu_t` = 136 (/yr) — treatment-seeking rate when symptomatic — [verified; 33–350]
+  - `rho` = 53 (/yr) — recovery rate after treatment — [verified; 43–63]
+  - `phi_f` = 0.83 (–) — cefixime treatment failure for resistant infection — [verified; 0.53–0.99]
+  - `pi_cef` = 0.3 (–) — proportion treated with cefixime — [illustrative constant; the paper used time-varying GRASP data peaking at about 0.7 in 2008]
+- Derived variables:
+  - `Inf_s` = Us+Es+As+Tsc+Tso — infected with sensitive strain
+  - `Inf_r` = Ur+Er+Ar+Trc+Tro — infected with resistant strain
+  - `foi_s` = theta*Inf_s/N — force of infection, sensitive
+  - `foi_r` = theta*Inf_r/N — force of infection, resistant
+- Flows:
+  - `S > Us : foi_s`
+  - `S > Ur : foi_r`
+  - `Us > Es : psi*sig_inc`
+  - `Us > As : (1-psi)*sig_inc`
+  - `Ur > Er : psi*sig_inc`
+  - `Ur > Ar : (1-psi)*sig_inc`
+  - `As > S : nu`
+  - `Ar > S : alpha_r*nu`
+  - `Es > Tsc : pi_cef*mu_t`
+  - `Es > Tso : (1-pi_cef)*mu_t`
+  - `Er > Trc : pi_cef*mu_t`
+  - `Er > Tro : (1-pi_cef)*mu_t`
+  - `Tsc > S : rho`
+  - `Tso > S : rho`
+  - `Tro > S : rho`
+  - `Trc > S : (1-phi_f)*rho`
+  - `Trc > Ar : phi_f*rho`
+- Notes:
+  - Closed population, N = 0.6 million MSM in England [verified].
+  - No post-recovery immunity, and no sexual-behaviour heterogeneity: the authors state they "did not model heterogeneity in sexual behaviours" [verified].
+  - Strains share the same transmissibility. I could not confirm from the main text which compartments are infectious; I assumed all infected compartments are (U, E, A and T). Check this in S1 Appendix.
+  - The paper also tracks asymptomatic screening diagnoses. A screening flow `As > S` / `Ar > S` at rate `scr` can be added.
+
+### syphilis_staged_garnett — Syphilis with incubating, primary, secondary, early/late latent stages and waning immunity
+- Disease/area: Syphilis | Category: Sexually transmitted & blood-borne
+- Source: Garnett GP, Aral SO, Hoyle DV, Cates W Jr, Anderson RM. The natural history of syphilis: implications for the transmission dynamics and control of infection. *Sex Transm Dis* 1997;24(4):185–200. DOI: 10.1097/00007435-199704000-00002 [DOI recalled]. Duration values come via the secondary source Feldman J, Mishra S. What could re-infection tell us about R0? A modeling case-study of syphilis transmission. *Infect Dis Model* 2019;4:257–264. DOI: 10.1016/j.idm.2019.09.002 ([PMC6806446](https://pmc.ncbi.nlm.nih.gov/articles/PMC6806446)).
+- Time unit: years ; simulation length 30 years
+- Compartments:
+  - `S` — susceptible — 0.99
+  - `E` — incubating — 0
+  - `P1` — primary (infectious) — 0.005
+  - `P2` — secondary (infectious) — 0.005
+  - `Le` — early latent (non-infectious; relapse possible) — 0
+  - `Ll` — late latent — 0
+  - `R` — treated, temporarily immune — 0
+- Parameters:
+  - `cp` = 15 (partners/yr) — mean partner change rate (MSM, Ontario) — [verified via Feldman & Mishra; originally Remis et al. 2010]
+  - `beta_s` = 0.3 (per partnership) — transmission probability — [illustrative; per-act range 0.09–0.64 verified via Feldman & Mishra, citing Garnett 1997]
+  - `sig_inc` = 365/25 (/yr) — 1/incubation period (25 days) — [verified via Feldman & Mishra citing Garnett 1997]
+  - `d_inf` = 154/365 (yr) — total primary + secondary infectious period — [verified via Feldman & Mishra citing Garnett 1997]
+  - `f_prim` = 0.3 (–) — fraction of `d_inf` spent in primary stage — [illustrative]
+  - `tau` = 0.4 (/yr) — treatment rate of infectious and early-latent cases — [verified range 0.1–0.8 via Feldman & Mishra, citing Remis 2010; midpoint is my choice]
+  - `tau_l` = 0.1 (/yr) — treatment rate in late latent — [illustrative]
+  - `rel` = 0.25 (/yr) — relapse rate early latent to secondary — [illustrative; Garnett 1997 includes relapse; check the value]
+  - `el` = 1 (/yr) — progression early to late latent (early latent about 1 yr) — [illustrative]
+  - `w_imm` = 1/5 (/yr) — waning of post-treatment immunity (5 yr) — [verified via Feldman & Mishra citing Garnett 1997]
+  - `mu` = 5831/366279 (/yr) — entry/exit rate — [verified via Feldman & Mishra]
+- Derived variables:
+  - `foi` = cp*beta_s*(P1 + P2)/N — force of infection
+- Flows:
+  - ` > S : mu*N` (absolute)
+  - `S > E : foi`
+  - `E > P1 : sig_inc`
+  - `P1 > P2 : 1/(f_prim*d_inf)`
+  - `P2 > Le : 1/((1-f_prim)*d_inf)`
+  - `Le > P2 : rel`
+  - `Le > Ll : el`
+  - `P1 > R : tau`
+  - `P2 > R : tau`
+  - `Le > R : tau`
+  - `Ll > R : tau_l`
+  - `R > S : w_imm`
+  - `S > : mu`
+  - `E > : mu`
+  - `P1 > : mu`
+  - `P2 > : mu`
+  - `Le > : mu`
+  - `Ll > : mu`
+  - `R > : mu`
+- Notes:
+  - Feldman & Mishra's version is simpler. It has S, E, I and L stratified by first infection versus reinfection, two activity groups with proportionate mixing (high-activity fraction 0.079–0.217; c_H/c_L of 5–10 [verified]), and R0 = αβ(c_H g_H + c_L g_L)/[(α+μ)(ρ+τ+μ)].
+  - In their model, treatment in I returns people straight to S, while treatment in latency gives temporary immunity [verified]. Here all treatment goes to R; set `P1 > S` and `P2 > S` instead if you want to follow Feldman & Mishra.
+  - Tertiary syphilis is omitted because it does not transmit.
+  - The 1997 paper's full text was not accessible, so check the stage durations against it.
+
+### chlamydia_seirs_screening_althaus — Chlamydia SEIRS, two sexes, symptomatic/asymptomatic, with screening
+- Disease/area: *Chlamydia trachomatis* | Category: Sexually transmitted & blood-borne
+- Source: Althaus CL, Heijne JCM, Roellin A, Low N. Transmission dynamics of *Chlamydia trachomatis* affect the impact of screening programmes. *Epidemics* 2010;2(3):123–131. DOI: 10.1016/j.epidem.2010.04.002 [DOI recalled] ([BORIS record](https://boris.unibe.ch/1316)). The model is SEIRS with screening, and the estimated mean asymptomatic duration in women is 433 days (95% CI 420–447) [verified from abstract via search].
+- Time unit: days ; simulation length 3650 days (10 yr)
+- Compartments (fractions of each sex):
+  - `Sf` — susceptible women — 0.95
+  - `Ef` — exposed (latent) women — 0
+  - `Iaf` — asymptomatic infected women — 0.05
+  - `Isf` — symptomatic infected women — 0
+  - `Rf` — immune women — 0
+  - `Sm` — susceptible men — 0.95
+  - `Em` — exposed men — 0
+  - `Iam` — asymptomatic infected men — 0.05
+  - `Ism` — symptomatic infected men — 0
+  - `Rm` — immune men — 0
+- Parameters:
+  - `cp` = 1/365 (partners/day) — partner change rate (1 per year, equal by sex to keep partnerships balanced) — [illustrative]
+  - `beta_mf` = 0.3 (per partnership) — male-to-female transmission — [illustrative]
+  - `beta_fm` = 0.3 (per partnership) — female-to-male transmission — [illustrative]
+  - `sig_inc` = 1/14 (/day) — exit from latent period — [illustrative]
+  - `p_sym_f` = 0.1 (–) — symptomatic fraction, women — [illustrative]
+  - `p_sym_m` = 0.2 (–) — symptomatic fraction, men — [illustrative]
+  - `d_af` = 433 (days) — asymptomatic duration, women — [verified, Althaus 2010]
+  - `d_am` = 433 (days) — asymptomatic duration, men — [illustrative; assumed equal to women]
+  - `d_s` = 30 (days) — time to treatment when symptomatic — [illustrative]
+  - `w_imm` = 1/365 (/day) — waning of immunity (R back to S) — [illustrative]
+  - `scr_f` = 0.2/365 (/day) — screening plus treatment rate, women — [illustrative]
+  - `scr_m` = 0.05/365 (/day) — screening plus treatment rate, men — [illustrative]
+- Derived variables:
+  - `Nf` = Sf+Ef+Iaf+Isf+Rf — women total
+  - `Nm` = Sm+Em+Iam+Ism+Rm — men total
+  - `foi_f` = cp*beta_mf*(Iam+Ism)/Nm — force of infection on women
+  - `foi_m` = cp*beta_fm*(Iaf+Isf)/Nf — force of infection on men
+- Flows:
+  - `Sf > Ef : foi_f`
+  - `Ef > Isf : p_sym_f*sig_inc`
+  - `Ef > Iaf : (1-p_sym_f)*sig_inc`
+  - `Iaf > Rf : 1/d_af` — natural clearance gives temporary immunity
+  - `Iaf > Sf : scr_f` — screening and treatment; no immunity
+  - `Isf > Sf : 1/d_s` — treatment
+  - `Rf > Sf : w_imm`
+  - `Sm > Em : foi_m`
+  - `Em > Ism : p_sym_m*sig_inc`
+  - `Em > Iam : (1-p_sym_m)*sig_inc`
+  - `Iam > Rm : 1/d_am`
+  - `Iam > Sm : scr_m`
+  - `Ism > Sm : 1/d_s`
+  - `Rm > Sm : w_imm`
+- Notes:
+  - The paper's main finding is that a longer asymptomatic duration gives a more pronounced screening impact [verified via search].
+  - Treated people return to S, while natural clearance leads to R. That asymmetry is the "arrested immunity" idea and should be checked against the full paper.
+  - Turner et al. 2006 (*Sex Transm Infect*) is an individual-based network model, so it is not expressible here and was skipped.
+  - Mixing is random heterosexual. For core groups, split each sex as in the gonorrhoea model.
+
+### hpv_vaccination_simplified — HPV (single high-risk type) SIRS-type model, two sexes, with vaccination
+- Disease/area: HPV 16/18, vaccination | Category: Sexually transmitted & blood-borne
+- Source: Simplified from Elbasha EH, Dasbach EJ, Insinga RP. Model for assessing human papillomavirus vaccination strategies. *Emerg Infect Dis* 2007;13(1):28–41. DOI: 10.3201/eid1301.060438 ([CDC EID](https://www.cdc.gov/eid/article/13/1/pdfs/06-0438-combined.pdf); [technical appendix](https://wwwnc.cdc.gov/eid/article/13/1/06-0438-techapp2)). The appendix PDF could not be parsed, so **all parameter values below are illustrative or recalled**.
+- Time unit: years ; simulation length 100 years (vaccination effects are slow)
+- Compartments:
+  - `Sf` — susceptible women — 0.9
+  - `If` — infected women — 0.05
+  - `Rf` — naturally immune women — 0.05
+  - `Vf` — vaccinated women — 0
+  - `Sm` — susceptible men — 0.9
+  - `Im` — infected men — 0.05
+  - `Rm` — immune men — 0.05
+  - `Vm` — vaccinated men — 0
+- Parameters:
+  - `cp` = 2 (partners/yr) — partner change rate — [illustrative]
+  - `beta_mf` = 0.8 (per partnership) — male-to-female transmission (Elbasha used high values) — [recalled order; illustrative]
+  - `beta_fm` = 0.7 (per partnership) — female-to-male transmission — [illustrative]
+  - `clr_f` = 1 (/yr) — clearance in women (about 1 yr) — [illustrative]
+  - `clr_m` = 1.5 (/yr) — clearance in men — [illustrative]
+  - `p_imm_f` = 0.5 (–) — fraction of women gaining natural immunity on clearance — [illustrative]
+  - `p_imm_m` = 0.2 (–) — fraction of men gaining natural immunity on clearance — [illustrative]
+  - `w_nat` = 0.1 (/yr) — waning of natural immunity — [illustrative]
+  - `w_vac` = 0 (/yr) — waning of vaccine protection (assumed lifelong) — [illustrative]
+  - `vc_f` = 0.7 (–) — vaccine coverage of girls at entry — [illustrative]
+  - `vc_m` = 0 (–) — vaccine coverage of boys at entry — [illustrative]
+  - `ve` = 0.9 (–) — vaccine efficacy (degree protection) — [illustrative]
+  - `mu` = 1/30 (/yr) — exit from the sexually active population — [illustrative]
+- Derived variables:
+  - `Nf` = Sf+If+Rf+Vf — women total
+  - `Nm` = Sm+Im+Rm+Vm — men total
+  - `foi_f` = cp*beta_mf*Im/Nm — force of infection on women
+  - `foi_m` = cp*beta_fm*If/Nf — force of infection on men
+- Flows:
+  - ` > Sf : mu*Nf*(1-vc_f)` (absolute)
+  - ` > Vf : mu*Nf*vc_f` (absolute)
+  - ` > Sm : mu*Nm*(1-vc_m)` (absolute)
+  - ` > Vm : mu*Nm*vc_m` (absolute)
+  - `Sf > If : foi_f`
+  - `Vf > If : (1-ve)*foi_f` — leaky vaccine
+  - `If > Rf : p_imm_f*clr_f`
+  - `If > Sf : (1-p_imm_f)*clr_f`
+  - `Rf > Sf : w_nat`
+  - `Vf > Sf : w_vac`
+  - `Sm > Im : foi_m`
+  - `Vm > Im : (1-ve)*foi_m`
+  - `Im > Rm : p_imm_m*clr_m`
+  - `Im > Sm : (1-p_imm_m)*clr_m`
+  - `Rm > Sm : w_nat`
+  - `Vm > Sm : w_vac`
+  - `Sf > : mu`
+  - `If > : mu`
+  - `Rf > : mu`
+  - `Vf > : mu`
+  - `Sm > : mu`
+  - `Im > : mu`
+  - `Rm > : mu`
+  - `Vm > : mu`
+- Notes:
+  - The real Elbasha model includes age, sexual activity groups, CIN1–3, cancer stages, screening and warts (types 6/11). That is far above 14 compartments.
+  - With a spare compartment budget (6 left), add a female `CIN` compartment fed from `If` at a progression rate.
+
+### hsv2_latent_reactivation — Genital herpes (HSV-2) with primary episode, latency and recurrent reactivation
+- Disease/area: HSV-2 | Category: Sexually transmitted & blood-borne
+- Source: Structure follows Blower SM, Porco TC, Darby G. Predicting and preventing the emergence of antiviral drug resistance in HSV-2. *Nat Med* 1998;4(6):673–678. DOI: 10.1038/nm0698-673 [recalled citation and structure; not verified this session]. Parameter values are illustrative.
+- Time unit: years ; simulation length 50 years
+- Compartments:
+  - `S` — susceptible — 0.8
+  - `Ip` — primary infection episode (high shedding) — 0.01
+  - `Lt` — latent (low-level asymptomatic shedding) — 0.17
+  - `Rc` — recurrent episode (reactivated shedding) — 0.02
+- Parameters:
+  - `cp` = 2 (partners/yr) — partner change rate — [illustrative]
+  - `beta_p` = 0.5 (per partnership) — transmission from primary episode — [illustrative]
+  - `beta_r` = 0.3 (per partnership) — transmission from recurrence — [illustrative]
+  - `beta_l` = 0.05 (per partnership) — transmission from latency (asymptomatic shedding) — [illustrative]
+  - `d_p` = 3/52 (yr) — duration of primary episode (about 3 weeks) — [illustrative]
+  - `react` = 4 (/yr) — reactivation rate (about 4 recurrences/yr in early years) — [recalled order of magnitude; illustrative]
+  - `d_r` = 5/365 (yr) — duration of a recurrence — [illustrative]
+  - `mu` = 1/30 (/yr) — exit from the sexually active population — [illustrative]
+  - `tx` = 0 (–) — fraction of recurrences shortened by suppressive antivirals — [illustrative scenario knob]
+- Derived variables:
+  - `foi` = cp*(beta_p*Ip + beta_r*Rc + beta_l*Lt)/N — force of infection
+- Flows:
+  - ` > S : mu*N` (absolute)
+  - `S > Ip : foi`
+  - `Ip > Lt : 1/d_p`
+  - `Lt > Rc : react*(1-tx)`
+  - `Rc > Lt : 1/d_r`
+  - `S > : mu`
+  - `Ip > : mu`
+  - `Lt > : mu`
+  - `Rc > : mu`
+- Notes:
+  - Infection is lifelong: there is no flow back to S.
+  - Blower et al. 1998 also tracked drug-sensitive and drug-resistant strains and treated/untreated states, giving about 8–12 compartments. Duplicate Ip/Lt/Rc for a resistant strain to reproduce that.
+  - Recurrence frequency declines with time since infection. Two latent stages (`Lt1` early with high `react`, `Lt2` late with low `react`) can capture this.
+
+### hbv_carrier_vaccination — Hepatitis B with acute infection, chronic carriers, vertical transmission and vaccination
+- Disease/area: Hepatitis B | Category: Sexually transmitted & blood-borne
+- Source: The conceptual basis is Medley GF, Lindop NA, Edmunds WJ, Nokes DJ. Hepatitis-B virus endemicity: heterogeneity, catastrophic dynamics and control. *Nat Med* 2001;7(5):619–624. DOI: 10.1038/87953 [DOI recalled; citation verified via search]. Supporting work is Edmunds WJ et al. *Epidemiol Infect* 1996;117:313–325, DOI 10.1017/s0950268800001497 ([PMC2271713](https://pmc.ncbi.nlm.nih.gov/articles/PMC2271713/)). The flow structure and values follow Zou L, Zhang W, Ruan S. Modeling the transmission dynamics and control of hepatitis B virus in China. *J Theor Biol* 2010;262:330–338, and Pang J, Cui JA, Zhou X. Dynamical behavior of a hepatitis B virus transmission model with vaccination. *J Theor Biol* 2010;265:572–578 [both recalled; verify values].
+- Time unit: years ; simulation length 100 years
+- Compartments:
+  - `S` — susceptible — 0.6
+  - `Ac` — acute infection — 0.01
+  - `Cr` — chronic carrier — 0.09
+  - `R` — recovered/immune — 0.3
+  - `V` — vaccinated — 0
+- Parameters:
+  - `beta_h` = 0.95 (/yr) — horizontal transmission coefficient — [recalled from Zou et al. 2010; verify]
+  - `eps_c` = 0.16 (–) — relative infectiousness of carriers vs acute — [recalled, Zou 2010]
+  - `gam_a` = 4 (/yr) — exit from acute stage (about 3 months) — [recalled, Zou 2010]
+  - `q_c` = 0.0886 (–) — probability that horizontal adult infection leads to carriage — [recalled, Zou 2010]
+  - `gam_c` = 0.025 (/yr) — carrier clearance (HBsAg loss) — [recalled, Zou 2010]
+  - `pv` = 0.11 (–) — fraction of births to carrier mothers infected perinatally — [recalled, Zou 2010]
+  - `pc0` = 0.885 (–) — probability that perinatal infection leads to carriage — [recalled; consistent with Edmunds 1993's age-dependent carrier probability, exp(-0.645 a^0.455)]
+  - `mu` = 0.00693 (/yr) — birth = natural death rate — [recalled, Zou 2010]
+  - `mu_c` = 0.002 (/yr) — HBV-related excess carrier mortality — [illustrative]
+  - `vax` = 0.0 (–) — infant vaccination coverage times efficacy (scenario: 0.9) — [illustrative]
+  - `w_v` = 0.1 (/yr) — waning of vaccine immunity — [recalled, Zou 2010 (about 10 yr); verify]
+- Derived variables:
+  - `foi` = beta_h*(Ac + eps_c*Cr)/N — force of infection
+  - `births_ok` = mu*N - mu*pv*Cr — births not perinatally infected
+- Flows:
+  - ` > S : births_ok*(1-vax) + mu_c*Cr` (absolute) — mu_c*Cr replaces HBV deaths to keep N fixed
+  - ` > V : births_ok*vax` (absolute)
+  - ` > Cr : mu*pv*Cr*pc0` (absolute)
+  - ` > Ac : mu*pv*Cr*(1-pc0)` (absolute)
+  - `S > Ac : foi`
+  - `Ac > Cr : q_c*gam_a`
+  - `Ac > R : (1-q_c)*gam_a`
+  - `Cr > R : gam_c`
+  - `V > S : w_v`
+  - `S > : mu`
+  - `Ac > : mu`
+  - `Cr > : mu + mu_c`
+  - `R > : mu`
+  - `V > : mu`
+- Notes:
+  - Medley 2001's key insight is that carrier probability falls steeply with age at infection, giving bistable ("catastrophic") endemicity. Under that reading, starting carrier prevalence is the most influential predictor of how interventions perform [verified via search summary].
+  - This age-free version cannot reproduce the bistability. To approximate it, make `q_c` depend on the force of infection: q_c = exp(-0.645*A50^0.455), with A50 ≈ log(2)/foi. That is a heuristic of mine, not from the paper.
+  - Sexual transmission among adults is folded into `beta_h`.
+  - Vaccination of a susceptible catch-up cohort can be added as `S > V : v_rate`.
+
+### hcv_pwid_treatment_martin — Hepatitis C among PWID with risk groups and DAA treatment as prevention
+- Disease/area: HCV in people who inject drugs | Category: Sexually transmitted & blood-borne
+- Source: Martin NK, Vickerman P, Grebely J, Hellard M, Hutchinson SJ, Lima VD, Foster GR, Dillon JF, Goldberg DJ, Dore GJ, Hickman M. Hepatitis C virus treatment for prevention among people who inject drugs: modeling treatment scale-up in the age of direct-acting antivirals. *Hepatology* 2013;58(5):1598–1609. DOI: 10.1002/hep.26431 ([PMC3933734](https://pmc.ncbi.nlm.nih.gov/articles/PMC3933734)). Parameters use the Edinburgh setting [verified]. The model extends Martin et al. *J Hepatol* 2011;54:1137–1144 [recalled].
+- Time unit: years ; simulation length 15–30 years (the paper's horizon is 15 yr)
+- Compartments (counts, N = 1000 PWID):
+  - `X0` — uninfected, low risk — 503
+  - `A0` — acute HCV, low risk — 5
+  - `Ch0` — chronic HCV, low risk — 150
+  - `Tx0` — on treatment, low risk — 0
+  - `Fail0` — failed treatment, low risk — 12
+  - `X1` — uninfected, high risk — 230
+  - `A1` — acute, high risk — 5
+  - `Ch1` — chronic, high risk — 90
+  - `Tx1` — on treatment, high risk — 0
+  - `Fail1` — failed treatment, high risk — 5
+- Parameters:
+  - `pi_inf` = 0.2 (/yr) — infection rate coefficient — [illustrative; fitted in the paper to reach 25% chronic prevalence in Edinburgh, so calibrate]
+  - `Pi_h` = 3.6 (–) — relative risk for high-risk PWID — [verified; Edinburgh/Melbourne, 1.5–8.7]
+  - `kappa` = 12/14 (/yr) — high to low risk (duration 14 months) — [verified, Edinburgh]
+  - `f_high` = 0.33 (–) — fraction of new injectors entering high risk — [illustrative; the paper fitted high-risk proportion = 33%, verified]
+  - `delta_c` = 0.26 (–) — proportion of acute infections clearing spontaneously — [verified]
+  - `psi_a` = 2 (/yr) — exit from acute (6 months) — [verified]
+  - `mu1` = 1/11 (/yr) — permanent cessation of injecting (11 yr career) — [verified]
+  - `mu2` = 0.01 (/yr) — death rate — [verified, Edinburgh]
+  - `phi_tx` = 8 (per 1000 PWID per yr) — treatments started per year — [verified baseline, Edinburgh; scale-up scenarios 15–76]
+  - `omega` = 52/12 (/yr) — 1/treatment duration (12 weeks for IFN-free DAA) — [verified]
+  - `alpha_svr` = 0.9 (–) — SVR with IFN-free DAAs — [verified; PEG-IFN+RBV is 0.37 for genotype 1 and 0.67 for genotypes 2/3]
+- Derived variables:
+  - `Ntot` = X0+A0+Ch0+Tx0+Fail0+X1+A1+Ch1+Tx1+Fail1 — total PWID
+  - `Chtot` = Ch0+Ch1 — total chronic infections
+  - `Infectious` = A0+A1+Ch0+Ch1+Fail0+Fail1+(1-alpha_svr)*(Tx0+Tx1) — those on treatment who will achieve SVR are non-infectious [verified assumption]
+  - `foi0` = pi_inf*Infectious/Ntot — force of infection, low risk
+  - `foi1` = Pi_h*pi_inf*Infectious/Ntot — force of infection, high risk
+  - `tx_pc` = pmin(phi_tx/1000*Ntot/max(Chtot, 1e-6), 52) — per-capita treatment rate implementing a fixed number treated per year; capped
+  - `exit_r` = mu1 + mu2 — total exit rate (cessation plus death)
+- Flows:
+  - ` > X0 : (1-f_high)*exit_r*Ntot` (absolute) — new injectors replace leavers
+  - ` > X1 : f_high*exit_r*Ntot` (absolute)
+  - `X0 > A0 : foi0`
+  - `X1 > A1 : foi1`
+  - `A0 > X0 : delta_c*psi_a`
+  - `A0 > Ch0 : (1-delta_c)*psi_a`
+  - `A1 > X1 : delta_c*psi_a`
+  - `A1 > Ch1 : (1-delta_c)*psi_a`
+  - `Ch0 > Tx0 : tx_pc`
+  - `Ch1 > Tx1 : tx_pc`
+  - `Tx0 > X0 : alpha_svr*omega` — SVR; reinfection possible at the same risk [verified]
+  - `Tx0 > Fail0 : (1-alpha_svr)*omega`
+  - `Tx1 > X1 : alpha_svr*omega`
+  - `Tx1 > Fail1 : (1-alpha_svr)*omega`
+  - `X1 > X0 : kappa`
+  - `A1 > A0 : kappa`
+  - `Ch1 > Ch0 : kappa`
+  - `Tx1 > Tx0 : kappa`
+  - `Fail1 > Fail0 : kappa`
+  - Exits from every compartment at `exit_r`, one line each:
+    - `X0 > : exit_r`
+    - `A0 > : exit_r`
+    - `Ch0 > : exit_r`
+    - `Tx0 > : exit_r`
+    - `Fail0 > : exit_r`
+    - `X1 > : exit_r`
+    - `A1 > : exit_r`
+    - `Ch1 > : exit_r`
+    - `Tx1 > : exit_r`
+    - `Fail1 > : exit_r`
+- Notes:
+  - The paper also stratifies by OST status (on-OST relative risk Γ = 0.41; OST duration 8 months in Edinburgh; 57% on OST [verified]). Adding OST doubles the model to 20 compartments, so it is omitted. Approximate it by scaling `pi_inf` by (0.57*0.41 + 0.43) if desired.
+  - Low-to-high risk switching is omitted. The paper allows risk-status changes but only reported the high-risk duration.
+  - Failures cannot be retreated [verified]. Acute cases are not treated [verified].
+  - The paper's θ was set to keep 1000 PWID [verified]. Here inflow equals outflow, so N stays constant.
+  - Sensitivity analysis: acute infection 5× more transmissible [verified].
+  - Other settings: Melbourne (50% prevalence, 25,000 PWID, death 0.83%/yr, treatment 3/1000) and Vancouver (65% prevalence, 13,500 PWID, death 3%/yr, high-risk RR 1.4, high-risk duration 38 months, treatment 5/1000) [verified].
+
+### htlv1_sexual_vertical — HTLV-1 lifelong infection with sexual and mother-to-child transmission and disease (ATL/HAM)
+- Disease/area: HTLV-1 | Category: Sexually transmitted & blood-borne
+- Source: I found no canonical population-level deterministic HTLV-1 transmission ODE paper in this session; published HTLV ODE models are mostly within-host. This is a composite model with **illustrative** values. The epidemiological facts behind it (about 2–5% lifetime ATL risk; MTCT mainly via prolonged breastfeeding) are from Gessain A, Cassar O. Epidemiological aspects and world distribution of HTLV-1 infection. *Front Microbiol* 2012;3:388. DOI: 10.3389/fmicb.2012.00388 [recalled; verify].
+- Time unit: years ; simulation length 200 years (very slow dynamics)
+- Compartments:
+  - `Sf` — susceptible women — 0.49
+  - `Hf` — HTLV-1 carrier women — 0.01
+  - `Sm` — susceptible men — 0.495
+  - `Hm` — carrier men — 0.005
+  - `Dz` — ATL/HAM disease (both sexes) — 0
+- Parameters:
+  - `cp` = 1 (partners/yr) — partner change rate — [illustrative]
+  - `b_mf` = 0.06 (per partnership/yr) — male-to-female transmission (higher than reverse, per the literature) — [illustrative]
+  - `b_fm` = 0.01 (per partnership/yr) — female-to-male transmission — [illustrative]
+  - `p_mtct` = 0.2 (–) — infant infection probability from a carrier mother (prolonged breastfeeding) — [recalled order of magnitude; illustrative]
+  - `dis` = 0.001 (/yr) — progression carrier to disease (about 4% lifetime over a 40-yr exposure) — [illustrative, consistent with the recalled lifetime risk]
+  - `mu` = 1/50 (/yr) — natural death = birth — [illustrative]
+  - `mu_d` = 0.5 (/yr) — disease-related death (ATL is rapidly fatal; HAM is not) — [illustrative]
+- Derived variables:
+  - `Nf` = Sf+Hf+Dz/2 — women total (assumes disease split evenly by sex)
+  - `Nm` = Sm+Hm+Dz/2 — men total
+  - `foi_f` = cp*b_mf*Hm/Nm — force of infection on women
+  - `foi_m` = cp*b_fm*Hf/Nf — force of infection on men
+  - `births` = mu*N + mu_d*Dz — births keeping N constant
+  - `pinf_birth` = p_mtct*Hf/Nf — fraction of births infected vertically
+- Flows:
+  - ` > Sf : 0.5*births*(1-pinf_birth)` (absolute)
+  - ` > Hf : 0.5*births*pinf_birth` (absolute)
+  - ` > Sm : 0.5*births*(1-pinf_birth)` (absolute)
+  - ` > Hm : 0.5*births*pinf_birth` (absolute)
+  - `Sf > Hf : foi_f`
+  - `Sm > Hm : foi_m`
+  - `Hf > Dz : dis`
+  - `Hm > Dz : dis`
+  - `Dz > : mu_d + mu`
+  - `Sf > : mu`
+  - `Hf > : mu`
+  - `Sm > : mu`
+  - `Hm > : mu`
+- Notes:
+  - Infants are recruited directly into the sexually active population, which ignores the delay to sexual debut. Add a `Juv` compartment (not sexually active) if needed.
+  - Blood transfusion and needle sharing can be added as an extra force-of-infection term.
+  - Treat this model as a teaching template, not a reproduction of a published model.
+
+---
+
+## Key Question 2: What is each model's primary source, and where do the parameter values come from?
+
+### Takeaway
+Primary citations for all models are listed above. Verified parameter sets are strongest for Martin 2013 (HCV), Whittles 2017 (gonorrhoea AMR) and the Garnett 1997 syphilis durations (via Feldman & Mishra 2019). For Granich 2009, Elbasha 2007, Medley 2001, Hethcote–Yorke 1984 and Blower 1998, the parameter tables sit in supplements, books or paywalled PDFs that I could not read this session, so their values are flagged recalled or illustrative.
+
+### Cited Findings
+- Granich et al., *Lancet* 2009;373:48–57, DOI 10.1016/S0140-6736(08)61697-9 — [LSHTM](https://researchonline.lshtm.ac.uk/id/eprint/312973):
+  - used a stochastic model for the case reproduction number and a deterministic transmission model for long-term dynamics;
+  - used South Africa as the test case, with all transmission heterosexual;
+  - modelled annual testing of everyone aged 15+ with immediate ART;
+  - projected incidence below 1/1000/yr within 10 years and prevalence below 1% within 50 years.
+- Martin et al., *Hepatology* 2013, DOI 10.1002/hep.26431 — [PMC3933734](https://pmc.ncbi.nlm.nih.gov/articles/PMC3933734):
+  - compartments are X/A/C/T/F stratified by risk and OST;
+  - full Edinburgh, Melbourne and Vancouver parameter tables (reproduced above);
+  - halving prevalence in 15 years needs 15, 40 or 76 treatments per 1000 PWID per year in Edinburgh, Melbourne or Vancouver.
+- Whittles et al., *PLoS Med* 2017, DOI 10.1371/journal.pmed.1002416 — [PMC5663337](https://pmc.ncbi.nlm.nih.gov/articles/PMC5663337):
+  - compartments are S, U, E, A and T (cefixime/other) for each strain, with posterior parameter values;
+  - N = 0.6 million MSM in England;
+  - resistant strains cause about half as many secondary infections;
+  - cefixime fails in 83–84% of resistant infections;
+  - cefixime could treat up to about 25% of cases without risk.
+- The ODEs for both Whittles 2017 and Martin 2013 are in supplementary appendices that were not readable here. The flows above are reconstructed from the text and figure descriptions — [PMC5663337](https://pmc.ncbi.nlm.nih.gov/articles/PMC5663337), [PMC3933734](https://pmc.ncbi.nlm.nih.gov/articles/PMC3933734).
+- Syphilis stage values from Garnett 1997, as reported by Feldman & Mishra 2019 — [PMC6806446](https://pmc.ncbi.nlm.nih.gov/articles/PMC6806446):
+  - incubation 25 days, infectious period 154 days, protective immunity 5 years;
+  - per-act transmission probability 0.09–0.64;
+  - mean of 15 partners/yr and treatment rate 0.1–0.8/yr (Remis 2010).
+- Althaus et al. 2010, *Epidemics*: the chlamydia model is SEIRS with screening, and the mean asymptomatic duration in women is 433 days (95% CI 420–447) — [BORIS](https://boris.unibe.ch/1316); the full PDF returned HTTP 503.
+- Medley et al., *Nat Med* 2001;7(5):619–624 — [record](https://acnpsearch.tweb-dev.unibo.it/singlejournalindex/82970255):
+  - an HBV model with "catastrophic" dynamics that explains prevalence ranging from <1% to >90%;
+  - starting carrier prevalence is the most influential predictor of intervention outcomes.
+- Edmunds et al., *Epidemiol Infect* 1996, DOI 10.1017/s0950268800001497 — [PMC2271713](https://pmc.ncbi.nlm.nih.gov/articles/PMC2271713/):
+  - uses A50 (the age by which half the population has been infected) as its infection-rate measure;
+  - finds a negative nonlinear relationship between A50 and carrier prevalence.
+- Elbasha et al., *Emerg Infect Dis* 2007, DOI 10.3201/eid1301.060438: the parameter tables are in a technical appendix PDF that could not be parsed — [CDC](https://www.cdc.gov/eid/article/13/1/pdfs/06-0438-combined.pdf).
+
+### Inferences
+- HBV, HTLV and HPV in this format cannot represent age structure, so the age-dependent carrier probability (HBV) and cohort vaccination (HPV) are approximated. The HBV model cannot reproduce Medley's bistability without age.
+- The Granich and Martin parameters treated as "fitted" (`lambda0`, `pi_inf`) must be calibrated by the code-generator user. Defaults are given only so the model runs.
+- Several of the original models are stochastic (Whittles) or individual-based (Turner 2006). The deterministic analogues here share mean-field behaviour but not extinction or stochastic behaviour.
+
+### Gaps
+- Granich 2009: I did not read the exact parameter table or check that λ = λ0·exp(−αPⁿ) is the transmission form; the full text and webappendix were not fetched.
+- Hethcote & Yorke 1984: the book is not openly accessible, so the core-group values (about 2% of the population, about 60% of infections) are recalled, not verified.
+- Chan et al. 2012 (gonorrhoea core groups/AMR): not researched within the tool budget. Whittles 2017 is used instead.
+- Turner et al. 2006 chlamydia: an individual-based network model that does not fit the ODE format, so it was skipped.
+- Elbasha 2007 HPV, Blower 1998 HSV-2, Zou/Pang 2010 HBV: values are recalled or illustrative, and the primary tables were not verified.
+- HTLV-1: I found no standard population-level ODE model, so that spec is a composite.
+- The full ODE supplements for Whittles 2017 and Martin 2013 were not read. The infectiousness of the incubating and treated compartments in Whittles is an assumption.

@@ -1,0 +1,269 @@
+{
+  "version": 1,
+  "id": "ebola_rivers_2014_intervention",
+  "category": "Zoonoses & emerging",
+  "name": "Ebola West Africa 2014 with case isolation and vaccination (Legrand extension)",
+  "description": "Ebola virus disease, human, Liberia/Sierra Leone 2014.\nOverlaps substantially with the already-implemented Legrand 2007 model — the compartment skeleton (S,E,I,H,F,R) is the same; the additions are the V compartment with a vaccination lever and the 2014 West-African parameterisation.\nParameter values: 0 of 13 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Rivers CM, Lofgren ET, Marathe M, Eubank S, Lewis BL (2014). Modeling the impact of interventions on an epidemic of Ebola in Sierra Leone and Liberia. PLOS Currents Outbreaks, Oct 16 ed",
+  "referenceUrl": "https://doi.org/10.1371/currents.outbreaks.fd38dd85078565450b0be3fcd78f5ccf",
+  "time": {
+    "start": "0",
+    "stop": "365",
+    "step": "0.5",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N_total"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "susceptible",
+      "init": "1e6",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 220
+    },
+    {
+      "id": "c2",
+      "name": "E",
+      "description": "latent (infected, not infectious)",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "I",
+      "description": "infectious in the community",
+      "init": "10",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 220
+    },
+    {
+      "id": "c4",
+      "name": "H",
+      "description": "hospitalised / isolated infectious",
+      "init": "0",
+      "inN": true,
+      "color": "#6A2C9C",
+      "x": 720,
+      "y": 220
+    },
+    {
+      "id": "c5",
+      "name": "Fn",
+      "description": "deceased, not yet buried (funeral-transmission compartment)",
+      "init": "0",
+      "inN": true,
+      "color": "#5D4037",
+      "x": 920,
+      "y": 220
+    },
+    {
+      "id": "c6",
+      "name": "R",
+      "description": "removed (recovered or safely buried)",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 1120,
+      "y": 220
+    },
+    {
+      "id": "c7",
+      "name": "V",
+      "description": "vaccinated, immune",
+      "init": "0",
+      "inN": true,
+      "color": "#2457C5",
+      "x": 320,
+      "y": 300
+    }
+  ],
+  "parameters": [
+    {
+      "name": "beta_i",
+      "symbol": "",
+      "value": "0.16",
+      "description": "community transmission rate [unverified] (per day)"
+    },
+    {
+      "name": "beta_h",
+      "symbol": "",
+      "value": "0.062",
+      "description": "transmission rate from hospitalised cases (reflects imperfect infection control) [unverified] (per day)"
+    },
+    {
+      "name": "beta_f",
+      "symbol": "",
+      "value": "0.489",
+      "description": "transmission rate at funerals/from unburied bodies [unverified] (per day)"
+    },
+    {
+      "name": "alpha",
+      "symbol": "",
+      "value": "1/11",
+      "description": "rate of leaving latency (mean incubation ≈11 d) [unverified] (per day)"
+    },
+    {
+      "name": "theta",
+      "symbol": "",
+      "value": "0.248",
+      "description": "proportion of cases hospitalised/isolated [unverified] (dimensionless)"
+    },
+    {
+      "name": "gamma_h",
+      "symbol": "",
+      "value": "1/4.12",
+      "description": "rate community case → hospital [unverified] (per day)"
+    },
+    {
+      "name": "gamma_i",
+      "symbol": "",
+      "value": "1/10",
+      "description": "rate of leaving community infectiousness [unverified] (per day)"
+    },
+    {
+      "name": "gamma_d",
+      "symbol": "",
+      "value": "1/8",
+      "description": "rate infectious → death (community) [unverified] (per day)"
+    },
+    {
+      "name": "gamma_dh",
+      "symbol": "",
+      "value": "1/6",
+      "description": "rate hospitalised → death [unverified] (per day)"
+    },
+    {
+      "name": "gamma_f",
+      "symbol": "",
+      "value": "1/2.01",
+      "description": "rate of burial (removal of Fn) [unverified] (per day)"
+    },
+    {
+      "name": "cfr",
+      "symbol": "",
+      "value": "0.7",
+      "description": "case fatality proportion [unverified] (dimensionless)"
+    },
+    {
+      "name": "nu",
+      "symbol": "",
+      "value": "0",
+      "description": "per-capita vaccination rate (intervention lever; set >0 to simulate a campaign) [illustrative] (per day)"
+    },
+    {
+      "name": "eff",
+      "symbol": "",
+      "value": "0.9",
+      "description": "vaccine efficacy (take) [illustrative] (dimensionless)"
+    }
+  ],
+  "variables": [
+    {
+      "name": "N",
+      "symbol": "",
+      "expr": "S + E + I + H + R + V",
+      "description": "living population",
+      "output": false
+    },
+    {
+      "name": "lambda",
+      "symbol": "",
+      "expr": "(beta_i * I + beta_h * H + beta_f * Fn) / N",
+      "description": "total force of infection",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lambda",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "nu * eff",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "alpha",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "gamma_h * theta",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c3",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "gamma_d * cfr * (1 - theta)",
+      "output": "",
+      "curve": 50
+    },
+    {
+      "id": "f6",
+      "from": "c3",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "gamma_i * (1 - cfr) * (1 - theta)",
+      "output": "",
+      "curve": 50
+    },
+    {
+      "id": "f7",
+      "from": "c4",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "gamma_dh * cfr",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c4",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "gamma_dh * (1 - cfr)",
+      "output": "",
+      "curve": 50
+    },
+    {
+      "id": "f9",
+      "from": "c5",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "gamma_f",
+      "output": "",
+      "curve": 0
+    }
+  ]
+}

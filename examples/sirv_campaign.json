@@ -1,0 +1,131 @@
+{
+  "version": 1,
+  "id": "sirv_campaign",
+  "category": "Interventions",
+  "name": "SIR with a vaccination campaign",
+  "description": "Mass vaccination of susceptibles at rate v starting on day t_vac (assumes a perfect vaccine).",
+  "reference": "Keeling & Rohani (2008), Modeling Infectious Diseases in Humans and Animals, §8.1",
+  "referenceUrl": "",
+  "time": {
+    "start": "0",
+    "stop": "200",
+    "step": "1",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "Susceptible",
+      "init": "9990",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 140
+    },
+    {
+      "id": "c2",
+      "name": "I",
+      "description": "Infectious",
+      "init": "10",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 320,
+      "y": 140
+    },
+    {
+      "id": "c3",
+      "name": "R",
+      "description": "Recovered",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "V",
+      "description": "Vaccinated",
+      "init": "0",
+      "inN": true,
+      "color": "#2457C5",
+      "x": 120,
+      "y": 300
+    }
+  ],
+  "parameters": [
+    {
+      "name": "beta",
+      "symbol": "",
+      "value": "0.3",
+      "description": "transmission rate per day"
+    },
+    {
+      "name": "gamma",
+      "symbol": "",
+      "value": "1 / 10",
+      "description": "recovery rate"
+    },
+    {
+      "name": "v",
+      "symbol": "",
+      "value": "0.02",
+      "description": "vaccination rate per day once the campaign starts"
+    },
+    {
+      "name": "t_vac",
+      "symbol": "",
+      "value": "30",
+      "description": "day the campaign starts"
+    }
+  ],
+  "variables": [
+    {
+      "name": "lam",
+      "symbol": "",
+      "expr": "beta * I / N",
+      "description": "force of infection",
+      "output": false
+    },
+    {
+      "name": "vacc",
+      "symbol": "",
+      "expr": "v * (t >= t_vac)",
+      "description": "vaccination rate at time t",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lam",
+      "output": "incidence",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "gamma",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "vacc",
+      "output": "",
+      "curve": 0
+    }
+  ]
+}

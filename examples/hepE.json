@@ -1,0 +1,277 @@
+{
+  "version": 1,
+  "id": "hepE",
+  "category": "Interventions",
+  "name": "Hepatitis E with latrines",
+  "description": "Hepatitis E outbreak with a latrine intervention (MMID practical, day 4).",
+  "reference": "MMID practical: modelling interventions in R",
+  "referenceUrl": "",
+  "time": {
+    "start": "38",
+    "stop": "73",
+    "step": "1 / 7",
+    "unit": "weeks"
+  },
+  "population": {
+    "name": "P"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "S",
+      "description": "Susceptible (non-immune)",
+      "init": "3700 - E - I - R",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 236
+    },
+    {
+      "id": "c2",
+      "name": "E",
+      "description": "Exposed",
+      "init": "1",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 236
+    },
+    {
+      "id": "c3",
+      "name": "I",
+      "description": "Infectious",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 236
+    },
+    {
+      "id": "c4",
+      "name": "R",
+      "description": "Immune",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 720,
+      "y": 236
+    }
+  ],
+  "parameters": [
+    {
+      "name": "mui",
+      "symbol": "",
+      "value": "1 / (50 * 52)",
+      "description": "birth"
+    },
+    {
+      "name": "muo",
+      "symbol": "",
+      "value": "1 / (50 * 52)",
+      "description": "death"
+    },
+    {
+      "name": "R0",
+      "symbol": "",
+      "value": "6.6",
+      "description": "basic reproduction number"
+    },
+    {
+      "name": "omega",
+      "symbol": "",
+      "value": "1 / (10 * 52)",
+      "description": "rate of loss of immunity"
+    },
+    {
+      "name": "gamma",
+      "symbol": "",
+      "value": "1 / 2",
+      "description": "latent -> infectious = 1/(latent period)"
+    },
+    {
+      "name": "nui",
+      "symbol": "",
+      "value": "1 / 4",
+      "description": "recovery = 1/(duration of infection)"
+    },
+    {
+      "name": "report",
+      "symbol": "",
+      "value": "1 / 7",
+      "description": "proportion of infections reported"
+    },
+    {
+      "name": "amp",
+      "symbol": "",
+      "value": "0",
+      "description": "relative amplitude of seasonal forcing"
+    },
+    {
+      "name": "phi",
+      "symbol": "",
+      "value": "0",
+      "description": "week of peak in seasonal forcing"
+    },
+    {
+      "name": "week_start",
+      "symbol": "",
+      "value": "38",
+      "description": "first week of the simulation"
+    },
+    {
+      "name": "week_interv",
+      "symbol": "",
+      "value": "15",
+      "description": "weeks after first case when intervention starts"
+    },
+    {
+      "name": "lat_cov_i",
+      "symbol": "",
+      "value": "0.24",
+      "description": "intervention coverage of latrines"
+    },
+    {
+      "name": "lat_eff",
+      "symbol": "",
+      "value": "0.7",
+      "description": "efficacy of latrines in reducing transmission"
+    }
+  ],
+  "variables": [
+    {
+      "name": "seas",
+      "symbol": "s",
+      "expr": "1 + amp * cos(2 * pi * (t - phi) / 52)",
+      "description": "seasonal forcing",
+      "output": false
+    },
+    {
+      "name": "beta",
+      "symbol": "",
+      "expr": "R0 * (muo + nui) * (gamma + muo) / gamma",
+      "description": "transmission rate from R0",
+      "output": false
+    },
+    {
+      "name": "lat_cov",
+      "symbol": "c_lat",
+      "expr": "(t >= (week_start + week_interv)) * lat_cov_i",
+      "description": "latrine coverage (0 before intervention)",
+      "output": false
+    },
+    {
+      "name": "latrine",
+      "symbol": "L",
+      "expr": "1 - lat_eff * lat_cov",
+      "description": "relative transmission with latrines",
+      "output": false
+    },
+    {
+      "name": "lam",
+      "symbol": "",
+      "expr": "latrine * beta * seas * I / P",
+      "description": "force of infection",
+      "output": false
+    },
+    {
+      "name": "inc",
+      "symbol": "",
+      "expr": "report * gamma * E",
+      "description": "weekly reported incidence",
+      "output": true
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": null,
+      "to": "c1",
+      "kind": "absolute",
+      "rate": "mui * P",
+      "output": "",
+      "curve": 0,
+      "ox": -20,
+      "oy": 236
+    },
+    {
+      "id": "f2",
+      "from": "c1",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "muo",
+      "output": "",
+      "curve": 0,
+      "ox": 120,
+      "oy": 366
+    },
+    {
+      "id": "f3",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "lam",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c2",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "muo",
+      "output": "",
+      "curve": 0,
+      "ox": 320,
+      "oy": 366
+    },
+    {
+      "id": "f5",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "gamma",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f6",
+      "from": "c3",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "muo",
+      "output": "",
+      "curve": 0,
+      "ox": 520,
+      "oy": 366
+    },
+    {
+      "id": "f7",
+      "from": "c3",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "nui",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f8",
+      "from": "c4",
+      "to": null,
+      "kind": "per_capita",
+      "rate": "muo",
+      "output": "",
+      "curve": 0,
+      "ox": 720,
+      "oy": 366
+    },
+    {
+      "id": "f9",
+      "from": "c4",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "omega",
+      "output": "",
+      "curve": 120
+    }
+  ]
+}

@@ -1,0 +1,352 @@
+{
+  "version": 1,
+  "id": "chlamydia_seirs_screening_althaus",
+  "category": "Sexually transmitted & blood-borne",
+  "name": "Chlamydia SEIRS, two sexes, symptomatic/asymptomatic, with screening",
+  "description": "Chlamydia trachomatis.\nParameter values: 1 of 12 checked against the source; the rest are recalled or illustrative.",
+  "reference": "Althaus CL, Heijne JCM, Roellin A, Low N. Transmission dynamics of Chlamydia trachomatis affect the impact of screening programmes. Epidemics 2010;2(3):123–131",
+  "referenceUrl": "https://doi.org/10.1016/j.epidem.2010.04.002",
+  "time": {
+    "start": "0",
+    "stop": "3650",
+    "step": "5",
+    "unit": "days"
+  },
+  "population": {
+    "name": "N"
+  },
+  "compartments": [
+    {
+      "id": "c1",
+      "name": "Sf",
+      "description": "susceptible women",
+      "init": "0.95",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 220
+    },
+    {
+      "id": "c2",
+      "name": "Ef",
+      "description": "exposed (latent) women",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 220
+    },
+    {
+      "id": "c3",
+      "name": "Iaf",
+      "description": "asymptomatic infected women",
+      "init": "0.05",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 140
+    },
+    {
+      "id": "c4",
+      "name": "Isf",
+      "description": "symptomatic infected women",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 300
+    },
+    {
+      "id": "c5",
+      "name": "Rf",
+      "description": "immune women",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 720,
+      "y": 220
+    },
+    {
+      "id": "c6",
+      "name": "Sm",
+      "description": "susceptible men",
+      "init": "0.95",
+      "inN": true,
+      "color": "#FFFFFF",
+      "x": 120,
+      "y": 596
+    },
+    {
+      "id": "c7",
+      "name": "Em",
+      "description": "exposed men",
+      "init": "0",
+      "inN": true,
+      "color": "#E8C468",
+      "x": 320,
+      "y": 596
+    },
+    {
+      "id": "c8",
+      "name": "Iam",
+      "description": "asymptomatic infected men",
+      "init": "0.05",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 516
+    },
+    {
+      "id": "c9",
+      "name": "Ism",
+      "description": "symptomatic infected men",
+      "init": "0",
+      "inN": true,
+      "color": "#B71C1C",
+      "x": 520,
+      "y": 676
+    },
+    {
+      "id": "c10",
+      "name": "Rm",
+      "description": "immune men",
+      "init": "0",
+      "inN": true,
+      "color": "#4E8A3E",
+      "x": 720,
+      "y": 596
+    }
+  ],
+  "parameters": [
+    {
+      "name": "cp",
+      "symbol": "",
+      "value": "1/365",
+      "description": "partner change rate (1 per year, equal by sex to keep partnerships balanced) (partners/day) [illustrative]"
+    },
+    {
+      "name": "beta_mf",
+      "symbol": "",
+      "value": "0.3",
+      "description": "male-to-female transmission (per partnership) [illustrative]"
+    },
+    {
+      "name": "beta_fm",
+      "symbol": "",
+      "value": "0.3",
+      "description": "female-to-male transmission (per partnership) [illustrative]"
+    },
+    {
+      "name": "sig_inc",
+      "symbol": "",
+      "value": "1/14",
+      "description": "exit from latent period (/day) [illustrative]"
+    },
+    {
+      "name": "p_sym_f",
+      "symbol": "",
+      "value": "0.1",
+      "description": "symptomatic fraction, women [illustrative]"
+    },
+    {
+      "name": "p_sym_m",
+      "symbol": "",
+      "value": "0.2",
+      "description": "symptomatic fraction, men [illustrative]"
+    },
+    {
+      "name": "d_af",
+      "symbol": "",
+      "value": "433",
+      "description": "asymptomatic duration, women (days) [verified]"
+    },
+    {
+      "name": "d_am",
+      "symbol": "",
+      "value": "433",
+      "description": "asymptomatic duration, men (days) [illustrative]"
+    },
+    {
+      "name": "d_s",
+      "symbol": "",
+      "value": "30",
+      "description": "time to treatment when symptomatic (days) [illustrative]"
+    },
+    {
+      "name": "w_imm",
+      "symbol": "",
+      "value": "1/365",
+      "description": "waning of immunity (R back to S) (/day) [illustrative]"
+    },
+    {
+      "name": "scr_f",
+      "symbol": "",
+      "value": "0.2/365",
+      "description": "screening plus treatment rate, women (/day) [illustrative]"
+    },
+    {
+      "name": "scr_m",
+      "symbol": "",
+      "value": "0.05/365",
+      "description": "screening plus treatment rate, men (/day) [illustrative]"
+    }
+  ],
+  "variables": [
+    {
+      "name": "Nf",
+      "symbol": "",
+      "expr": "Sf+Ef+Iaf+Isf+Rf",
+      "description": "women total",
+      "output": false
+    },
+    {
+      "name": "Nm",
+      "symbol": "",
+      "expr": "Sm+Em+Iam+Ism+Rm",
+      "description": "men total",
+      "output": false
+    },
+    {
+      "name": "foi_f",
+      "symbol": "",
+      "expr": "cp*beta_mf*(Iam+Ism)/Nm",
+      "description": "force of infection on women",
+      "output": false
+    },
+    {
+      "name": "foi_m",
+      "symbol": "",
+      "expr": "cp*beta_fm*(Iaf+Isf)/Nf",
+      "description": "force of infection on men",
+      "output": false
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "c1",
+      "to": "c2",
+      "kind": "per_capita",
+      "rate": "foi_f",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f2",
+      "from": "c2",
+      "to": "c4",
+      "kind": "per_capita",
+      "rate": "p_sym_f*sig_inc",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f3",
+      "from": "c2",
+      "to": "c3",
+      "kind": "per_capita",
+      "rate": "(1-p_sym_f)*sig_inc",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f4",
+      "from": "c3",
+      "to": "c5",
+      "kind": "per_capita",
+      "rate": "1/d_af",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f5",
+      "from": "c3",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "scr_f",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f6",
+      "from": "c4",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "1/d_s",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f7",
+      "from": "c5",
+      "to": "c1",
+      "kind": "per_capita",
+      "rate": "w_imm",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f8",
+      "from": "c6",
+      "to": "c7",
+      "kind": "per_capita",
+      "rate": "foi_m",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f9",
+      "from": "c7",
+      "to": "c9",
+      "kind": "per_capita",
+      "rate": "p_sym_m*sig_inc",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f10",
+      "from": "c7",
+      "to": "c8",
+      "kind": "per_capita",
+      "rate": "(1-p_sym_m)*sig_inc",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f11",
+      "from": "c8",
+      "to": "c10",
+      "kind": "per_capita",
+      "rate": "1/d_am",
+      "output": "",
+      "curve": 0
+    },
+    {
+      "id": "f12",
+      "from": "c8",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "scr_m",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f13",
+      "from": "c9",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "1/d_s",
+      "output": "",
+      "curve": 60
+    },
+    {
+      "id": "f14",
+      "from": "c10",
+      "to": "c6",
+      "kind": "per_capita",
+      "rate": "w_imm",
+      "output": "",
+      "curve": 60
+    }
+  ]
+}
