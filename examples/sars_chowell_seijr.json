@@ -4,8 +4,8 @@
   "category": "Respiratory",
   "name": "SARS SEIJR model with diagnosis/isolation and two susceptibility classes (Chowell et al. 2003/2004)",
   "description": "SARS (the template also suits MERS).\nParameter values: 0 of 11 checked against the source; the rest are recalled or illustrative.",
-  "reference": "",
-  "referenceUrl": "",
+  "reference": "Chowell G, Fenimore PW, Castillo-Garsow MA, Castillo-Chavez C. \"SARS outbreaks in Ontario, Hong Kong and Singapore: the role of diagnosis and isolation as a control mechanism.\" J Theor Biol 2003;224:1–8",
+  "referenceUrl": "https://doi.org/10.1016/S0022-5193(03)00228-5",
   "time": {
     "start": "0",
     "stop": "150",

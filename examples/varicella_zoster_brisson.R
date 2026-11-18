@@ -1,6 +1,8 @@
 ## Varicella with latent VZV, exogenous boosting and zoster reactivation (after Brisson et al. 2000)
 ## Varicella / herpes zoster.
 ## Parameter values: 0 of 12 checked against the source; the rest are recalled or illustrative.
+## Reference: Brisson M, Edmunds WJ, Gay NJ, Law B, De Serres G. "Modelling the impact of immunization on the epidemiology of varicella zoster virus." Epidemiol Infect 2000;125:651–669
+## Source: https://pubmed.ncbi.nlm.nih.gov/?term=Brisson+2000+varicella+zoster+Epidemiol+Infect
 ##
 ## Generated from a compartmental model diagram (model format v1).
 ## Regenerating from the same diagram always gives this exact file.

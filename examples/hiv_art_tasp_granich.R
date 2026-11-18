@@ -2,7 +2,7 @@
 ## HIV, generalised heterosexual epidemic (South Africa).
 ## Parameter values: 0 of 10 checked against the source; the rest are recalled or illustrative.
 ## Reference: Granich RM, Gilks CF, Dye C, De Cock KM, Williams BG. Universal voluntary HIV testing with immediate antiretroviral therapy as a strategy for elimination of HIV transmission: a mathematical model. Lancet 2009;373(9657):48–57
-## Source: https://doi.org/10.1016/S0140-6736(08
+## Source: https://doi.org/10.1016/S0140-6736(08)61697-9
 ##
 ## Generated from a compartmental model diagram (model format v1).
 ## Regenerating from the same diagram always gives this exact file.

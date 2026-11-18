@@ -2,7 +2,7 @@
 ## Cholera, Haiti 2010–11.
 ## Parameter values: 0 of 15 checked against the source; the rest are recalled or illustrative.
 ## Reference: Andrews JR, Basu S. Transmission dynamics and control of cholera in Haiti: an epidemic model. Lancet 2011;377(9773):1248–1255
-## Source: https://doi.org/10.1016/S0140-6736(11
+## Source: https://doi.org/10.1016/S0140-6736(11)60273-0
 ##
 ## Generated from a compartmental model diagram (model format v1).
 ## Regenerating from the same diagram always gives this exact file.

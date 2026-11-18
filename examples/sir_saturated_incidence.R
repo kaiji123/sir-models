@@ -3,7 +3,7 @@
 ## The incidence g(I)S with g bounded represents protective behaviour or saturation at high prevalence.
 ## Parameter values: 0 of 3 checked against the source; the rest are recalled or illustrative.
 ## Reference: Capasso V. & Serio G. (1978) "A generalization of the Kermack–McKendrick deterministic epidemic model", Math. Biosci. 42:43–61
-## Source: https://doi.org/10.1016/0025-5564(78
+## Source: https://doi.org/10.1016/0025-5564(78)90006-8
 ##
 ## Generated from a compartmental model diagram (model format v1).
 ## Regenerating from the same diagram always gives this exact file.

@@ -4,8 +4,8 @@
   "category": "Vector-borne",
   "name": "Lyme borreliosis: stage-structured Ixodes ticks with a mouse reservoir and deer as tick-only hosts [ILLUSTRATIVE-COMPOSITE]",
   "description": "Lyme disease (Borrelia burgdorferi s.l.), temperate woodland in NE USA or Europe.\nParameter values: 0 of 15 checked against the source; the rest are recalled or illustrative.",
-  "reference": "",
-  "referenceUrl": "",
+  "reference": "Rosà R, Pugliese A, Norman R, Hudson PJ (2003). Thresholds for disease persistence in models for tick-borne infections including non-viraemic transmission, extended feeding and tick aggregation. J Theor Biol 224:359–376",
+  "referenceUrl": "https://doi.org/10.1016/S0022-5193(03)00173-5",
   "time": {
     "start": "0",
     "stop": "7300",

@@ -77,6 +77,4 @@ research notes, run `node cli/import-research.mjs`. Then run `npm run examples &
 
 ## Verification
 
-`test/r.test.mjs` checks that the generated Hepatitis E model reproduces the original
-hand-written practical script exactly (max difference 0) and that all 118 library models solve
-in R with finite, non-negative compartments.
+`test/r.test.mjs` checks that all 118 library models solve in R with finite, non-negative compartments.

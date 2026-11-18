@@ -99,9 +99,21 @@ function parseModel(b, file) {
   const disease = stripMd(dis.split('|')[0]);
 
   // --- source
-  const srcRaw = s[get('source')]?.head || '';
-  const doi = /\b(10\.\d{4,9}\/[^\s;,)\]]+)/.exec(srcRaw);
-  const url = doi ? 'https://doi.org/' + doi[1].replace(/[.]$/, '') : (/(https?:\/\/[^\s)\]]+)/.exec(srcRaw) || [])[1] || '';
+  // The citation is on the "- Source:" line itself, or (when that line is empty)
+  // in the first nested item. For a nested item keep just the citation: drop a
+  // leading label ("Model:") or explanation ("... See Smith DL ..."), and
+  // everything from its first link onwards (the link itself goes into url).
+  const srcSec = s[get('source')];
+  let srcRaw = (srcSec?.head || '').trim();
+  let linkSrc = srcRaw;
+  if (!srcRaw && srcSec?.items.length) {
+    linkSrc = srcSec.items[0].replace(/^(?:model|structural basis|structure motivated by)\s*:?\s*/i, '');
+    srcRaw = linkSrc.replace(/^.*?\bSee (?=[A-Z])/, '').split(/\s*\(?(?:https?:\/\/|PubMed:)/)[0];
+  }
+  // DOIs may contain balanced brackets and ";" inside them, e.g.
+  // 10.1016/S0022-5193(03)00228-5 or 10.1890/1051-0761(2006)016[2208:DOPDTI]2.0.CO;2.
+  const doi = /\b(10\.\d{4,9}\/(?:[^\s;,()[\]]|\([^\s()]*\)|\[[^\s[\]]*\]|;(?=\w))+)/.exec(linkSrc);
+  const url = doi ? 'https://doi.org/' + doi[1].replace(/[.]$/, '') : (/(https?:\/\/[^\s)\]]+)/.exec(linkSrc) || [])[1] || '';
   let reference = stripMd(srcRaw.replace(/\(\[[^\]]*\]\([^)]*\)[^)]*\)/g, '').split(/\s*DOI[:\s]/i)[0]).replace(/[.;,\s]+$/, '');
   if (reference.length > 260) reference = reference.slice(0, 257).replace(/\s+\S*$/, '') + '…';
 

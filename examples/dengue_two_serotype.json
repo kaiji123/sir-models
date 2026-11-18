@@ -4,8 +4,8 @@
   "category": "Vector-borne",
   "name": "Two-serotype dengue with secondary infection (after Esteva & Vargas 2003) [ILLUSTRATIVE-COMPOSITE]",
   "description": "Dengue (DENV, two co-circulating serotypes), tropical urban settings.\nParameter values: 0 of 8 checked against the source; the rest are recalled or illustrative.",
-  "reference": "",
-  "referenceUrl": "",
+  "reference": "Esteva L, Vargas C (2003). Coexistence of different serotypes of dengue virus. J Math Biol 46:31–47",
+  "referenceUrl": "https://doi.org/10.1007/s00285-002-0168-4",
   "time": {
     "start": "0",
     "stop": "3650",

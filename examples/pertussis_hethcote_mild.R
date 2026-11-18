@@ -3,7 +3,7 @@
 ## Hethcote's 1997 paper is age-structured with many age groups.
 ## Parameter values: 0 of 8 checked against the source; the rest are recalled or illustrative.
 ## Reference: Hethcote HW. "An age-structured model for pertussis transmission." Math Biosci 1997;145:89–136. https://doi.org/10.1016/S0025-5564(97)00014-X
-## Source: https://doi.org/10.1016/S0025-5564(97
+## Source: https://doi.org/10.1016/S0025-5564(97)00014-X
 ##
 ## Generated from a compartmental model diagram (model format v1).
 ## Regenerating from the same diagram always gives this exact file.

@@ -1,6 +1,8 @@
 ## Rubella with two age groups, routine infant vaccination, and congenital rubella syndrome (CRS) as an output
 ## Rubella / CRS.
 ## Parameter values: 0 of 9 checked against the source; the rest are recalled or illustrative.
+## Reference: Anderson RM, May RM. "Vaccination against rubella and measles: quantitative investigations of different policies." J Hyg (Lond) 1983;90:259–325
+## Source: https://doi.org/10.1017/S002217240002893X
 ##
 ## Generated from a compartmental model diagram (model format v1).
 ## Regenerating from the same diagram always gives this exact file.

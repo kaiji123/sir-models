@@ -4,8 +4,8 @@
   "category": "Respiratory",
   "name": "TB with treatment, acquired and transmitted MDR, and a fitness cost (after Dye & Williams 2000 and Cohen & Murray 2004)",
   "description": "Tuberculosis.\nParameter values: 0 of 14 checked against the source; the rest are recalled or illustrative.",
-  "reference": "",
-  "referenceUrl": "",
+  "reference": "Dye C, Williams BG. \"Criteria for the control of drug-resistant tuberculosis.\" PNAS 2000;97:8180–8185",
+  "referenceUrl": "https://doi.org/10.1073/pnas.140102797",
   "time": {
     "start": "0",
     "stop": "200",

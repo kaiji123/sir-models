@@ -5,7 +5,7 @@
   "name": "SIR with saturated incidence (Capasso–Serio)",
   "description": "cholera (Bari 1973 epidemic), generic.\nThe incidence g(I)S with g bounded represents protective behaviour or saturation at high prevalence.\nParameter values: 0 of 3 checked against the source; the rest are recalled or illustrative.",
   "reference": "Capasso V. & Serio G. (1978) \"A generalization of the Kermack–McKendrick deterministic epidemic model\", Math. Biosci. 42:43–61",
-  "referenceUrl": "https://doi.org/10.1016/0025-5564(78",
+  "referenceUrl": "https://doi.org/10.1016/0025-5564(78)90006-8",
   "time": {
     "start": "0",
     "stop": "365",

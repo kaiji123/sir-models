@@ -4,8 +4,8 @@
   "category": "Vector-borne",
   "name": "Ross–Macdonald with superinfection clearance and boosted acquired immunity (Macdonald/Dietz superinfection + Aron 1988 boosting) [ILLUSTRATIVE-COMPOSITE]",
   "description": "P. falciparum malaria, stable endemic areas.\nParameter values: 0 of 9 checked against the source; the rest are recalled or illustrative.",
-  "reference": "",
-  "referenceUrl": "",
+  "reference": "Smith DL, Battle KE, Hay SI, et al. (2012) Ross, Macdonald, and a theory for the dynamics and control of mosquito-transmitted pathogens. PLoS Pathog 8(4):e1002588",
+  "referenceUrl": "https://doi.org/10.1371/journal.ppat.1002588",
   "time": {
     "start": "0",
     "stop": "7300",

@@ -1,6 +1,8 @@
 ## SARS SEIJR model with diagnosis/isolation and two susceptibility classes (Chowell et al. 2003/2004)
 ## SARS (the template also suits MERS).
 ## Parameter values: 0 of 11 checked against the source; the rest are recalled or illustrative.
+## Reference: Chowell G, Fenimore PW, Castillo-Garsow MA, Castillo-Chavez C. "SARS outbreaks in Ontario, Hong Kong and Singapore: the role of diagnosis and isolation as a control mechanism." J Theor Biol 2003;224:1–8
+## Source: https://doi.org/10.1016/S0022-5193(03)00228-5
 ##
 ## Generated from a compartmental model diagram (model format v1).
 ## Regenerating from the same diagram always gives this exact file.

@@ -1,6 +1,8 @@
 ## Domestic Chagas transmission: Triatoma infestans with humans, dogs and non-competent chickens (after Cohen & Gürtler 2001) [ILLUSTRATIVE-COMPOSITE]
 ## Chagas disease (Trypanosoma cruzi), rural households, Santiago del Estero, Argentina.
 ## Parameter values: 0 of 14 checked against the source; the rest are recalled or illustrative.
+## Reference: Cohen JE, Gürtler RE (2001). Modeling household transmission of American trypanosomiasis. Science 293(5530):694–698
+## Source: https://doi.org/10.1126/science.1060638
 ##
 ## Generated from a compartmental model diagram (model format v1).
 ## Regenerating from the same diagram always gives this exact file.

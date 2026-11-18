@@ -278,7 +278,7 @@ export default [
   "name": "SIR with saturated incidence (Capasso–Serio)",
   "description": "cholera (Bari 1973 epidemic), generic.\nThe incidence g(I)S with g bounded represents protective behaviour or saturation at high prevalence.\nParameter values: 0 of 3 checked against the source; the rest are recalled or illustrative.",
   "reference": "Capasso V. & Serio G. (1978) \"A generalization of the Kermack–McKendrick deterministic epidemic model\", Math. Biosci. 42:43–61",
-  "url": "https://doi.org/10.1016/0025-5564(78",
+  "url": "https://doi.org/10.1016/0025-5564(78)90006-8",
   "keywords": [
    "cholera",
    "bari 1973 epidemic",
@@ -660,7 +660,7 @@ export default [
   "name": "SIS with vaccination (Kribs-Zaleta & Velasco-Hernández)",
   "description": "generic SIS infection with imperfect waning vaccine.\nThis is the canonical small model where an endemic equilibrium coexists with a stable disease-free state when the vaccine-reduced R_phi < 1.\nParameter values: 0 of 6 checked against the source; the rest are recalled or illustrative.",
   "reference": "Kribs-Zaleta C.M. & Velasco-Hernández J.X. (2000) \"A simple vaccination model with multiple endemic states\", Math. Biosci. 164:183–201",
-  "url": "https://doi.org/10.1016/S0025-5564(00",
+  "url": "https://doi.org/10.1016/S0025-5564(00)00003-1",
   "keywords": [],
   "time": [
    0,
@@ -2519,7 +2519,7 @@ export default [
   "name": "Haiti cholera with water reservoir, vaccination and water-sanitation intervention",
   "description": "Cholera, Haiti 2010–11.\nParameter values: 0 of 15 checked against the source; the rest are recalled or illustrative.",
   "reference": "Andrews JR, Basu S. Transmission dynamics and control of cholera in Haiti: an epidemic model. Lancet 2011;377(9773):1248–1255",
-  "url": "https://doi.org/10.1016/S0140-6736(11",
+  "url": "https://doi.org/10.1016/S0140-6736(11)60273-0",
   "keywords": [
    "cholera",
    "haiti 2010–11"
@@ -5372,7 +5372,7 @@ export default [
   "name": "Early Wuhan SARS-CoV-2 SEIR with Erlang stages and reporting delay (deterministic version of Kucharski et al. 2020)",
   "description": "COVID-19.\nParameter values: 0 of 7 checked against the source; the rest are recalled or illustrative.",
   "reference": "Kucharski AJ, Russell TW, Diamond C, Liu Y, Edmunds J, Funk S, Eggo RM; CMMID COVID-19 working group. \"Early dynamics of transmission and control of COVID-19: a mathematical modelling study.\" Lancet Infect Dis 2020;20:553–558.…",
-  "url": "https://doi.org/10.1016/S1473-3099(20",
+  "url": "https://doi.org/10.1016/S1473-3099(20)30144-4",
   "keywords": [
    "covid-19"
   ],
@@ -5784,7 +5784,7 @@ export default [
   "name": "RSV with seasonal forcing and repeated infections with graded immunity (Weber, Weber & Milligan 2001)",
   "description": "RSV.\nParameter values: 0 of 11 checked against the source; the rest are recalled or illustrative.",
   "reference": "Weber A, Weber M, Milligan P. \"Modeling epidemics caused by respiratory syncytial virus (RSV).\" Math Biosci 2001;172(2):95–113. https://doi.org/10.1016/S0025-5564(01)00066-9",
-  "url": "https://doi.org/10.1016/S0025-5564(01",
+  "url": "https://doi.org/10.1016/S0025-5564(01)00066-9",
   "keywords": [
    "rsv"
   ],
@@ -6013,7 +6013,7 @@ export default [
   "name": "Pertussis with vaccination, waning, and mild reinfections in partially immune people (Hethcote-style)",
   "description": "Pertussis.\nHethcote's 1997 paper is age-structured with many age groups.\nParameter values: 0 of 8 checked against the source; the rest are recalled or illustrative.",
   "reference": "Hethcote HW. \"An age-structured model for pertussis transmission.\" Math Biosci 1997;145:89–136. https://doi.org/10.1016/S0025-5564(97)00014-X",
-  "url": "https://doi.org/10.1016/S0025-5564(97",
+  "url": "https://doi.org/10.1016/S0025-5564(97)00014-X",
   "keywords": [
    "pertussis"
   ],
@@ -6381,8 +6381,8 @@ export default [
   "category": "Respiratory",
   "name": "TB with treatment, acquired and transmitted MDR, and a fitness cost (after Dye & Williams 2000 and Cohen & Murray 2004)",
   "description": "Tuberculosis.\nParameter values: 0 of 14 checked against the source; the rest are recalled or illustrative.",
-  "reference": "",
-  "url": "",
+  "reference": "Dye C, Williams BG. \"Criteria for the control of drug-resistant tuberculosis.\" PNAS 2000;97:8180–8185",
+  "url": "https://doi.org/10.1073/pnas.140102797",
   "keywords": [
    "tuberculosis"
   ],
@@ -6892,8 +6892,8 @@ export default [
   "category": "Respiratory",
   "name": "Varicella with latent VZV, exogenous boosting and zoster reactivation (after Brisson et al. 2000)",
   "description": "Varicella / herpes zoster.\nParameter values: 0 of 12 checked against the source; the rest are recalled or illustrative.",
-  "reference": "",
-  "url": "",
+  "reference": "Brisson M, Edmunds WJ, Gay NJ, Law B, De Serres G. \"Modelling the impact of immunization on the epidemiology of varicella zoster virus.\" Epidemiol Infect 2000;125:651–669",
+  "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Brisson+2000+varicella+zoster+Epidemiol+Infect",
   "keywords": [
    "varicella",
    "herpes zoster"
@@ -7122,8 +7122,8 @@ export default [
   "category": "Respiratory",
   "name": "Rubella with two age groups, routine infant vaccination, and congenital rubella syndrome (CRS) as an output",
   "description": "Rubella / CRS.\nParameter values: 0 of 9 checked against the source; the rest are recalled or illustrative.",
-  "reference": "",
-  "url": "",
+  "reference": "Anderson RM, May RM. \"Vaccination against rubella and measles: quantitative investigations of different policies.\" J Hyg (Lond) 1983;90:259–325",
+  "url": "https://doi.org/10.1017/S002217240002893X",
   "keywords": [
    "rubella",
    "crs"
@@ -7694,8 +7694,8 @@ export default [
   "category": "Respiratory",
   "name": "SARS SEIJR model with diagnosis/isolation and two susceptibility classes (Chowell et al. 2003/2004)",
   "description": "SARS (the template also suits MERS).\nParameter values: 0 of 11 checked against the source; the rest are recalled or illustrative.",
-  "reference": "",
-  "url": "",
+  "reference": "Chowell G, Fenimore PW, Castillo-Garsow MA, Castillo-Chavez C. \"SARS outbreaks in Ontario, Hong Kong and Singapore: the role of diagnosis and isolation as a control mechanism.\" J Theor Biol 2003;224:1–8",
+  "url": "https://doi.org/10.1016/S0022-5193(03)00228-5",
   "keywords": [
    "sars",
    "the template also suits mers"
@@ -7885,7 +7885,7 @@ export default [
   "name": "HIV universal test-and-treat (4 untreated + 4 ART stages)",
   "description": "HIV, generalised heterosexual epidemic (South Africa).\nParameter values: 0 of 10 checked against the source; the rest are recalled or illustrative.",
   "reference": "Granich RM, Gilks CF, Dye C, De Cock KM, Williams BG. Universal voluntary HIV testing with immediate antiretroviral therapy as a strategy for elimination of HIV transmission: a mathematical model. Lancet 2009;373(9657):48–57",
-  "url": "https://doi.org/10.1016/S0140-6736(08",
+  "url": "https://doi.org/10.1016/S0140-6736(08)61697-9",
   "keywords": [
    "hiv",
    "generalised heterosexual epidemic",
@@ -8514,7 +8514,7 @@ export default [
   "name": "HIV among MSM with PrEP and treatment as prevention",
   "description": "HIV in MSM; PrEP.\nParameter values: 0 of 13 checked against the source; the rest are recalled or illustrative.",
   "reference": "Structure is a generic composite in the style of many PrEP models. The efficacy value comes from McCormack S, Dunn DT, et al. Pre-exposure prophylaxis to prevent the acquisition of HIV-1 infection (PROUD). Lancet 2016;387:53–60",
-  "url": "https://doi.org/10.1016/S0140-6736(15",
+  "url": "https://doi.org/10.1016/S0140-6736(15)00056-2",
   "keywords": [
    "hiv in msm",
    "prep"
@@ -11392,8 +11392,8 @@ export default [
   "category": "Vector-borne",
   "name": "Ross–Macdonald with superinfection clearance and boosted acquired immunity (Macdonald/Dietz superinfection + Aron 1988 boosting) [ILLUSTRATIVE-COMPOSITE]",
   "description": "P. falciparum malaria, stable endemic areas.\nParameter values: 0 of 9 checked against the source; the rest are recalled or illustrative.",
-  "reference": "",
-  "url": "",
+  "reference": "Smith DL, Battle KE, Hay SI, et al. (2012) Ross, Macdonald, and a theory for the dynamics and control of mosquito-transmitted pathogens. PLoS Pathog 8(4):e1002588",
+  "url": "https://doi.org/10.1371/journal.ppat.1002588",
   "keywords": [
    "p. falciparum malaria",
    "stable endemic areas"
@@ -11620,8 +11620,8 @@ export default [
   "category": "Vector-borne",
   "name": "Two-serotype dengue with secondary infection (after Esteva & Vargas 2003) [ILLUSTRATIVE-COMPOSITE]",
   "description": "Dengue (DENV, two co-circulating serotypes), tropical urban settings.\nParameter values: 0 of 8 checked against the source; the rest are recalled or illustrative.",
-  "reference": "",
-  "url": "",
+  "reference": "Esteva L, Vargas C (2003). Coexistence of different serotypes of dengue virus. J Math Biol 46:31–47",
+  "url": "https://doi.org/10.1007/s00285-002-0168-4",
   "keywords": [
    "dengue",
    "denv",
@@ -12777,8 +12777,8 @@ export default [
   "category": "Vector-borne",
   "name": "Lyme borreliosis: stage-structured Ixodes ticks with a mouse reservoir and deer as tick-only hosts [ILLUSTRATIVE-COMPOSITE]",
   "description": "Lyme disease (Borrelia burgdorferi s.l.), temperate woodland in NE USA or Europe.\nParameter values: 0 of 15 checked against the source; the rest are recalled or illustrative.",
-  "reference": "",
-  "url": "",
+  "reference": "Rosà R, Pugliese A, Norman R, Hudson PJ (2003). Thresholds for disease persistence in models for tick-borne infections including non-viraemic transmission, extended feeding and tick aggregation. J Theor Biol 224:359–376",
+  "url": "https://doi.org/10.1016/S0022-5193(03)00173-5",
   "keywords": [
    "lyme disease",
    "borrelia burgdorferi s.l.",
@@ -13045,8 +13045,8 @@ export default [
   "category": "Vector-borne",
   "name": "Visceral leishmaniasis (anthroponotic, Indian subcontinent) with asymptomatic, VL, treatment and PKDL; sandfly SEI (simplified after Stauch et al. 2011) [ILLUSTRATIVE-COMPOSITE]",
   "description": "Visceral leishmaniasis (L. donovani, Phlebotomus argentipes), Bihar, India / Nepal.\nParameter values: 0 of 17 checked against the source; the rest are recalled or illustrative.",
-  "reference": "",
-  "url": "",
+  "reference": "Stauch A, Sarkar RR, Picado A, Ostyn B, Sundar S, Rijal S, Boelaert M, Dujardin J-C, Duerr H-P (2011). Visceral leishmaniasis in the Indian subcontinent: modelling epidemiology and control. PLoS NTD 5(11):e1405",
+  "url": "https://doi.org/10.1371/journal.pntd.0001405",
   "keywords": [
    "visceral leishmaniasis",
    "l. donovani",
@@ -13387,8 +13387,8 @@ export default [
   "category": "Vector-borne",
   "name": "Domestic Chagas transmission: Triatoma infestans with humans, dogs and non-competent chickens (after Cohen & Gürtler 2001) [ILLUSTRATIVE-COMPOSITE]",
   "description": "Chagas disease (Trypanosoma cruzi), rural households, Santiago del Estero, Argentina.\nParameter values: 0 of 14 checked against the source; the rest are recalled or illustrative.",
-  "reference": "",
-  "url": "",
+  "reference": "Cohen JE, Gürtler RE (2001). Modeling household transmission of American trypanosomiasis. Science 293(5530):694–698",
+  "url": "https://doi.org/10.1126/science.1060638",
   "keywords": [
    "chagas disease",
    "trypanosoma cruzi",
@@ -18109,7 +18109,7 @@ export default [
   "name": "Chronic wasting disease in deer with environmental prion accumulation",
   "description": "Chronic wasting disease (prion), mule deer / white-tailed deer.\nOnly 3 compartments, which makes this the cleanest demonstration of an environmental-reservoir model: with beta_env = 0 the epidemic is density-dependent and self-limiting, while with slow prion decay the environmental term creates a ratche\nParameter values: 0 of 10 checked against the source; the rest are recalled or illustrative.",
   "reference": "Miller MW, Hobbs NT, Tavener SJ (2006). Dynamics of prion disease transmission in mule deer. Ecological Applications 16(6):2208–2214",
-  "url": "https://doi.org/10.1890/1051-0761(2006",
+  "url": "https://doi.org/10.1890/1051-0761(2006)016[2208:DOPDTI]2.0.CO;2",
   "keywords": [
    "chronic wasting disease",
    "prion",

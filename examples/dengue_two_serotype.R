@@ -1,6 +1,8 @@
 ## Two-serotype dengue with secondary infection (after Esteva & Vargas 2003) [ILLUSTRATIVE-COMPOSITE]
 ## Dengue (DENV, two co-circulating serotypes), tropical urban settings.
 ## Parameter values: 0 of 8 checked against the source; the rest are recalled or illustrative.
+## Reference: Esteva L, Vargas C (2003). Coexistence of different serotypes of dengue virus. J Math Biol 46:31–47
+## Source: https://doi.org/10.1007/s00285-002-0168-4
 ##
 ## Generated from a compartmental model diagram (model format v1).
 ## Regenerating from the same diagram always gives this exact file.

@@ -5,7 +5,7 @@
   "name": "Pertussis with vaccination, waning, and mild reinfections in partially immune people (Hethcote-style)",
   "description": "Pertussis.\nHethcote's 1997 paper is age-structured with many age groups.\nParameter values: 0 of 8 checked against the source; the rest are recalled or illustrative.",
   "reference": "Hethcote HW. \"An age-structured model for pertussis transmission.\" Math Biosci 1997;145:89–136. https://doi.org/10.1016/S0025-5564(97)00014-X",
-  "referenceUrl": "https://doi.org/10.1016/S0025-5564(97",
+  "referenceUrl": "https://doi.org/10.1016/S0025-5564(97)00014-X",
   "time": {
     "start": "0",
     "stop": "100",

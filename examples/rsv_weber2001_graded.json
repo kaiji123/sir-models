@@ -5,7 +5,7 @@
   "name": "RSV with seasonal forcing and repeated infections with graded immunity (Weber, Weber & Milligan 2001)",
   "description": "RSV.\nParameter values: 0 of 11 checked against the source; the rest are recalled or illustrative.",
   "reference": "Weber A, Weber M, Milligan P. \"Modeling epidemics caused by respiratory syncytial virus (RSV).\" Math Biosci 2001;172(2):95–113. https://doi.org/10.1016/S0025-5564(01)00066-9",
-  "referenceUrl": "https://doi.org/10.1016/S0025-5564(01",
+  "referenceUrl": "https://doi.org/10.1016/S0025-5564(01)00066-9",
   "time": {
     "start": "0",
     "stop": "30",

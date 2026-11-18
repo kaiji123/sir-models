@@ -2,7 +2,7 @@
 ## RSV.
 ## Parameter values: 0 of 11 checked against the source; the rest are recalled or illustrative.
 ## Reference: Weber A, Weber M, Milligan P. "Modeling epidemics caused by respiratory syncytial virus (RSV)." Math Biosci 2001;172(2):95–113. https://doi.org/10.1016/S0025-5564(01)00066-9
-## Source: https://doi.org/10.1016/S0025-5564(01
+## Source: https://doi.org/10.1016/S0025-5564(01)00066-9
 ##
 ## Generated from a compartmental model diagram (model format v1).
 ## Regenerating from the same diagram always gives this exact file.

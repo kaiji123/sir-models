@@ -2,7 +2,7 @@
 ## HIV in MSM; PrEP.
 ## Parameter values: 0 of 13 checked against the source; the rest are recalled or illustrative.
 ## Reference: Structure is a generic composite in the style of many PrEP models. The efficacy value comes from McCormack S, Dunn DT, et al. Pre-exposure prophylaxis to prevent the acquisition of HIV-1 infection (PROUD). Lancet 2016;387:53–60
-## Source: https://doi.org/10.1016/S0140-6736(15
+## Source: https://doi.org/10.1016/S0140-6736(15)00056-2
 ##
 ## Generated from a compartmental model diagram (model format v1).
 ## Regenerating from the same diagram always gives this exact file.

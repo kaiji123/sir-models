@@ -3,7 +3,7 @@
 ## This is the canonical small model where an endemic equilibrium coexists with a stable disease-free state when the vaccine-reduced R_phi < 1.
 ## Parameter values: 0 of 6 checked against the source; the rest are recalled or illustrative.
 ## Reference: Kribs-Zaleta C.M. & Velasco-Hernández J.X. (2000) "A simple vaccination model with multiple endemic states", Math. Biosci. 164:183–201
-## Source: https://doi.org/10.1016/S0025-5564(00
+## Source: https://doi.org/10.1016/S0025-5564(00)00003-1
 ##
 ## Generated from a compartmental model diagram (model format v1).
 ## Regenerating from the same diagram always gives this exact file.

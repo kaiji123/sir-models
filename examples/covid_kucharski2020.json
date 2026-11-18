@@ -5,7 +5,7 @@
   "name": "Early Wuhan SARS-CoV-2 SEIR with Erlang stages and reporting delay (deterministic version of Kucharski et al. 2020)",
   "description": "COVID-19.\nParameter values: 0 of 7 checked against the source; the rest are recalled or illustrative.",
   "reference": "Kucharski AJ, Russell TW, Diamond C, Liu Y, Edmunds J, Funk S, Eggo RM; CMMID COVID-19 working group. \"Early dynamics of transmission and control of COVID-19: a mathematical modelling study.\" Lancet Infect Dis 2020;20:553–558.…",
-  "referenceUrl": "https://doi.org/10.1016/S1473-3099(20",
+  "referenceUrl": "https://doi.org/10.1016/S1473-3099(20)30144-4",
   "time": {
     "start": "0",
     "stop": "120",

@@ -2,7 +2,7 @@
 ## COVID-19.
 ## Parameter values: 0 of 7 checked against the source; the rest are recalled or illustrative.
 ## Reference: Kucharski AJ, Russell TW, Diamond C, Liu Y, Edmunds J, Funk S, Eggo RM; CMMID COVID-19 working group. "Early dynamics of transmission and control of COVID-19: a mathematical modelling study." Lancet Infect Dis 2020;20:553–558.…
-## Source: https://doi.org/10.1016/S1473-3099(20
+## Source: https://doi.org/10.1016/S1473-3099(20)30144-4
 ##
 ## Generated from a compartmental model diagram (model format v1).
 ## Regenerating from the same diagram always gives this exact file.

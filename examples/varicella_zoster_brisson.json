@@ -4,8 +4,8 @@
   "category": "Respiratory",
   "name": "Varicella with latent VZV, exogenous boosting and zoster reactivation (after Brisson et al. 2000)",
   "description": "Varicella / herpes zoster.\nParameter values: 0 of 12 checked against the source; the rest are recalled or illustrative.",
-  "reference": "",
-  "referenceUrl": "",
+  "reference": "Brisson M, Edmunds WJ, Gay NJ, Law B, De Serres G. \"Modelling the impact of immunization on the epidemiology of varicella zoster virus.\" Epidemiol Infect 2000;125:651–669",
+  "referenceUrl": "https://pubmed.ncbi.nlm.nih.gov/?term=Brisson+2000+varicella+zoster+Epidemiol+Infect",
   "time": {
     "start": "0",
     "stop": "100",

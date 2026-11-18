@@ -1,6 +1,8 @@
 ## TB with treatment, acquired and transmitted MDR, and a fitness cost (after Dye & Williams 2000 and Cohen & Murray 2004)
 ## Tuberculosis.
 ## Parameter values: 0 of 14 checked against the source; the rest are recalled or illustrative.
+## Reference: Dye C, Williams BG. "Criteria for the control of drug-resistant tuberculosis." PNAS 2000;97:8180–8185
+## Source: https://doi.org/10.1073/pnas.140102797
 ##
 ## Generated from a compartmental model diagram (model format v1).
 ## Regenerating from the same diagram always gives this exact file.

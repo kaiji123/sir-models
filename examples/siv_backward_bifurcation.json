@@ -5,7 +5,7 @@
   "name": "SIS with vaccination (Kribs-Zaleta & Velasco-Hernández)",
   "description": "generic SIS infection with imperfect waning vaccine.\nThis is the canonical small model where an endemic equilibrium coexists with a stable disease-free state when the vaccine-reduced R_phi < 1.\nParameter values: 0 of 6 checked against the source; the rest are recalled or illustrative.",
   "reference": "Kribs-Zaleta C.M. & Velasco-Hernández J.X. (2000) \"A simple vaccination model with multiple endemic states\", Math. Biosci. 164:183–201",
-  "referenceUrl": "https://doi.org/10.1016/S0025-5564(00",
+  "referenceUrl": "https://doi.org/10.1016/S0025-5564(00)00003-1",
   "time": {
     "start": "0",
     "stop": "50",

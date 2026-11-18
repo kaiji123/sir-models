@@ -1,6 +1,8 @@
 ## Visceral leishmaniasis (anthroponotic, Indian subcontinent) with asymptomatic, VL, treatment and PKDL; sandfly SEI (simplified after Stauch et al. 2011) [ILLUSTRATIVE-COMPOSITE]
 ## Visceral leishmaniasis (L. donovani, Phlebotomus argentipes), Bihar, India / Nepal.
 ## Parameter values: 0 of 17 checked against the source; the rest are recalled or illustrative.
+## Reference: Stauch A, Sarkar RR, Picado A, Ostyn B, Sundar S, Rijal S, Boelaert M, Dujardin J-C, Duerr H-P (2011). Visceral leishmaniasis in the Indian subcontinent: modelling epidemiology and control. PLoS NTD 5(11):e1405
+## Source: https://doi.org/10.1371/journal.pntd.0001405
 ##
 ## Generated from a compartmental model diagram (model format v1).
 ## Regenerating from the same diagram always gives this exact file.

@@ -3,7 +3,7 @@
 ## Only 3 compartments, which makes this the cleanest demonstration of an environmental-reservoir model: with beta_env = 0 the epidemic is density-dependent and self-limiting, while with slow prion decay the environmental term creates a ratche
 ## Parameter values: 0 of 10 checked against the source; the rest are recalled or illustrative.
 ## Reference: Miller MW, Hobbs NT, Tavener SJ (2006). Dynamics of prion disease transmission in mule deer. Ecological Applications 16(6):2208–2214
-## Source: https://doi.org/10.1890/1051-0761(2006
+## Source: https://doi.org/10.1890/1051-0761(2006)016[2208:DOPDTI]2.0.CO;2
 ##
 ## Generated from a compartmental model diagram (model format v1).
 ## Regenerating from the same diagram always gives this exact file.
