@@ -47,12 +47,12 @@ test/                  node:test suites; test/r/ holds the R-side checks
 
 ## Model library
 
-118 models, all generated, validated and solved in R by the test suite:
+117 models, all generated, validated and solved in R by the test suite:
 
 | Category | Models | Examples |
 | --- | --- | --- |
 | Basic | 10 | SI, SIS, SIR, SIRS, SEIR(S), SIRD/SEIRD, with and without demography |
-| Interventions | 6 | newborn and campaign vaccination, leaky vaccine, isolation, lockdown, Hep E latrines |
+| Interventions | 5 | newborn and campaign vaccination, leaky vaccine, isolation, lockdown |
 | Natural history | 11 | maternal immunity, asymptomatic, pre-symptomatic, hospitalisation, carriers, TB, HIV stages, Ebola |
 | Transmission routes | 6 | cholera water reservoir, Ross–Macdonald, dengue, rabies, age groups, seasonality |
 | Classic extensions | 15 | treatment, saturated incidence, awareness, waning vaccine, backward bifurcation, AMR, cross-immunity, superinfection |
@@ -77,4 +77,4 @@ research notes, run `node cli/import-research.mjs`. Then run `npm run examples &
 
 ## Verification
 
-`test/r.test.mjs` checks that all 118 library models solve in R with finite, non-negative compartments.
+`test/r.test.mjs` checks that all 117 library models solve in R with finite, non-negative compartments.

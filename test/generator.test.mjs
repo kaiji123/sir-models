@@ -39,10 +39,10 @@ test('diagram layout does not affect the code', () => {
 });
 
 test('flows become correctly signed terms (per-capita x source, absolute as-is)', () => {
-  const code = generate(BY_ID.hepE).code;
-  assert.match(code, /dS <- mui \* P - muo \* S - lam \* S \+ omega \* R\n/);
-  assert.match(code, /dE <- lam \* S - muo \* E - gamma \* E\n/);
-  assert.match(code, /list\(c\(dS, dE, dI, dR\), c\(inc = inc\)\)/);
+  const code = generate(BY_ID.seir_vital).code;
+  assert.match(code, /dS <- mu \* N - lam \* S - mu \* S\n/);
+  assert.match(code, /dE <- lam \* S - sigma \* E - mu \* E\n/);
+  assert.match(code, /list\(c\(dS, dE, dI, dR\), c\(incidence = incidence\)\)/);
   const seachr = generate(BY_ID.seachr).code;
   assert.match(seachr, /dA <- nu \* \(1 - gamma\) \* E - tauA \* A \+ nu \* \(1 - gamma \/ 2\) \* ER\n/);
   assert.match(seachr, /dD <- tauH \* omega \* H\n/);

@@ -326,38 +326,6 @@ export const LIBRARY = [
     ],
     flows: ['S > E : lam', 'E > I : sigma | out=incidence', 'I > R : gamma'],
   }),
-  def({
-    id: 'hepE', category: 'Interventions', name: 'Hepatitis E with latrines',
-    description: 'Hepatitis E outbreak with a latrine intervention (MMID practical, day 4).',
-    reference: 'MMID practical: modelling interventions in R',
-    time: [38, 73, '1 / 7', 'weeks'],
-    pop: 'P',
-    comps: [['S', 'Susceptible (non-immune)', '3700 - E - I - R', 0, 0.6], ['E', 'Exposed', 1, 1, 0.6], ['I', 'Infectious', 0, 2, 0.6], ['R', 'Immune', 0, 3, 0.6]],
-    params: [
-      ['mui', '1 / (50 * 52)', 'birth'],
-      ['muo', '1 / (50 * 52)', 'death'],
-      ['R0', 6.6, 'basic reproduction number'],
-      ['omega', '1 / (10 * 52)', 'rate of loss of immunity'],
-      ['gamma', '1 / 2', 'latent -> infectious = 1/(latent period)'],
-      ['nui', '1 / 4', 'recovery = 1/(duration of infection)'],
-      ['report', '1 / 7', 'proportion of infections reported'],
-      ['amp', 0, 'relative amplitude of seasonal forcing'],
-      ['phi', 0, 'week of peak in seasonal forcing'],
-      ['week_start', 38, 'first week of the simulation'],
-      ['week_interv', 15, 'weeks after first case when intervention starts'],
-      ['lat_cov_i', 0.24, 'intervention coverage of latrines'],
-      ['lat_eff', 0.7, 'efficacy of latrines in reducing transmission'],
-    ],
-    vars: [
-      ['seas', '1 + amp * cos(2 * pi * (t - phi) / 52)', 'seasonal forcing', false, 's'],
-      ['beta', 'R0 * (muo + nui) * (gamma + muo) / gamma', 'transmission rate from R0'],
-      ['lat_cov', '(t >= (week_start + week_interv)) * lat_cov_i', 'latrine coverage (0 before intervention)', false, 'c_lat'],
-      ['latrine', '1 - lat_eff * lat_cov', 'relative transmission with latrines', false, 'L'],
-      ['lam', 'latrine * beta * seas * I / P', 'force of infection'],
-      ['inc', 'report * gamma * E', 'weekly reported incidence', true],
-    ],
-    flows: [' > S : mui * P | at=-140,0', 'S > : muo', 'S > E : lam', 'E > : muo', 'E > I : gamma', 'I > : muo', 'I > R : nui', 'R > : muo', 'R > S : omega | curve=120'],
-  }),
 
   // -------------------------------------------------------------------------
   // Natural history
