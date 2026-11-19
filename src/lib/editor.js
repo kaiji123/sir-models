@@ -645,6 +645,7 @@ function renderParameters() {
   el.innerHTML = `<h3>Parameters</h3>
     <p class="help">Constants passed to <code>ode()</code>. Values are numbers or arithmetic (e.g. <code>1 / (50 * 52)</code>).
     The symbol is only used for diagram labels (<code>tau_A</code> shows as τ<sub>A</sub>).</p>
+    ${model.parameters.length ? greekPad('param') : ''}
     ${model.parameters.map((p, i) => `<div class="card">
       <div class="row">
         ${input(`param:${i}:name`, p.name, { placeholder: 'name' })}
@@ -661,12 +662,50 @@ function renderParameters() {
     <button class="primary" data-action="add-param">+ Add parameter</button>`;
 }
 
+// Greek keypad for the Parameters and Variables panels. Letters go into the last-focused
+// symbol/description field of that panel (diagram labels only: R names and expressions stay ASCII).
+const GREEK_LOWER = 'αβγδεζηθικλμνξοπρστυφχψω';
+const GREEK_UPPER = 'ΓΔΘΛΞΠΣΦΨΩ';
+const GREEK_NAMES = ['alpha', 'beta', 'gamma', 'delta', 'epsilon', 'zeta', 'eta', 'theta', 'iota', 'kappa', 'lambda', 'mu',
+  'nu', 'xi', 'omicron', 'pi', 'rho', 'sigma', 'tau', 'upsilon', 'phi', 'chi', 'psi', 'omega'];
+const greekName = (ch) => {
+  const i = GREEK_LOWER.indexOf(ch.toLowerCase());
+  const n = GREEK_NAMES[i];
+  return ch === GREEK_LOWER[i] ? n : n[0].toUpperCase() + n.slice(1);
+};
+const greekTarget = { param: null, var: null }; // data-key of the last focused symbol/description input per panel
+
+function greekPad(scope) {
+  const btn = (ch) => `<button type="button" data-greek="${ch}" data-name="${greekName(ch)}" aria-label="${greekName(ch)}">${ch}</button>`;
+  return `<div class="greek-pad" data-greek-scope="${scope}" aria-label="Greek letters">
+    <span class="small muted">Insert into the selected symbol or description:</span>
+    <div class="greek-keys">${[...GREEK_LOWER].map(btn).join('')}</div>
+    <div class="greek-keys">${[...GREEK_UPPER].map(btn).join('')}</div>
+  </div>`;
+}
+
+function insertGreek(ch, scope) {
+  const last = (scope === 'param' ? model.parameters : model.variables).length - 1;
+  const saved = greekTarget[scope];
+  const key = saved && document.querySelector(`[data-key="${CSS.escape(saved)}"]`) ? saved : `${scope}:${last}:symbol`;
+  const el = document.querySelector(`[data-key="${CSS.escape(key)}"]`);
+  if (!el) return;
+  const start = el.selectionStart ?? el.value.length;
+  const end = el.selectionEnd ?? start;
+  el.value = el.value.slice(0, start) + ch + el.value.slice(end);
+  el.focus();
+  el.setSelectionRange(start + ch.length, start + ch.length);
+  greekTarget[scope] = key;
+  applyField(key, el);
+}
+
 function renderVariables() {
   const el = $('#panel-variables');
   el.innerHTML = `<h3>Variables (derived quantities)</h3>
     <p class="help">Recomputed at every time step, in dependency order, from compartments, parameters, other variables,
     <code>${esc(model.population.name)}</code> (total population) and <code>t</code> (time). Use them for forces of infection,
     seasonality and interventions, e.g. <code>(t &gt;= t_start) * coverage</code>.</p>
+    ${model.variables.length ? greekPad('var') : ''}
     ${model.variables.map((v, i) => `<div class="card">
       <div class="row">
         ${input(`var:${i}:name`, v.name, { placeholder: 'name' })}
@@ -788,9 +827,20 @@ document.querySelector('.side').addEventListener('change', (evt) => {
   if (el.dataset && el.dataset.key) applyField(el.dataset.key, el);
 });
 
+document.querySelector('.side').addEventListener('focusin', (evt) => {
+  const k = evt.target.dataset?.key;
+  const m = k && /^(param|var):\d+:(symbol|description)$/.exec(k);
+  if (m) greekTarget[m[1]] = k;
+});
+// Keep focus (and the caret) in the text field when a Greek key is pressed.
+document.querySelector('.side').addEventListener('mousedown', (evt) => {
+  if (evt.target.closest('[data-greek]')) evt.preventDefault();
+});
+
 document.querySelector('.side').addEventListener('click', (evt) => {
   const t = evt.target.closest('button, a');
   if (!t) return;
+  if (t.dataset.greek) { insertGreek(t.dataset.greek, t.closest('[data-greek-scope]').dataset.greekScope); return; }
   if (t.dataset.tab) { setTab(t.dataset.tab); return; }
   if (t.dataset.selectFlow) { selection = { kind: 'flow', id: t.dataset.selectFlow }; refresh(); return; }
   if (t.dataset.delParam != null) { const i = +t.dataset.delParam; mutate(() => model.parameters.splice(i, 1)); return; }
