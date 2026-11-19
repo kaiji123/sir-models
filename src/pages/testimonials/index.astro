@@ -1,0 +1,37 @@
+---
+import '../../styles/app.css';
+import testimonials from '../../data/testimonials.json';
+
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="What people say about Diagram to R." />
+    <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+    <title>Testimonials</title>
+  </head>
+  <body>
+    <main class="lib">
+      <header>
+        <h1>Testimonials</h1>
+        <span class="muted">What people say about Diagram to R</span>
+        <a class="button" href={base}>← Back to editor</a>
+      </header>
+
+      <div class="testimonial-grid">
+        {testimonials.map((t) => (
+          <figure class="testimonial-card">
+            <blockquote>“{t.quote}”</blockquote>
+            <figcaption>
+              <span class="testimonial-name">{t.name}</span>
+              {t.role && <span class="muted small">{t.role}</span>}
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </main>
+  </body>
+</html>
